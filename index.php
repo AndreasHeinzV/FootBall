@@ -1,23 +1,38 @@
 <?php
 
-echo 'page:';
-var_dump($_GET['id']);
 
-echo '<br>id:';
-var_dump( $_GET['id']);
+$uri = 'https://api.football-data.org/v4/competitions/';
+$reqPrefs['http']['method'] = 'GET';
+$reqPrefs['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
+$stream_context = stream_context_create($reqPrefs);
+$response = file_get_contents($uri, false, $stream_context);
+$matches = json_decode($response, true);
+
+if (!isset($_GET['page']) && !isset($_GET['code'])) {
+    foreach ($matches['competitions'] as $competition) {
+        // var_dump($competition['id'], $competition['name']);
+        ///index.php?page=competition&id=$competition['id'],
+        //<a href=index?$competition=><$competition['name']</a>;
+        $id = $competition['id'];
+        $name = $competition['code'];
+
+        //     echo $code;
+        echo "<a href=/index.php?page=competitions&name=" . $name . ">" . $competition['name'] . "</a><br>";
 
 
+        //  echo $_GET['name']. "<br>";
+    }
+
+}
+testOutput();
 echo '<br>';
+//testOutputStanding();
+//request();
 
 
-
-echo '<a href="/index.php?page=hallo&id=123">Hallo</a><br>';
-
-
-die();
-
-function request()
+/*function request()
 {
+
     $uri = 'https://api.football-data.org/v2/competitions/';
     $reqPrefs['http']['method'] = 'GET';
     $reqPrefs['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
@@ -25,66 +40,118 @@ function request()
     $response = file_get_contents($uri, false, $stream_context);
     $matches = json_decode($response, true);
 
+    if (!isset($_GET['page']) && !isset($_GET['name'])) {
+        foreach ($matches['competitions'] as $competition) {
+            // var_dump($competition['id'], $competition['name']);
+            ///index.php?page=competition&id=$competition['id'],
+            //<a href=index?$competition=><$competition['name']</a>;
+            $id = $competition['id'];
+            $name = $competition['name'];
+            $code = $competition['code'];
+            echo $code;
+       //     echo $code;
+            echo "<a href=/index.php?page=" . $id . "&name=" . $name . ">" . $competition['name'] . "</a><br>";
 
 
-    foreach ($matches['competitions'] as $competition) {
-        var_dump($competition['id'], $competition['name']);
-        ///index.php?page=competition&id=$competition['id'],
-        //<a href=index?$competition=><$competition['name']</a>;
-        die();
-         echo $competition['name'] ;
-        echo $_GET['name']. "<br>";
-    }
-
-    var_dump($matches);
-   /* foreach ($matches['competitions'] as $competition) {
-        if ($competition['name'] ==='Bundesliga'){
-            echo $competition['name'];
+            //  echo $_GET['name']. "<br>";
         }
 
     }
-*/
-}
+    testOutput($code);
 
+}*/
 
-?>
-<?php
-
-
-function initiate()
+function testOutput()
 {
-    $uri = 'https://api.football-data.org/v2/competitions/';
-    $reqPrefs['http']['method'] = 'GET';
-    $reqPrefs['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
-    $stream_context = stream_context_create($reqPrefs);
-    $response = file_get_contents($uri, false, $stream_context);
-    $matches = json_decode($response, true);
-  $length =  getLength($matches);
 
-    request();
+    $code = $_GET['name'];
+
+
+    if (!is_null(isset($code))) {
+
+        $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/teams';
+        $reqPrefs['http']['method'] = 'GET';
+        $reqPrefs['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
+        $stream_context = stream_context_create($reqPrefs);
+        $response = file_get_contents($uri, false, $stream_context);
+        $teams = json_decode($response, true);
+
+        $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
+        $reqPref['http']['method'] = 'GET';
+        $reqPref['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
+        $stream_context = stream_context_create($reqPref);
+        $response = file_get_contents($uri, false, $stream_context);
+        $standings = json_decode($response, true);
+       // print_r($standings);
+        foreach ($teams['teams'] as $team) {
+           $id = $team['id'];
+            $teamID = $standings['standings'][0]['table'];
+            //var_dump($teamID);
+
+            foreach ($teamID as $table) {
+               // var_dump($teamID);
+                if ($table['team']['id'] === $id) {
+                    echo $table['team']['name'] . $table['team']. "<br>";
+
+                }
+
+
+
+            }
+            if ($standings[$id] === $id) {
+                $position = $standings[$id]['position'];
+                $goals = $standings[$id]['goals'];
+                $games = $standings[$id]['playedGames'];
+                $wins = $standings[$id]['wins'];
+                $loses = $standings[$id]['losses'];
+            }
+          //  echo "Position: " . $position . "Team: " . $team['name'] . " ID: " . $id . " games: " . $games . " GoalDiff: " . $goals . " Wins: " . $wins . "Loses: " . $loses . "<br>";
+        }
+
+
+    }
+
+
 }
-function getLength()
+
+function getPosition($standings)
 {
-    return 179;
+
+}
+
+function testOutputStanding()
+{
+
+    $code = $_GET['name'];
+
+
+    if (!is_null(isset($code))) {
+
+        $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
+        $reqPref['http']['method'] = 'GET';
+        $reqPref['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
+        $stream_context = stream_context_create($reqPref);
+        $response = file_get_contents($uri, false, $stream_context);
+        $standings = json_decode($response, true);
+
+
+        foreach ($standings['teams'] as $standing) {
+            $id = $standing['id'];
+            echo "Team: " . $standing['name'] . " ID: " . $id . " Goals: " . $standing['goals'] . "<br>";
+        }
+
+
+    }
+
+
 }
 
 ?>
 
-<?php
-function requestFor($number, $matches){
-foreach ($matches['competitions'] as $competition) {
 
-        echo '<a href="dasdasdsa?date=' . $competition['name'] . '">' . $competition['name'] . '</a><br>';
-
-
-
-
-}}
-?>
-
-
-<?php function test(){
-     $uri = 'https://api.football-data.org/v2/competitions/PL/standings';
+<?php function test()
+{
+    $uri = 'https://api.football-data.org/v2/competitions/PL/standings';
     $reqPrefs['http']['method'] = 'GET';
     $reqPrefs['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
     $stream_context = stream_context_create($reqPrefs);
@@ -92,13 +159,9 @@ foreach ($matches['competitions'] as $competition) {
     $matches = json_decode($response, true);
     var_dump($matches);
 }
+
 ?>
 
-<a href="page=competion&name=PL">Premier League<?php ?></a>
-<?php
-request();
 
-$_GET['name'] = 'PL';
-?>
 
 
