@@ -1,0 +1,48 @@
+<html>
+<head>
+    <h1>Login</h1>
+
+</head>
+<body>
+<form action="/login.php" method="POST">
+
+
+    <label for="password">Password:</label>
+    <input type="text" id="password" name="password" value="{{ errors ? password|default('') }}">
+
+    {% if errors.passwordEmptyError %}
+        <div class="error">{{ errors.passwordEmptyError }}</div>
+    {% endif %}
+
+    {% if errors.loginFailedError %}
+        <div class="error">{{ errors.loginFailedError }}</div>
+    {% endif %}
+
+    <br><br>
+
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" value="{{ errors? email|default('') }}">
+
+    {% if errors.emailEmptyError %}
+        <div class="error">{{ errors.emailEmptyError }}</div>
+    {% endif %}
+    {% if errors.emailError %}
+        <div class="error">{{ errors.emailError }}</div>
+    {% endif %}
+    {% if errors.dataError %}
+        <div class="error">{{ errors.dataError }}</div>
+    {% endif %}
+    <br><br>
+
+    <input type="submit" value="Submit">
+    <br>
+    <a href="/user.php" > No Account yet?</a>   <a href="/index.php" > Index </a><br>
+</form>
+
+{% if not errors %}
+
+    <p>{{ successMessage }}</p>
+
+{% endif %}
+</body>
+</html>

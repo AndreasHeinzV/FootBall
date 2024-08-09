@@ -1,0 +1,72 @@
+<html>
+<body>
+<form action="/user.php" method="POST">
+    <label for="fName">First name:</label>
+    <input type="text" id="fName" name="fName" value="{{ errors ? firstName|default('') }}">
+
+    {% if errors.firstNameEmptyError %}
+        <div class="error">{{ errors.firstNameEmptyError }}</div>
+    {% endif %}
+
+    <br><br>
+
+    <label for="lName">Last name:</label>
+    <input type="text" id="lName" name="lName" value="{{ errors? lastName|default('') }}">
+
+    {% if errors.lastNameEmptyError %}
+        <div class="error">{{ errors.lastNameEmptyError }}</div>
+    {% endif %}
+
+    <br><br>
+
+    <label for="password">Password:</label>
+    <input type="text" id="password" name="password" value="{{ errors ? password|default('') }}">
+
+    {% if errors.passwordEmptyError %}
+        <div class="error">{{ errors.passwordEmptyError }}</div>
+    {% endif %}
+    {% if errors.passwordLengthError %}
+        <div class="error">{{ errors.passwordLengthError }}</div>
+    {% endif %}
+
+    {% if errors.passwordSpecialError %}
+        <div class="error">{{ errors.passwordSpecialError }}</div>
+    {% endif %}
+
+    {% if errors.passwordUpperError %}
+        <div class="error">{{ errors.passwordUpperError }}</div>
+    {% endif %}
+
+    {% if errors.passwordLowerError %}
+        <div class="error">{{ errors.passwordLowerError }}</div>
+    {% endif %}
+    {% if errors.passwordNumberError %}
+        <div class="error">{{ errors.passwordNumberError }}</div>
+    {% endif %}
+    <br><br>
+
+
+
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" value="{{ errors? email|default('') }}">
+    {% if errors.emailError %}
+        <div class="error">{{ errors.emailError }}</div>
+    {% endif %}
+    {% if errors.emailEmptyError %}
+        <div class="error">{{ errors.emailEmptyError }}</div>
+    {% endif %}
+    <br><br>
+
+    <input type="submit" value="Submit">
+
+    <a href="/login.php" >Login</a>
+</form>
+
+{% if not errors and firstName and lastName and password and email%}
+    <p>First name: {{ firstName }}</p>
+    <p>Last name: {{ lastName }}</p>
+    <p>Password: {{ password }}</p>
+    <p>Email: {{ email }}</p>
+{% endif %}
+</body>
+</html>
