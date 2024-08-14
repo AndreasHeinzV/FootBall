@@ -1,13 +1,12 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Controller;
-
-
 use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class SquadController
+class TeamController
 {
     private FootballRepository $repository;
     private Environment $twig;
@@ -27,12 +26,12 @@ class SquadController
     {
         $id = $_GET['id'];
         if (isset($id) && $_GET['page'] === "team") {
-            $squadArray = $this->repository->getSquad($id);
+            $squadArray = $this->repository->getTeam($id);
           $this->value['players'] = $squadArray;
         }
+        $this->renderSquad();
     }
-    public function renderSquad() :void{
-        echo $this->twig->render('squad.twig', $this->value);
+    private function renderSquad() :void{
+        echo $this->twig->render('Team.twig', $this->value);
     }
-
 }

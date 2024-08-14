@@ -1,7 +1,6 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Controller;
-
 use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -9,7 +8,8 @@ use Twig\Loader\FilesystemLoader;
 class IndexController
 {
     private FootballRepository $repository;
-
+    private Environment $twig;
+    private  array $value;
     public function __construct()
     {
         $loader = new FilesystemLoader(__DIR__ . '/../View');
@@ -29,15 +29,9 @@ class IndexController
         $sessionUsername = '';
 
 
-        if (isset($_SESSION['loginStatus']) && $_SESSION['loginStatus'] === true) {
+        if (isset($_SESSION['loginStatus']) && $_SESSION['loginStatus']) {
             $sessionUsername = $_SESSION['userName'];
             $loginStatus = $_SESSION['loginStatus'];
-
-            if (isset($_POST['logout'])) {
-                $loginStatus = false;
-                $sessionUsername = '';
-                session_destroy();
-            }
         }
         if (isset($_POST['login'])) {
             header("Location: /login.php");
@@ -47,6 +41,7 @@ class IndexController
         $this->value['userName'] = $sessionUsername;
         $this->value['status'] = $loginStatus;
     }
+
 
     public function renderIndex(): void
     {

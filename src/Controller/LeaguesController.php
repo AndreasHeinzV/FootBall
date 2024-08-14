@@ -1,12 +1,11 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Controller;
-
 use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class CompetitionsController
+class LeaguesController
 {
     private FootballRepository $repository;
     private Environment $twig;
@@ -28,9 +27,10 @@ class CompetitionsController
             $teamsArray = $this->repository->getCompetition($code);
             $this->value['teams'] = $teamsArray;
         }
+        $this->renderCompetitions();
     }
 
-    public function renderCompetitions(): void
+    private function renderCompetitions(): void
     {
         echo $this->twig->render('competitions.twig', $this->value);
     }

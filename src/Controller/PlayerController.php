@@ -1,7 +1,7 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Controller;
-
 use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -30,10 +30,12 @@ class PlayerController
             $playerName = array_shift($playerArray);
             $this->value['playerName'] = $playerName;
             $this->value['playerData'] = $playerArray;
+
         }
+    $this->renderPlayer();
     }
 
-    public function renderPlayer(): void
+    private function renderPlayer(): void
     {
         echo $this->twig->render('player.twig', $this->value);
     }

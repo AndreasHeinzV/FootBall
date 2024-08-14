@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
 class FootballRepository
 {
-    public function getPlayer($id): array
+    private ApiRequester $apiRequester;
+
+    function __construct()
+    {
+        $this->apiRequester = new ApiRequester();
+    }
+
+    public function getPlayer(string $id): array
     {
         $uri = 'https://api.football-data.org/v4/persons/' . $id;
-        $reqPref['http']['method'] = 'GET';
-        $reqPref['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
-        $stream_context = stream_context_create($reqPref);
-        $response = file_get_contents($uri, false, $stream_context);
-        $player = json_decode($response, true);
+        $player = $this->apiRequester->parRequest($uri);
 
 
         return [
@@ -23,14 +28,10 @@ class FootballRepository
         ];
     }
 
-    public function getSquad($id): array
+    public function getTeam(string $id): array
     {
         $uri = 'https://api.football-data.org/v4/teams/' . $id;
-        $reqPref['http']['method'] = 'GET';
-        $reqPref['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
-        $stream_context = stream_context_create($reqPref);
-        $response = file_get_contents($uri, false, $stream_context);
-        $team = json_decode($response, true);
+        $team = $this->apiRequester->parRequest($uri);
         $playersArray = [];
 
         foreach ($team['squad'] as $player) {
@@ -44,22 +45,14 @@ class FootballRepository
         return $playersArray;
     }
 
-    public function getCompetition($code): array
+    public function getCompetition(string $code): array
     {
         $teamsArray = [];
-
-
         $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
-        $reqPref['http']['method'] = 'GET';
-        $reqPref['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
-        $stream_context = stream_context_create($reqPref);
-        $response = file_get_contents($uri, false, $stream_context);
-        $standings = json_decode($response, true);
+        $standings = $this->apiRequester->parRequest($uri);
 
 
         $teamID = $standings['standings'][0]['table'];
-
-
         foreach ($teamID as $table) {
             $teamArray = [];
             $teamArray['position'] = $table['position'];
@@ -81,11 +74,7 @@ class FootballRepository
     public function getLeagues(): array
     {
         $uri = 'https://api.football-data.org/v4/competitions/';
-        $reqPref['http']['method'] = 'GET';
-        $reqPref['http']['header'] = 'X-Auth-Token: f08428cacebe4e639816224794f01bd5';
-        $stream_context = stream_context_create($reqPref);
-        $response = file_get_contents($uri, false, $stream_context);
-        $matches = json_decode($response, true);
+        $matches = $this->apiRequester->parRequest($uri);
         $leaguesArray = [];
 
 

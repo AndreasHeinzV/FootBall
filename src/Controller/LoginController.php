@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
 
+namespace App\Controller;
 
 use App\Model\UserRepository;
 use Twig\Environment;
@@ -12,23 +13,23 @@ class LoginController
     private UserRepository $repository;
     private Environment $twig;
 
+    private array $templateVars;
 
     public function __construct()
     {
         $loader = new FilesystemLoader(__DIR__ . '/../View');
         $this->twig = new Environment($loader, []);
         $this->repository = new UserRepository();
-        $templateVars = [];
-        $this->loadLogin($this->doLogin($templateVars));
+        $this->templateVars = [];
     }
 
-    public function doLogin($templateVars): array
+    public function doLogin(): void
     {
         $filePath = __DIR__ . '/../../users.json';
-        $existingUsers = $this->repository->getUsers($filePath);
 
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $existingUsers = $this->repository->getUsers($filePath);
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
             $errors = [];
@@ -37,27 +38,30 @@ class LoginController
 
 
             if (empty($errors)) {
-                $templateVars['email'] = '';
-                $templateVars['password'] = '';
+                $userName = $this->repository->getUserName($existingUsers, $email);
+
+                $this->templateVars['email'] = '';
+                $this->templateVars['password'] = '';
                 $_SESSION["loginStatus"] = true;
-                $_SESSION['userName'] = $this->repository->getUserName($existingUsers, $email);
+                $_SESSION['userName'] = $userName;
                 header("Location: /index.php");
             } else {
-                $templateVars['errors'] = $errors;
-                $templateVars['password'] = $password;
-                $templateVars['email'] = $email;
+                $this->templateVars['errors'] = $errors;
+                $this->templateVars['password'] = $password;
+                $this->templateVars['email'] = $email;
                 $_SESSION['loginStatus'] = false;
             }
         }
-        return $templateVars;
+        $this->loadLogin();
+        //return $this->templateVars;
     }
 
-    function loadLogin($templateVars): void
+    private function loadLogin(): void
     {
-        echo $this->twig->render('login.twig', $templateVars);
+        echo $this->twig->render('login.twig', $this->templateVars);
     }
 
-    private function checkAndGetErrors($existingUsers, $email, $password, $errors): array
+    private function checkAndGetErrors(array $existingUsers,string $email,string $password,array $errors): array
     {
         if (!empty($email)) {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
