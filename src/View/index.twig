@@ -1,0 +1,27 @@
+<html>
+
+<form action="/index.php" method="POST">
+<a href="/register.php"> No Account yet?</a>
+
+{% if not status %}
+  <a href="/login.php">
+    <button type="submit" name="login">Login</button>
+  </a>
+{% endif %}
+
+{% if status  %}
+  <button type="submit" name="logout">Logout</button>
+    <h1> Welcome: {{ userName }}</h1>
+
+{% endif %}
+</form>
+<ul>
+
+    {% for league in leagues %}
+
+
+        <li><a href="{{ league.link }}">{{ league.name }}</a></li>
+    {% endfor %}
+</ul>
+
+</html>
