@@ -12,7 +12,7 @@ class View implements ViewInterface
 
     public function __construct()
     {
-        $templatePath = __DIR__ . '/View';
+        $templatePath = __DIR__ . '/../View';
         $loader = new FilesystemLoader($templatePath);
         $this->twig = new Environment($loader, []);
     }

@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-class FootballRepository
-{
-    private ApiRequester $apiRequester;
+use App\Model\ApiRequesterInterface;
 
-    function __construct()
+class FootballRepository implements FootballRepositoryInterface
+{
+    private  ApiRequesterInterface $apiRequester;
+    private array $playerData;
+
+    public function __construct(ApiRequesterInterface $apiRequester)
     {
-        $this->apiRequester = new ApiRequester();
+        $this->apiRequester = $apiRequester;
+
     }
 
     public function getPlayer(string $id): array
@@ -47,28 +51,30 @@ class FootballRepository
 
     public function getCompetition(string $code): array
     {
-        $teamsArray = [];
+        $teams = [];
         $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
         $standings = $this->apiRequester->parRequest($uri);
 
 
         $teamID = $standings['standings'][0]['table'];
         foreach ($teamID as $table) {
-            $teamArray = [];
-            $teamArray['position'] = $table['position'];
-            $teamArray['name'] = $table['team']['name'];
-            $teamArray['link'] = "/index.php?page=team&id=" . $table['team']['id'];
-            $teamArray['playedGames'] = $table['playedGames'];
-            $teamArray['won'] = $table['won'];
-            $teamArray['draw'] = $table['draw'];
-            $teamArray['lost'] = $table['lost'];
-            $teamArray['points'] = $table['points'];
-            $teamArray['goalsFor'] = $table['goalsFor'];
-            $teamArray['goalsAgainst'] = $table['goalsAgainst'];
-            $teamArray['goalDifference'] = $table['goalDifference'];
-            $teamsArray[] = $teamArray;
+            $team = [];
+
+            $team['position'] = $table['position'];
+            $team['name'] = $table['team']['name'];
+            $team['link'] = "/index.php?page=team&id=" . $table['team']['id'];
+            $team['playedGames'] = $table['playedGames'];
+            $team['won'] = $table['won'];
+            $team['draw'] = $table['draw'];
+            $team['lost'] = $table['lost'];
+            $team['points'] = $table['points'];
+            $team['goalsFor'] = $table['goalsFor'];
+            $team['goalsAgainst'] = $table['goalsAgainst'];
+            $team['goalDifference'] = $table['goalDifference'];
+
+            $teams[] = $team;
         }
-        return $teamsArray;
+        return $teams;
     }
 
     public function getLeagues(): array

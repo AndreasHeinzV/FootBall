@@ -42,4 +42,8 @@ class Validation
         }
         return false;
     }
+
+    private function setEmptyError($value){
+        return;
+    }
 }

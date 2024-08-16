@@ -25,10 +25,19 @@ class LoginController implements Controller
 
     public function load(): void
     {
-        $filePath = __DIR__ . '/../../users.json';
+        $this->handlePost();
+        //return $this->templateVars;
+    }
 
+    private function loadLogin(): void
+    {
+        echo $this->twig->render('login.twig', $this->templateVars);
+    }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    private function handlePost(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['loginButton'] === 'login') {
+            $filePath = __DIR__ . '/../../users.json';
             $existingUsers = $this->repository->getUsers($filePath);
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
@@ -53,15 +62,9 @@ class LoginController implements Controller
             }
         }
         $this->loadLogin();
-        //return $this->templateVars;
     }
 
-    private function loadLogin(): void
-    {
-        echo $this->twig->render('login.twig', $this->templateVars);
-    }
-
-    private function checkAndGetErrors(array $existingUsers,string $email,string $password,array $errors): array
+    private function checkAndGetErrors(array $existingUsers, string $email, string $password, array $errors): array
     {
         if (!empty($email)) {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {

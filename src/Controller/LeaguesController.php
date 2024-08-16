@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Controller;
+
 use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -9,29 +12,29 @@ class LeaguesController implements Controller
 {
     private FootballRepository $repository;
     private Environment $twig;
-    private array $value;
 
-    function __construct()
+    public function __construct()
     {
         $loader = new FilesystemLoader(__DIR__ . "/../View");
         $this->repository = new FootballRepository();
         $this->twig = new Environment($loader);
-        $this->value = [];
     }
 
     public function load(): void
     {
-        $code = $_GET['name'];
-        $page = $_GET['page'];
-        if (isset($code) && isset($page) && $page === "competitions") {
-            $teamsArray = $this->repository->getCompetition($code);
-            $this->value['teams'] = $teamsArray;
+        if (!isset($_GET['name'])) {
+            throw new \RuntimeException("No name specified");
         }
-        $this->renderCompetitions();
+
+        $code = $_GET['name'];
+        $teamsArray = $this->repository->getCompetition($code);
+        $value['teams'] = $teamsArray;
+
+        echo $this->twig->render('competitions.twig', $value);
     }
 
-    private function renderCompetitions(): void
-    {
-        echo $this->twig->render('competitions.twig', $this->value);
-    }
+
+
+
+
 }

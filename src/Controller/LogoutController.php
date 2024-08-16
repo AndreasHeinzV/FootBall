@@ -15,10 +15,7 @@ class LogoutController implements Controller
 
     private function handleLogout(): void
     {
-        if (isset($_GET['page']) && $_GET['page'] === "logout") {
-            echo "test";
-            session_destroy();
-            header("location:/");
-        }
+        session_destroy();
+        header("location:/");
     }
 }

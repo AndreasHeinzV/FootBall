@@ -1,83 +1,48 @@
 <?php
+
 declare(strict_types=1);
 
-use App\Controller\LeaguesController;
-use App\Controller\LoginController;
-use App\Controller\LogoutController;
-use App\Controller\RegisterController;
-use App\Controller\TeamController;
-use App\Controller\PlayerController;
+use App\Core\ControllerProvider;
+use App\Model\ApiKeyHandler;
 use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-use \App\Model\ApiKeyHandler;
 
 session_start();
 require_once __DIR__ . '/vendor/autoload.php';
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 
 $loader = new FilesystemLoader(__DIR__ . '/src/View');
 $twig = new Environment($loader);
-$repository = new FootballRepository();
+//$repository = new FootballRepository();
 $value = [];
 $apikeyHandler = new ApiKeyHandler();
-// Load the index logic
-if (!isset($_GET['page']) && !isset($_GET['code'])) {
-    $value['leagues'] = $repository->getLeagues();
-}
+$controllerProvider = new ControllerProvider();
 
-$page = $_GET['page'] ?? '';
+$controllerProvider->handlePage();
+
 $loginStatus = false;
 $sessionUsername = '';
+
+if (!isset($_GET['page']) && !isset($_SESSION['loginStatus'])) {
+    $value['leagues'] = $repository->getLeagues();
+    echo $twig->render('home.twig', $value);
+}
 
 if (isset($_SESSION['loginStatus']) && $_SESSION['loginStatus']) {
     $sessionUsername = $_SESSION['userName'];
     $loginStatus = $_SESSION['loginStatus'];
+    $value['userName'] = $sessionUsername;
+    $value['status'] = $loginStatus;
+    $value['leagues'] = $repository->getLeagues();
+    echo $twig->render('home.twig', $value);
 }
 
 
-$value['userName'] = $sessionUsername;
-$value['status'] = $loginStatus;
-
-
-switch ($page) {
-    case 'player':
-
-        $playerController = new PlayerController();
-        $playerController->load();
-        break;
-
-    case 'competitions':
-        $competitionController = new LeaguesController();
-        $competitionController->load();
-
-        break;
-
-    case 'team':
-
-        $squadController = new TeamController();
-        $squadController->load();
-        break;
-
-    case 'logout':
-        $logoutController = new LogoutController();
-        $logoutController->load();
-        break;
-
-    case 'login':
-        $loginController = new LoginController();
-        $loginController->load();
-        break;
-
-    case 'register':
-        $registerController = new RegisterController();
-        $registerController->load();
-        break;
-
-    default:
-        echo $twig->render('home.twig', $value);
-        break;
-}
 
 
 

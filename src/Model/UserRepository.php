@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Model;
 
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
     public function getUserName(array $existingUsers,string $email): string {
         foreach ($existingUsers as $existingUser) {

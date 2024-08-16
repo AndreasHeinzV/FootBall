@@ -3,12 +3,12 @@
 namespace App\Model;
 
 
-class ApiRequester
+class ApiRequester implements ApiRequesterInterface
 {
     private $apiKey;
 
 //todo get Api key from jsonfile out of project
-    function __construct()
+    public function __construct()
     {
         $this->apiKey = "f08428cacebe4e639816224794f01bd5";
     }
