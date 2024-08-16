@@ -8,7 +8,7 @@ use App\Model\UserRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class LoginController
+class LoginController implements Controller
 {
     private UserRepository $repository;
     private Environment $twig;
@@ -23,7 +23,7 @@ class LoginController
         $this->templateVars = [];
     }
 
-    public function doLogin(): void
+    public function load(): void
     {
         $filePath = __DIR__ . '/../../users.json';
 
@@ -77,35 +77,6 @@ class LoginController
         if (empty($password)) {
             $errors['passwordEmptyError'] = "Password is empty.";
         }
-
-        return $errors;
-    }
-
-
-    private function checkErrors($existingUsers, $email, $password): bool
-    {
-        return true;
-    }
-
-    private function getErrors($existingUsers, $email, $password): array
-    {
-        $errors = [];
-
-        if (!empty($email)) {
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors['emailError'] = "Invalid email address.";
-            } else {
-                if (!$this->checkLoginData($existingUsers, $email, $password)) {
-                    $errors['dataError'] = 'email and data is wrong';
-                }
-            }
-        } else {
-            $errors['emailEmptyError'] = "Email is required.";
-        }
-        if (empty($password)) {
-            $errors['passwordEmptyError'] = "Password is empty.";
-        }
-
 
         return $errors;
     }

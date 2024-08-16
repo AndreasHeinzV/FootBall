@@ -45,6 +45,6 @@ class IndexController
 
     public function renderIndex(): void
     {
-        echo $this->twig->render('index.twig', $this->value);
+        echo $this->twig->render('home.twig', $this->value);
     }
 }

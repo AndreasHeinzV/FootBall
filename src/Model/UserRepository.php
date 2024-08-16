@@ -14,7 +14,7 @@ class UserRepository
         return '';
     }
 
-    function getUser(array $existingUsers,string $email): array{
+    public function getUser(array $existingUsers,string $email): array{
         foreach ($existingUsers as $existingUser) {
             if ($existingUser['email'] === $email) {
                 return $existingUser;
@@ -23,9 +23,10 @@ class UserRepository
         return [];
     }
 
-    function getUsers(string $filePath): array
+    public function getUsers(string $filePath): array
 
     {
         return file_exists($filePath) ? json_decode(file_get_contents($filePath), true) : [];
     }
+
 }

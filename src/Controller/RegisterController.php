@@ -13,7 +13,7 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
 
-class RegisterController
+class RegisterController implements Controller
 {
 
     private UserRepository $repository;
@@ -43,7 +43,7 @@ class RegisterController
         }
     }
 
-    public function doRegister(): void
+    public function load(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $firstName = $_POST['fName'] ?? '';
@@ -60,11 +60,7 @@ class RegisterController
                     'email' => htmlspecialchars($email),
                     'password' => password_hash($password, PASSWORD_DEFAULT), // Hash the password securely
                 ];
-
-
-                $existingUsers = $this->repository->getUsers($this->filePath);
-                $existingUsers[] = $userData;
-                $this->entityManager->safeUser($this->filePath, $existingUsers);
+                $this->entityManager->save($userData, $email, $this->filePath);
                 $this->setTempVarsDefault();
                 header('Location: /');
             } else {
@@ -116,11 +112,6 @@ class RegisterController
         if (!empty($email)) {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors['emailError'] = "Invalid email address.";
-            } else {
-                $existingUsers = $this->repository->getUsers($this->filePath);
-                if ($this->validation->checkDuplicateMail($existingUsers, $email)) {
-                    $errors['emailError'] = 'This email is already registered.';
-                }
             }
         } else {
             $errors['emailEmptyError'] = "Email is required.";

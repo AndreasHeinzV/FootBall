@@ -6,7 +6,7 @@ use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class TeamController
+class TeamController implements Controller
 {
     private FootballRepository $repository;
     private Environment $twig;
@@ -22,7 +22,7 @@ class TeamController
 
     }
 
-    public function loadSquad(): void
+    public function load(): void
     {
         $id = $_GET['id'];
         if (isset($id) && $_GET['page'] === "team") {

@@ -10,23 +10,23 @@ use App\Controller\PlayerController;
 use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use \App\Model\ApiKeyHandler;
 
 session_start();
 require_once __DIR__ . '/vendor/autoload.php';
-$templatePath = __DIR__ . '/src/View';
-$page = $_GET['page'] ?? '';
 
 
 $loader = new FilesystemLoader(__DIR__ . '/src/View');
 $twig = new Environment($loader);
 $repository = new FootballRepository();
 $value = [];
-
+$apikeyHandler = new ApiKeyHandler();
 // Load the index logic
 if (!isset($_GET['page']) && !isset($_GET['code'])) {
     $value['leagues'] = $repository->getLeagues();
 }
 
+$page = $_GET['page'] ?? '';
 $loginStatus = false;
 $sessionUsername = '';
 
@@ -44,38 +44,38 @@ switch ($page) {
     case 'player':
 
         $playerController = new PlayerController();
-        $playerController->loadPlayer();
+        $playerController->load();
         break;
 
     case 'competitions':
         $competitionController = new LeaguesController();
-        $competitionController->loadCompetitions();
+        $competitionController->load();
 
         break;
 
     case 'team':
 
         $squadController = new TeamController();
-        $squadController->loadSquad();
+        $squadController->load();
         break;
 
     case 'logout':
         $logoutController = new LogoutController();
-        $logoutController->logout();
+        $logoutController->load();
         break;
 
     case 'login':
         $loginController = new LoginController();
-        $loginController->doLogin();
+        $loginController->load();
         break;
 
     case 'register':
         $registerController = new RegisterController();
-        $registerController->doRegister();
+        $registerController->load();
         break;
 
     default:
-        echo $twig->render('index.twig', $value);
+        echo $twig->render('home.twig', $value);
         break;
 }
 

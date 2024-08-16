@@ -5,7 +5,7 @@ use App\Model\FootballRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class LeaguesController
+class LeaguesController implements Controller
 {
     private FootballRepository $repository;
     private Environment $twig;
@@ -19,7 +19,7 @@ class LeaguesController
         $this->value = [];
     }
 
-    public function loadCompetitions(): void
+    public function load(): void
     {
         $code = $_GET['name'];
         $page = $_GET['page'];

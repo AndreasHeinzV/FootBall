@@ -7,7 +7,7 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 
-class PlayerController
+class PlayerController implements Controller
 {
     private FootballRepository $repository;
     private Environment $twig;
@@ -21,7 +21,7 @@ class PlayerController
         $this->value = [];
     }
 
-    public function loadPlayer(): void
+    public function load(): void
     {
         $id = $_GET['id'];
 
