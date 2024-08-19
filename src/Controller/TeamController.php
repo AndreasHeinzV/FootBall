@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\ViewInterface;
 use App\Model\FootballRepository;
 use App\Model\FootballRepositoryInterface;
 use Twig\Environment;
@@ -16,27 +17,22 @@ class TeamController implements Controller
     private array $value;
 
 
-    public function __construct( )
+    public function __construct(Environment $twig, FootballRepository $repository)
     {
-        $this->repository = new FootballRepository();
-        $loader = new FilesystemLoader(__DIR__ . "/../View");
-        $this->twig = new Environment($loader);
+        $this->repository = $repository;
+        $this->twig = $twig;
         $this->value = [];
         //$this->repository = new FootballRepository();
     }
 
-    public function load(): void
+    public function load(ViewInterface $view): array
     {
         $id = $_GET['id'];
         if (isset($id)) {
             $squadArray = $this->repository->getTeam($id);
             $this->value['players'] = $squadArray;
-            $this->renderSquad();
+            //echo $this->twig->render('team.twig', $this->value);
         }
-    }
-
-    private function renderSquad(): void
-    {
-        echo $this->twig->render('Team.twig', $this->value);
+        return $this->value;
     }
 }

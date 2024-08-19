@@ -16,7 +16,6 @@ use Twig\Loader\FilesystemLoader;
 class RegisterController implements Controller
 {
 
-    private UserEntityManager $entityManager;
     private Environment $twig;
     private string $filePath;
     private array $templateVars;
@@ -29,30 +28,22 @@ class RegisterController implements Controller
     private string $password;
     private array $errors;
 
+    private UserEntityManager $userEntityManager;
 
-    public function __construct()
+    public function __construct(Environment $twig, UserEntityManager $userEntityManager, Validation $validation)
     {
-        $loader = new FilesystemLoader(__DIR__ . '/../View');
-        $this->twig = new Environment($loader, []);
-
-        $this->entityManager = new UserEntityManager();
+        $this->twig = $twig;
+        $this->userEntityManager = $userEntityManager;
         $this->filePath = __DIR__ . '/../../users.json';
         $this->templateVars = [];
-        $this->validation = new Validation();
+        $this->validation = $validation;
     }
 
-    private function loadRegister(): void
-    {
-        try {
-            echo $this->twig->render('register.twig', $this->templateVars);
-        } catch (LoaderError|RuntimeError|SyntaxError $e) {
-            echo $e->getMessage();
-        }
-    }
 
-    public function load(): void
+    public function load($view): array
     {
         $this->handlePost();
+        return $this->templateVars;
     }
 
 
@@ -72,14 +63,13 @@ class RegisterController implements Controller
                     'email' => htmlspecialchars($this->email),
                     'password' => password_hash($this->password, PASSWORD_DEFAULT), // Hash the password securely
                 ];
-                $this->entityManager->save($userData, $this->email, $this->filePath);
+                $this->userEntityManager->save($userData, $this->email, $this->filePath);
                 $this->setTempVarsDefault();
                 header('Location: /');
             } else {
                 $this->setTempVars();
             }
         }
-        $this->loadRegister();
     }
 
 

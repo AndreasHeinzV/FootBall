@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\ViewInterface;
 use App\Model\FootballRepository;
+use App\Model\FootballRepositoryInterface;
+use App\Model\RepositoryInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -15,30 +18,25 @@ class PlayerController implements Controller
     private Environment $twig;
     private array $value;
 
-    public function __construct(FootballRepository $repository)
+    public function __construct(Environment $twig, FootballRepositoryInterface $repository)
     {
-
-      $this->repository = $repository;
-        $loader = new FilesystemLoader(__DIR__ . '/../View');
-        $this->twig = new Environment($loader);
-      //  $this->repository = new FootballRepository();
+        $this->repository = $repository;
+        $this->twig = $twig;
+        //  $this->repository = new FootballRepository();
         $this->value = [];
     }
 
-    public function load(): void
+    public function load(ViewInterface $view): array
     {
-
         $id = $_GET['id'];
         if (isset($id)) {
             $playerArray = $this->repository->getPlayer($id);
             $playerName = array_shift($playerArray);
             $this->value['playerName'] = $playerName;
             $this->value['playerData'] = $playerArray;
-
-
-            echo $this->twig->render('player.twig', $this->value);
+            //echo $this->twig->render('player.twig', $this->value);
+            return $this->value;
         }
+        return [];
     }
-
-
 }

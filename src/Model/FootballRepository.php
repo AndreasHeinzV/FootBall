@@ -6,7 +6,7 @@ namespace App\Model;
 
 use App\Model\ApiRequesterInterface;
 
-class FootballRepository implements FootballRepositoryInterface
+class FootballRepository implements FootballRepositoryInterface, RepositoryInterface
 {
     private  ApiRequesterInterface $apiRequester;
     private array $playerData;
@@ -96,4 +96,8 @@ class FootballRepository implements FootballRepositoryInterface
     }
 
 
+    public function load(): void
+    {
+        // TODO: Implement load() method.
+    }
 }

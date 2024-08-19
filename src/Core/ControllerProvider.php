@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Controller\Controller;
+use App\Controller\HomeController;
 use App\Controller\LeaguesController;
 use App\Controller\LoginController;
 use App\Controller\LogoutController;
@@ -14,10 +14,18 @@ use App\Controller\TeamController;
 
 class ControllerProvider
 {
+    private Container $container;
+    private array $data;
+
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
     public function getList(): array
     {
         return [
-
+            'home' => HomeController::class,
             'competitions' => LeaguesController::class,
             'team' => TeamController::class,
             'player' => PlayerController::class,
@@ -31,12 +39,17 @@ class ControllerProvider
 
     public function handlePage(): void
     {
-        $page = $_GET['page'] ?? 'competitions';
-
+        $page = $_GET['page'] ?? 'home';
         $controllerList = $this->getList();
-        $controller = $controllerList[$page];
-        $controller = new $controller();
-        $controller->load();
+        $value = $controllerList[$page];
+        $controller = $this->container->get($value);
+        $view = $this->container->get(View::class);
+        $view->setTemplate($page. ".twig");
+       $this->data= $controller->load($view);
     }
 
+
+    public function getData(): array{
+        return  $this->data;
+    }
 }

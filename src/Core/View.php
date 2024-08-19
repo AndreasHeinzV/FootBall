@@ -3,18 +3,18 @@ declare(strict_types=1);
 namespace App\Core;
 
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 class View implements ViewInterface
 {
     private array $parameters;
     private Environment $twig;
 
-    public function __construct()
+    private string $template;
+    public function __construct(Environment $twig)
     {
-        $templatePath = __DIR__ . '/../View';
-        $loader = new FilesystemLoader($templatePath);
-        $this->twig = new Environment($loader, []);
+        $this->twig = $twig;
+        $this->template = 'home.twig';
+        $this->parameters = [];
     }
 
     public function addParameter(string $key, mixed $value): void
@@ -22,8 +22,19 @@ class View implements ViewInterface
         $this->parameters[$key] = $value;
     }
 
-    public function display(string $template): void
+    public function getTemplate(): string{
+
+        return $this->template;
+    }
+    public function setTemplate(string $template): void
     {
-        echo $this->twig->render($template, $this->parameters);
+        $this->template = $template;
+    }
+    public function getParameters(): array{
+        return $this->parameters;
+    }
+    public function display(string $template, array $dataArray): void
+    {
+        echo $this->twig->render($template, $dataArray);
     }
 }

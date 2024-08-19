@@ -2,8 +2,13 @@
 declare(strict_types=1);
 namespace App\Model;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository implements UserRepositoryInterface, RepositoryInterface
 {
+
+    public function __construct()
+    {
+
+    }
     public function getUserName(array $existingUsers,string $email): string {
         foreach ($existingUsers as $existingUser) {
             if ($existingUser['email'] === $email) {
@@ -29,4 +34,8 @@ class UserRepository implements UserRepositoryInterface
         return file_exists($filePath) ? json_decode(file_get_contents($filePath), true) : [];
     }
 
+    public function load(): void
+    {
+        // TODO: Implement load() method.
+    }
 }

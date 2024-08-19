@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\SessionHandler;
+use App\Core\View;
+use App\Core\ViewInterface;
 use App\Model\UserRepository;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -15,25 +18,29 @@ class LoginController implements Controller
 
     private array $templateVars;
 
-    public function __construct()
+
+    public function __construct(Environment $twig, UserRepository $repository)
     {
-        $loader = new FilesystemLoader(__DIR__ . '/../View');
-        $this->twig = new Environment($loader, []);
-        $this->repository = new UserRepository();
+
+        $this->twig = $twig;
+        $this->repository = $repository;
+
         $this->templateVars = [];
     }
 
-    public function load(): void
+    public function load(ViewInterface $view): array
     {
         $this->handlePost();
         //return $this->templateVars;
+        return $this->templateVars;
     }
 
+    /*
     private function loadLogin(): void
     {
         echo $this->twig->render('login.twig', $this->templateVars);
     }
-
+*/
     private function handlePost(): void
     {
         if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['loginButton'] === 'login') {
@@ -61,7 +68,6 @@ class LoginController implements Controller
                 $_SESSION['loginStatus'] = false;
             }
         }
-        $this->loadLogin();
     }
 
     private function checkAndGetErrors(array $existingUsers, string $email, string $password, array $errors): array
@@ -87,7 +93,7 @@ class LoginController implements Controller
     private function checkLoginData($existingUsers, $emailToCheck, $passwordToCheck): bool
     {
         foreach ($existingUsers as $user) {
-            if (isset($user['password']) && isset($user['email'])) {
+            if (isset($user['password'], $user['email'])) {
                 if ($user['email'] === $emailToCheck) {
                     return password_verify($passwordToCheck, $user['password']);
                 }
