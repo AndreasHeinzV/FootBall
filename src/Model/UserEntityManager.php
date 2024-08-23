@@ -4,41 +4,54 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Core\Validation;
+use App\Core\ValidationInterface;
 
 class UserEntityManager
 {
+    private ValidationInterface $validation;
+    private UserRepositoryInterface $repository;
+    private array $user;
 
-    private function safeUser( array $existingUsers): void
+    public function __construct(ValidationInterface $validation, UserRepositoryInterface $repository)
     {
-        file_put_contents(__DIR__. '/../../users.json', json_encode($existingUsers, JSON_PRETTY_PRINT));
+        $this->validation = $validation;#
+        $this->repository = $repository;
     }
 
-    private function updateUser(array &$existingUsers, array $user, string $email): void
+
+    public function save(array $userData): void
     {
-        foreach ($existingUsers as $position => &$existingUser) {
-            if ($existingUser['email'] === $email) {
+        $existingUsers = $this->repository->getUsers();
+       // print_r($existingUsers);
+        //echo " <-array -> mail: ";
+        //print_r($userData['email']);
+        if ($this->validation->checkDuplicateMail($existingUsers, $userData['email'])) {
+
+            $this->updateUser( $existingUsers, $userData);
+
+        } else {
+          //  echo "Vali doesnt work";
+            $existingUsers[] = $userData;
+            $this->putUserIntoJson($existingUsers);
+        }
+    }
+    private function updateUser(array $existingUsers, array $user): void
+    {
+        foreach ($existingUsers as $position => $existingUser) {
+            if ($existingUser['email'] === $user['email']) {
                 $existingUsers[$position]['firstName'] = $user['firstName'];
                 $existingUsers[$position]['lastName'] = $user['lastName'];
                 $existingUsers[$position]['password'] = $user['password'];
-                $this->safeUser($existingUsers);
-
             }
         }
+        $this->putUserIntoJson($existingUsers);
     }
 
-    public function save(array $user, string $email, string $filePath): void
+    private function putUserIntoJson(array $existingUsers): void
     {
+      //  print_r($existingUsers);
+        $path = $this->repository->getFilePath();
 
-         $validation = new Validation();
-         $repository = new UserRepository();
-        $existingUsers = $repository->getUsers($filePath);
-
-        if ($validation->checkDuplicateMail($existingUsers, $email)) {
-            $this->updateUser($existingUsers, $user, $email);
-        } else {
-            $existingUsers[] = $user;
-            $this->safeUser( $existingUsers);
-        }
+        file_put_contents($path, json_encode($existingUsers, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 }

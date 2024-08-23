@@ -6,10 +6,11 @@ namespace App\Model;
 
 use App\Model\ApiRequesterInterface;
 
-class FootballRepository implements FootballRepositoryInterface, RepositoryInterface
+
+
+class FootballRepository implements FootballRepositoryInterface
 {
     private  ApiRequesterInterface $apiRequester;
-    private array $playerData;
 
     public function __construct(ApiRequesterInterface $apiRequester)
     {
@@ -57,6 +58,7 @@ class FootballRepository implements FootballRepositoryInterface, RepositoryInter
 
 
         $teamID = $standings['standings'][0]['table'];
+
         foreach ($teamID as $table) {
             $team = [];
 
@@ -74,6 +76,7 @@ class FootballRepository implements FootballRepositoryInterface, RepositoryInter
 
             $teams[] = $team;
         }
+       // var_dump($teams);
         return $teams;
     }
 
@@ -83,7 +86,7 @@ class FootballRepository implements FootballRepositoryInterface, RepositoryInter
         $matches = $this->apiRequester->parRequest($uri);
         $leaguesArray = [];
 
-
+    //var_export($matches['competitions']);
         foreach ($matches['competitions'] as $competition) {
             $leagueArray = [];
             $leagueArray['id'] = $competition['id'];
@@ -93,11 +96,5 @@ class FootballRepository implements FootballRepositoryInterface, RepositoryInter
             $leaguesArray[] = $leagueArray;
         }
         return $leaguesArray;
-    }
-
-
-    public function load(): void
-    {
-        // TODO: Implement load() method.
     }
 }

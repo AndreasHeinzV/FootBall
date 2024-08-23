@@ -22,12 +22,9 @@ $dependencyProvider->fill($container);
 
 $view = $container->get(View::class);
 
-
 $controllerProvider = new ControllerProvider($container);
 $controllerProvider->handlePage();
-$userData = $controllerProvider->getData();
-//echo "Template: ". $view->getTemplate();
-$view->display($view->getTemplate(), $userData);
+$view->display();
 
 
 

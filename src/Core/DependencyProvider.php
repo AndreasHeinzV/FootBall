@@ -33,7 +33,10 @@ class DependencyProvider
 
         $container->set(UserRepository::class, new UserRepository());
 
-        $container->set(UserEntityManager::class, new UserEntityManager());
+        $container->set(UserEntityManager::class, new UserEntityManager(
+            $container->get(Validation::class),
+            $container->get(UserRepository::class)
+        ));
 
         $container->set(SessionHandler::class, new SessionHandler());
 
@@ -50,32 +53,26 @@ class DependencyProvider
             $container->get(Environment::class),
         ));
         $container->set(LoginController::class, new LoginController(
-            $container->get(Environment::class),
             $container->get(UserRepository::class)
         ));
 
         $container->set(RegisterController::class, new RegisterController(
-            $container->get(Environment::class),
             $container->get(UserEntityManager::class),
             $container->get(Validation::class)
         ));
 
         $container->set(PlayerController::class, new PlayerController(
-            $container->get(Environment::class),
-            $container->get(FootballRepository::class),
+            $container->get(FootballRepository::class)
         ));
 
         $container->set(TeamController::class, new TeamController(
-            $container->get(Environment::class),
-            $container->get(FootballRepository::class),
+            $container->get(FootballRepository::class)
         ));
         $container->set(LeaguesController::class, new LeaguesController(
-            $container->get(Environment::class),
-            $container->get(FootballRepository::class),
+            $container->get(FootballRepository::class)
         ));
 
         $container->set(HomeController::class, new HomeController(
-            $container->get(Environment::class),
             $container->get(FootballRepository::class)
         ));
     }

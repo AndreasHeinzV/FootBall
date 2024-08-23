@@ -4,27 +4,20 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\SessionHandler;
-use App\Core\View;
 use App\Core\ViewInterface;
 use App\Model\UserRepository;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 class LoginController implements Controller
 {
     private UserRepository $repository;
-    private Environment $twig;
+
 
     private array $templateVars;
 
 
-    public function __construct(Environment $twig, UserRepository $repository)
+    public function __construct(UserRepository $repository)
     {
-
-        $this->twig = $twig;
         $this->repository = $repository;
-
         $this->templateVars = [];
     }
 
@@ -45,7 +38,7 @@ class LoginController implements Controller
     {
         if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['loginButton'] === 'login') {
             $filePath = __DIR__ . '/../../users.json';
-            $existingUsers = $this->repository->getUsers($filePath);
+            $existingUsers = $this->repository->getUsers();
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
             $errors = [];

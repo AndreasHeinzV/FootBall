@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\SessionHandler;
-use App\Core\View;
 use App\Core\ViewInterface;
 use App\Model\FootballRepository;
-use Twig\Environment;
 
 class HomeController implements Controller
 {
     private FootballRepository $repository;
-    private Environment $twig;
 
     private array $value;
 
 
-    public function __construct(Environment $twig, FootballRepository $repository)
+    public function __construct(FootballRepository $repository)
     {
-        $this->twig = $twig;
+
         $this->repository = $repository;
 
         $this->value = [];

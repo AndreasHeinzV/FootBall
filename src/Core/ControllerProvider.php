@@ -41,15 +41,13 @@ class ControllerProvider
     {
         $page = $_GET['page'] ?? 'home';
         $controllerList = $this->getList();
-        $value = $controllerList[$page];
-        $controller = $this->container->get($value);
+
+        $controllerToRender = $controllerList[$page];
+        $controller = $this->container->get($controllerToRender);
+
         $view = $this->container->get(View::class);
-        $view->setTemplate($page. ".twig");
-       $this->data= $controller->load($view);
-    }
-
-
-    public function getData(): array{
-        return  $this->data;
+        $view->setTemplate($page . ".twig");
+        $data = $controller->load($view);
+        $view->setParametersForView($data);
     }
 }

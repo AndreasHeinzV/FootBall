@@ -7,20 +7,16 @@ namespace App\Controller;
 use App\Core\ViewInterface;
 use App\Model\FootballRepository;
 use App\Model\FootballRepositoryInterface;
-use App\Model\UserRepository;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 class LeaguesController implements Controller
 {
     private FootballRepository $repository;
-    private Environment $twig;
 
-    private UserRepository $userRepository;
-    public function __construct(Environment $twig, FootballRepositoryInterface $repository)
+
+    public function __construct(FootballRepositoryInterface $repository)
     {
         $this->repository = $repository;
-        $this->twig = $twig;
+
 
     }
 

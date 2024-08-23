@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Core;
 
 use Twig\Environment;
@@ -10,6 +12,7 @@ class View implements ViewInterface
     private Environment $twig;
 
     private string $template;
+
     public function __construct(Environment $twig)
     {
         $this->twig = $twig;
@@ -22,19 +25,34 @@ class View implements ViewInterface
         $this->parameters[$key] = $value;
     }
 
-    public function getTemplate(): string{
+    public function setParametersForView(array $data): void
+    {
+        /*
+        if (empty($data)) {
+            $this->parameters = [];
+        } else {
+            foreach ($data as $key => $value) {
+                $this->parameters[$key] = $value;
+            }
+        }
+          */
+        foreach ($data as $key => $value) {
+            $this->parameters[$key] = $value;
+        }
 
+    }
+    public function getTemplate(): string
+    {
         return $this->template;
     }
+
     public function setTemplate(string $template): void
     {
         $this->template = $template;
     }
-    public function getParameters(): array{
-        return $this->parameters;
-    }
-    public function display(string $template, array $dataArray): void
+
+    public function display(): void
     {
-        echo $this->twig->render($template, $dataArray);
+        echo $this->twig->render($this->template, $this->parameters);
     }
 }
