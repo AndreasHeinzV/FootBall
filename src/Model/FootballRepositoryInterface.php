@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use App\Model\DTOs\PlayerDTO;
+
 interface FootballRepositoryInterface
 {
     public function getLeagues(): array;
@@ -10,5 +12,5 @@ interface FootballRepositoryInterface
 
     public function getTeam(string $id): array;
 
-    public function getPlayer(string $id): array;
+    public function getPlayer(string $id): PlayerDTO;
 }

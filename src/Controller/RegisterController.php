@@ -4,82 +4,80 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Validation;
+
 use App\Core\ValidationInterface;
+use App\Core\View;
+use App\Core\ViewInterface;
+use App\Model\DTOs\ErrorsDTO;
+use App\Model\DTOs\UserDTO;
+use App\Model\Mapper\UserMapper;
+use App\Model\Mapper\UserMapperInterface;
 use App\Model\UserEntityManager;
 
 class RegisterController implements Controller
 {
 
 
-    private string $filePath;
-    private array $templateVars;
     private ValidationInterface $validation;
 
-    private string $firstName;
 
-    private string $lastName;
-    private string $email;
-    private string $password;
-    private array $errors;
-
+    private UserMapper $userMapper;
     private UserEntityManager $userEntityManager;
+    private UserDTO $userDTO;
 
-    public function __construct(UserEntityManager $userEntityManager, ValidationInterface $validation)
-    {
+    private ErrorsDTO $errorsDTO;
+    public array $temp;
+
+    public function __construct(
+        UserEntityManager $userEntityManager,
+        ValidationInterface $validation,
+        UserMapperInterface $userMapper,
+
+    ) {
         $this->userEntityManager = $userEntityManager;
-        $this->filePath = __DIR__ . '/../../users.json';
-        $this->templateVars = [];
+        $this->userMapper = $userMapper;
         $this->validation = $validation;
     }
 
 
-    public function load($view): array
+    public function load(ViewInterface $view): void
     {
+        $this->userDTO = new UserDTO('', '', '', '');
+        $this->errorsDTO = new ErrorsDTO('', '', '', '', '', '');
         $this->handlePost();
-        return $this->templateVars;
+        $this->setupView($view);
     }
-
 
     private function handlePost(): void
     {
         if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['registerMe'] === 'push') {
-           // $this->errors = [];
+            $this->temp['firstName'] = htmlspecialchars($_POST['fName'] ?? '');
+            $this->temp['lastName'] = htmlspecialchars($_POST['lName'] ?? '');
+            $this->temp['email'] = htmlspecialchars($_POST['email'] ?? '');
+            $this->temp['password'] = htmlspecialchars($_POST['password'] ?? '');
 
-            $userData = [
-                'firstName' => htmlspecialchars($_POST['fName'] ?? ''),
-                'lastName' => htmlspecialchars($_POST['lName'] ?? ''),
-                'email' => htmlspecialchars($_POST['lName'] ?? ''),
-                'password' => password_hash($_POST['password'] ?? '', PASSWORD_DEFAULT), // Hash the password securely
-            ];
-            $this->errors = $this->validation->checkForErrors($userData);
+            $this->userDTO = $this->userMapper->createDTO($this->temp);
+            $this->errorsDTO = $this->validation->userRegisterValidation($this->userDTO);
+            $inputValidation = $this->validation->checkForNoErrors($this->errorsDTO);
 
-            if (empty($this->errors)) {
-                $this->userEntityManager->save($userData, $this->email, $this->filePath);
-                $this->setTempVarsDefault();
+            if ($inputValidation) {
+                $this->userDTO = new UserDTO(
+                    $this->temp['firstName'],
+                    $this->temp['lastName'],
+                    $this->temp['email'],
+                    password_hash($this->temp['password'], PASSWORD_DEFAULT),
+                );
+                $this->userEntityManager->save($this->userDTO);
                 header('Location: /');
-            } else {
-                $this->setTempVars();
             }
         }
     }
 
 
-    private function setTempVarsDefault(): void
+    private function setupView(Viewinterface $view): void
     {
-        $this->templateVars['firstName'] = '';
-        $this->templateVars['lastName'] = '';
-        $this->templateVars['email'] = '';
-        $this->templateVars['password'] = '';
-        $this->templateVars['successMessage'] = 'User data saved successfully.';
-    }
-
-    private function setTempVars(): void
-    {
-        $this->templateVars['errors'] = $this->errors;
-        $this->templateVars['password'] = $this->password;
-        $this->templateVars['firstName'] = $this->firstName;
-        $this->templateVars['lastName'] = $this->lastName;
-        $this->templateVars['email'] = $this->email;
+        $view->setTemplate('register.twig');
+        $view->addParameter('userDto', $this->userDTO);
+        $view->addParameter('errors', $this->errorsDTO);
     }
 }

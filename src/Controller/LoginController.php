@@ -10,8 +10,6 @@ use App\Model\UserRepository;
 class LoginController implements Controller
 {
     private UserRepository $repository;
-
-
     private array $templateVars;
 
 
@@ -21,19 +19,13 @@ class LoginController implements Controller
         $this->templateVars = [];
     }
 
-    public function load(ViewInterface $view): array
+    public function load(ViewInterface $view): void
     {
         $this->handlePost();
-        //return $this->templateVars;
-        return $this->templateVars;
+
+       // return (object)$this->templateVars;
     }
 
-    /*
-    private function loadLogin(): void
-    {
-        echo $this->twig->render('login.twig', $this->templateVars);
-    }
-*/
     private function handlePost(): void
     {
         if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['loginButton'] === 'login') {
@@ -68,10 +60,8 @@ class LoginController implements Controller
         if (!empty($email)) {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors['emailError'] = "Invalid email address.";
-            } else {
-                if (!$this->checkLoginData($existingUsers, $email, $password)) {
-                    $errors['dataError'] = 'email and data is wrong';
-                }
+            } elseif (!$this->checkLoginData($existingUsers, $email, $password)) {
+                $errors['dataError'] = 'email and data is wrong';
             }
         } else {
             $errors['emailEmptyError'] = "Email is required.";
@@ -86,10 +76,8 @@ class LoginController implements Controller
     private function checkLoginData($existingUsers, $emailToCheck, $passwordToCheck): bool
     {
         foreach ($existingUsers as $user) {
-            if (isset($user['password'], $user['email'])) {
-                if ($user['email'] === $emailToCheck) {
-                    return password_verify($passwordToCheck, $user['password']);
-                }
+            if (isset($user['password'], $user['email']) && $user['email'] === $emailToCheck) {
+                return password_verify($passwordToCheck, $user['password']);
             }
         }
         return false;

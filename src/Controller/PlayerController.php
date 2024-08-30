@@ -4,33 +4,31 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\View;
 use App\Core\ViewInterface;
+use App\Model\DTOs\PlayerDTO;
 use App\Model\FootballRepositoryInterface;
 
 
 class PlayerController implements Controller
 {
     private FootballRepositoryInterface $repository;
-    private array $value;
 
     public function __construct(FootballRepositoryInterface $repository)
     {
         $this->repository = $repository;
-        //  $this->repository = new FootballRepository();
-        $this->value = [];
     }
 
-    public function load(ViewInterface $view): array
+    public function load(ViewInterface $view): void
     {
         $id = $_GET['id'];
         if (isset($id)) {
-            $playerArray = $this->repository->getPlayer($id);
-            $playerName = array_shift($playerArray);
-            $this->value['playerName'] = $playerName;
-            $this->value['playerData'] = $playerArray;
-            //echo $this->twig->render('player.twig', $this->value);
-            return $this->value;
+            $playerDTO = $this->repository->getPlayer($id);
+
+            $view->setTemplate('player.twig');
+
+            $view->addParameter('playerName', $playerDTO->name);
+            $view->addParameter('playerData', $playerDTO);
         }
-        return [];
     }
 }

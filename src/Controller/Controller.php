@@ -7,6 +7,6 @@ use App\Core\ViewInterface;
 
 interface Controller
 {
-    public function load(ViewInterface $view): array;
+    public function load(ViewInterface $view): void;
 
 }

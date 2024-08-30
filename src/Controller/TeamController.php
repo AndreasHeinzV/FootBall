@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\View;
 use App\Core\ViewInterface;
 use App\Model\FootballRepository;
 
@@ -11,24 +12,26 @@ class TeamController implements Controller
 {
     private FootballRepository $repository;
 
-    private array $value;
+    private array $squadArray;
 
-
-    public function __construct( FootballRepository $repository)
+    public function __construct(FootballRepository $repository)
     {
         $this->repository = $repository;
-        $this->value = [];
-        //$this->repository = new FootballRepository();
     }
 
-    public function load(ViewInterface $view): array
+    public function load(ViewInterface $view): void
     {
         $id = $_GET['id'];
         if (isset($id)) {
-            $squadArray = $this->repository->getTeam($id);
-            $this->value['players'] = $squadArray;
-            //echo $this->twig->render('team.twig', $this->value);
+            $this->squadArray = $this->repository->getTeam($id);
         }
-        return $this->value;
+        $this->setupView($view);
+    }
+
+    private function setupView(Viewinterface $view): void
+    {
+
+        $view->setTemplate('team.twig');
+        $view->addParameter('players', $this->squadArray ?? []);
     }
 }

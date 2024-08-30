@@ -1,13 +1,11 @@
-<html>
-
-
+<html lang="DE">
 
 <h1>{{ playerName }}</h1>
 <ul>
-    {% for player in playerData %}
-
-        <li>{{ player }}</li>
-    {% endfor %}
+    <li>{{ playerData.position }}</li>
+    <li>{{ playerData.dateOfBirth }}</li>
+    <li>{{ playerData.nationality }}</li>
+    <li>{{ playerData.shirtNumber }}</li>
 </ul>
 
 </html>

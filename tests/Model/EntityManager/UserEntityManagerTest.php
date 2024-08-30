@@ -14,6 +14,7 @@ class UserEntityManagerTest extends TestCase
     private string $path;
 
     private Validation $validation;
+    private UserEntityManager $entityManager;
 
     protected function setUp(): void
     {
@@ -29,6 +30,10 @@ class UserEntityManagerTest extends TestCase
             ],
         ];
         file_put_contents($this->path, json_encode($testData));
+
+
+
+        $this->entityManager = new UserEntityManager($this->validation, new UserRepository());
         parent::setUp();
     }
 
@@ -43,12 +48,11 @@ class UserEntityManagerTest extends TestCase
     public function testSafeUserSameMail(): void
     {
 
-        $stubRepositrory = $this->createStub(UserRepository::class);
-        $stubRepositrory->method('getFilePath')
+        $stubRepository = $this->createStub(UserRepository::class);
+        $stubRepository->method('getFilePath')
             ->willReturn($this->path);
 
-        //$entityManager = new UserEntityManager($this->validation, $stubRepositrory);
-        $entityManager = new UserEntityManager($this->validation, new UserRepository());
+
         $userData = [
             'firstName' => 'testcat',
             'lastName' => 'sghwhwehw',
@@ -56,11 +60,10 @@ class UserEntityManagerTest extends TestCase
             'password' => 'ewqwh262624rh',
         ];
 
-        $beforeSave = json_decode(file_get_contents($stubRepositrory->getFilePath()), true, 512, JSON_THROW_ON_ERROR);
 
+        $beforeSave = json_decode(file_get_contents($stubRepository->getFilePath()), true, 512, JSON_THROW_ON_ERROR);
         self::assertCount(1, $beforeSave);
-        $entityManager->save($userData);
-
+        $this->entityManager->save($userData);
         $actualData = json_decode(file_get_contents($this->path), true, 512, JSON_THROW_ON_ERROR);
 
 
@@ -71,6 +74,17 @@ class UserEntityManagerTest extends TestCase
         self::assertSame($userData['password'], $actualData[0]['password']);
 
 
+    }
+
+
+    public function testUserDifferentMail(): void
+    {
+
+        $stubRepository = $this->createStub(UserRepository::class);
+        $stubRepository->method('getFilePath')
+            ->willReturn($this->path);
+
+
         $userData2 = [
             'firstName' => 'test1',
             'lastName' => 'sghwhwehw1',
@@ -78,8 +92,8 @@ class UserEntityManagerTest extends TestCase
             'password' => 'ewqwh1262624rh',
         ];
 
-        $entityManager->save($userData2);
-        $actual2Data = json_decode(file_get_contents($stubRepositrory->getFilePath()), true);
+        $this->entityManager->save($userData2);
+        $actual2Data = json_decode(file_get_contents($stubRepository->getFilePath()), true);
 
         self::assertCount(2, $actual2Data);
         self::assertSame($userData2['firstName'], $actual2Data[1]['firstName']);

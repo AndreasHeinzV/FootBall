@@ -20,8 +20,8 @@ class UserRepository implements UserRepositoryInterface
     public function getUserName(array $existingUsers, string $email): string
     {
         foreach ($existingUsers as $existingUser) {
+
             if ($existingUser['email'] === $email) {
-                // echo  "Method: " . $existingUser['firstName']. "<br>";
                 return $existingUser['firstName'];
             }
         }

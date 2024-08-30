@@ -20,6 +20,10 @@ class ApiRequester implements ApiRequesterInterface
         $stream_context = stream_context_create($reqPref);
         $response = file_get_contents($url, false, $stream_context);
 
+
+        $filename = str_replace(['https://api.football-data.org/v4/', '/'], [''], $url);
+
+        file_put_contents(__DIR__ . '/' . $filename . '.json', $response);
         return json_decode($response, true);
     }
 }

@@ -5,32 +5,32 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Core\ValidationInterface;
+use App\Model\DTOs\UserDTO;
+use App\Model\Mapper\UserMapper;
+use App\Model\Mapper\UserMapperInterface;
 
 class UserEntityManager
 {
     private ValidationInterface $validation;
     private UserRepositoryInterface $repository;
-    private array $user;
+    private UserMapper $userMapper;
 
-    public function __construct(ValidationInterface $validation, UserRepositoryInterface $repository)
+    public function __construct(ValidationInterface $validation, UserRepositoryInterface $repository, UserMapperInterface $userMapper)
     {
-        $this->validation = $validation;#
+        $this->validation = $validation;
         $this->repository = $repository;
+        $this->userMapper = $userMapper;
     }
 
 
-    public function save(array $userData): void
+    public function save(UserDTO $userData): void
     {
         $existingUsers = $this->repository->getUsers();
-       // print_r($existingUsers);
-        //echo " <-array -> mail: ";
-        //print_r($userData['email']);
-        if ($this->validation->checkDuplicateMail($existingUsers, $userData['email'])) {
-
-            $this->updateUser( $existingUsers, $userData);
+        if ($this->validation->checkDuplicateMail($existingUsers, $userData->email)) {
+            $user = $this->userMapper->getUserData($userData);
+            $this->updateUser( $existingUsers, $user);
 
         } else {
-          //  echo "Vali doesnt work";
             $existingUsers[] = $userData;
             $this->putUserIntoJson($existingUsers);
         }

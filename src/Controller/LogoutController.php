@@ -10,10 +10,10 @@ use App\Core\ViewInterface;
 class LogoutController implements Controller
 {
 
-    public function load(ViewInterface $view): array
+    public function load(ViewInterface $view): void
     {
         $this->handleLogout();
-        return [];
+
     }
 
     private function handleLogout(): void

@@ -44,10 +44,7 @@ class ControllerProvider
 
         $controllerToRender = $controllerList[$page];
         $controller = $this->container->get($controllerToRender);
-
         $view = $this->container->get(View::class);
-        $view->setTemplate($page . ".twig");
-        $data = $controller->load($view);
-        $view->setParametersForView($data);
+        $controller->load($view);
     }
 }

@@ -6,14 +6,16 @@ namespace App\Tests\Controller;
 
 use App\Controller\PlayerController;
 use App\Core\ViewInterface;
+use App\Model\DTOs\PlayerDTO;
 use App\Model\FootballRepositoryInterface;
+use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
 
 class PlayerControllerTest extends TestCase
 {
     private PlayerController $controller;
 
-    private ViewInterface $view;
+    private ViewFaker $view;
 
     private FootballRepositoryInterface $repository;
 
@@ -23,7 +25,7 @@ class PlayerControllerTest extends TestCase
 
         $this->repository = $this->createStub(FootballRepositoryInterface::class);
         $this->controller = new PlayerController($this->repository);
-        $this->view = $this->createStub(ViewInterface::class);
+        $this->view = new ViewFaker();
     }
 
     protected function tearDown(): void
@@ -35,7 +37,7 @@ class PlayerControllerTest extends TestCase
     public function testClassIfGetIsEmpty(): void
     {
         $_GET = [];
-        $result = $this->controller->load($this->view);
+        $result = $this->controller->load();
         self::assertSame([], $result);
     }
 
@@ -43,23 +45,34 @@ class PlayerControllerTest extends TestCase
     {
         $_GET['id'] = "John";
 
-        $userData = [
-            'playerPosition' => 'Goalkeeper',
-            'playerDate' => '1996-02-13',
-            'playerNationality' => 'Brazil',
-            'playerShirtNumber' => '12',
-        ];
-
-        $this->repository->method('getPlayer')->willReturn([
-                'playerName' => 'John',
-                'playerPosition' => 'Goalkeeper',
-                'playerDate' => '1996-02-13',
-                'playerNationality' => 'Brazil',
-                'playerShirtNumber' => '12',
-            ]
+        $player = new PlayerDTO(
+            name: 'John',
+            position: 'Goalkeeper',
+            dateOfBirth: '1996-02-13',
+            nationality: 'Brazil',
+            shirtNumber: 12,
         );
 
-        $result = $this->controller->load($this->view);
-        self::assertSame(['playerName' => 'John', 'playerData' => $userData], $result);
+        $this->repository
+            ->method('getPlayer')
+            ->willReturn($player);
+
+        $this->controller->load($this->view);
+
+        $paramters = $this->view->getParameters();
+
+        self::assertArrayHasKey('playerData', $paramters);
+
+        $playerData = $paramters['playerData'];
+        self::assertSame('John', $playerData['name']);
+        self::assertSame('Goalkeeper', $playerData['position']);
+        self::assertSame('1996-02-13', $playerData['dateOfBirth']);
+        self::assertSame('Brazil', $playerData['nationality']);
+        self::assertSame(12, $playerData['shirtNumber']);
+
+
+        self::assertSame('player.twig', $this->view->getTemplate());
+
+        self::assertSame('John', $paramters['playerName']);
     }
 }
