@@ -12,7 +12,7 @@ class Validation implements ValidationInterface
 {
 
 
-    public function checkForNoErrors(ErrorsDTO $errorsDTO): bool
+    public function validateErrors(ErrorsDTO $errorsDTO): bool
     {
         foreach ($errorsDTO as $key => $error) {
             if (!($error === '')) {
@@ -21,6 +21,7 @@ class Validation implements ValidationInterface
         }
         return true;
     }
+
     public function checkDuplicateMail(array $existingUsers, string $mailToCheck): bool
     {
         foreach ($existingUsers as $user) {
@@ -34,36 +35,99 @@ class Validation implements ValidationInterface
     public function userRegisterValidation(UserDTO $userDTO): ErrorsDTO
     {
         $errors = [];
-        if (empty($userDTO->firstName)) {
-            $errors['firstNameEmptyError'] = "First name is empty.";
-        }
+        $errors['firstNameEmptyError'] = $this->checkForEmptyFirstName($userDTO->firstName);
+        $errors['lastNameEmptyError'] = $this->checkForEmptyLastName($userDTO->lastName);
+        $errors['emailError'] = $this->validateEmail($userDTO->email);
+        $errors['passwordError'] = $this->validatePasswordRegister($userDTO->password);
 
-        if (empty($userDTO->lastName)) {
-            $errors['lastNameEmptyError'] = "Last name is empty.";
-        }
 
-        if (empty($userDTO->email)) {
-            $errors['emailEmptyError'] = "Email is empty.";
-        } elseif (!filter_var($userDTO->email, FILTER_VALIDATE_EMAIL)) {
-            $errors['emailError'] = "Invalid email address.";
-        }
-
-        if (empty($userDTO->password)) {
-            $errors['passwordEmptyError'] = "Password is empty.";
-        } elseif (!preg_match('/^(?=.*\d)(?=.*[!?*#@$%^&])(?=.*[A-Z])(?=.*[a-z]).{7,}$/', $userDTO->password)) {
-            $errors['passwordError'] = "Password must be at least 7 characters long and include at least one lowercase letter, 
-        one uppercase letter, one number, and one special character like ?!*$#@%^&.";
-        }
         return (new ErrorMapper())->createErrorDTO($errors);
     }
 
-    private function checkLoginData(array $existingUsers, string $emailToCheck, string $passwordToCheck): bool
+    private function checkLoginData(array $existingUsers, UserDTO $userDTO): bool
     {
         foreach ($existingUsers as $user) {
-            if (isset($user['password'], $user['email']) && $user['email'] === $emailToCheck) {
-                return password_verify($passwordToCheck, $user['password']);
+            if ($user['email'] === $userDTO->email) {
+                return password_verify($userDTO->password, $user['password']);
             }
         }
         return false;
+    }
+
+
+    public function getErrors(array $existingUsers, UserDTO $userDTO): ErrorsDTO
+    {
+            $errors = [];
+        $errors['emailError']=$this->validateEmail($userDTO->email);
+        $errors['passwordError'] = $this->validatePasswordRegister($userDTO->password);
+
+            if (!$this->checkLoginData($existingUsers,$userDTO)) {
+                $errors['passwordError'] = 'email or password is wrong';
+            }
+
+
+        return (new ErrorMapper())->createErrorDTO($errors);
+    }
+    /*
+        public function userLoginValidation(UserDTO $userDTO): ErrorsDTO
+        {
+            if (empty($userDTO->firstName)) {
+                $errors['firstNameEmptyError'] = "First name is empty.";
+            }
+
+            if (empty($userDTO->lastName)) {
+                $errors['lastNameEmptyError'] = "Last name is empty.";
+            }
+        }
+    */
+
+    private function checkForEmptyFirstName(string $firstName): string
+    {
+        if (empty($firstName)) {
+            return "First name is empty.";
+        }
+        return "";
+    }
+
+    private function checkForEmptyLastName(string $lastName): string
+    {
+        if (empty($lastName)) {
+            return "Last name is empty.";
+        }
+        return "";
+    }
+
+    private function validateEmail(string $email): string
+    {
+        if (empty($email)) {
+            return "Email is empty.";
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return "Invalid email address.";
+        }
+        return "";
+    }
+
+    private function validatePasswordRegister(string $password): string
+    {
+        if (empty($password)) {
+            return "Password is empty.";
+        }
+
+        if (!preg_match('/^(?=.*\d)(?=.*[!?*#@$%^&])(?=.*[A-Z])(?=.*[a-z]).{7,}$/', $password)) {
+            return "Password must be at least 7 characters long and include at least one lowercase letter, 
+        one uppercase letter, one number, and one special character like ?!*$#@%^&.";
+        }
+        return "";
+    }
+    private function validatePasswordLogin(string $password): string
+    {
+        if (empty($password)) {
+            return "Password is empty.";
+        }
+
+
+        return "";
     }
 }

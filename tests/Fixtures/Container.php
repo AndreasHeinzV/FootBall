@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Fixtures;
 
+use App\Core\Validation;
 use App\Model\FootballRepository;
 use App\Model\Mapper\CompetitionMapper;
 use App\Model\Mapper\LeaguesMapper;
 use App\Model\Mapper\PlayerMapper;
 use App\Model\Mapper\TeamMapper;
+use App\Model\Mapper\UserMapper;
+use App\Model\UserEntityManager;
+use App\Model\UserRepository;
 use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
+use SebastianBergmann\CodeUnit\Mapper;
 
 class Container
 {
@@ -22,5 +27,15 @@ class Container
             new TeamMapper(),
             new PlayerMapper()
         );
+    }
+
+
+    public static function getEntityManager(): UserEntityManager{
+        return  new UserEntityManager(
+            new Validation(),
+            new UserRepository(),
+            new UserMapper(),
+        );
+
     }
 }

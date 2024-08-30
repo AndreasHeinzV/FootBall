@@ -12,5 +12,5 @@ interface ValidationInterface
 
     public function userRegisterValidation(UserDTO $userDTO): ErrorsDTO;
 
-    public function checkForNoErrors(ErrorsDTO $errorsDTO);
+    public function validateErrors(ErrorsDTO $errorsDTO);
 }

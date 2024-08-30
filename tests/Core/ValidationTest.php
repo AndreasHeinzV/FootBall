@@ -86,14 +86,14 @@ class ValidationTest extends TestCase
     public function testCheckForNoErrors(): void
     {
         $errorDTO = new ErrorsDTO('', '', '', '', '', '');
-        $errorStatus = $this->validation->checkForNoErrors($errorDTO);
+        $errorStatus = $this->validation->validateErrors($errorDTO);
         assertTrue($errorStatus);
     }
 
     public function testIfErrorsHasValues(): void
     {
         $errorDTO = new ErrorsDTO('First name is empty.', '', '', '', '', '');
-        $errorStatus = $this->validation->checkForNoErrors($errorDTO);
+        $errorStatus = $this->validation->validateErrors($errorDTO);
         assertFalse($errorStatus);
     }
 

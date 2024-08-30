@@ -14,6 +14,7 @@ class ApiRequesterFaker implements ApiRequesterInterface
         $path = __DIR__ . '/cache/' . $filename . '.json';
 
         if (!file_exists($path)) {
+
             return [];
         }
 

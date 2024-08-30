@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Model\EntityManager;
 
 use App\Core\Validation;
+use App\Model\DTOs\UserDTO;
+use App\Model\Mapper\UserMapper;
 use App\Model\UserEntityManager;
 use App\Model\UserRepository;
+use App\Tests\Fixtures\Container;
 use PHPUnit\Framework\TestCase;
 
 class UserEntityManagerTest extends TestCase
@@ -15,12 +18,16 @@ class UserEntityManagerTest extends TestCase
 
     private Validation $validation;
     private UserEntityManager $entityManager;
+    public UserMapper $userMapper;
+
+
 
     protected function setUp(): void
     {
+        $_ENV['test'] = 1;
         $this->path = __DIR__ . '/../../../users_test.json';
         $this->validation = new Validation();
-
+        $this->userMapper = new UserMapper();
         $testData = [
             [
                 'firstName' => 'ImATestCat',
@@ -30,16 +37,16 @@ class UserEntityManagerTest extends TestCase
             ],
         ];
         file_put_contents($this->path, json_encode($testData));
-
-
-
-        $this->entityManager = new UserEntityManager($this->validation, new UserRepository());
+        $this->entityManager = new UserEntityManager(
+            new Validation(),
+            new UserRepository(),
+            $this->userMapper
+        );
         parent::setUp();
     }
 
     protected function tearDown(): void
     {
-
         if (file_exists($this->path)) {
             unlink($this->path);
         }
@@ -59,27 +66,26 @@ class UserEntityManagerTest extends TestCase
             'email' => 'dog@gmail.com',
             'password' => 'ewqwh262624rh',
         ];
-
+    //$userDTO = new UserDTO('','','','');
 
         $beforeSave = json_decode(file_get_contents($stubRepository->getFilePath()), true, 512, JSON_THROW_ON_ERROR);
         self::assertCount(1, $beforeSave);
-        $this->entityManager->save($userData);
+        $userDTO = $this->userMapper->createDTO($userData);
+
+        $this->entityManager->save($userDTO);
         $actualData = json_decode(file_get_contents($this->path), true, 512, JSON_THROW_ON_ERROR);
 
 
         self::assertCount(1, $actualData);
-        self::assertSame($userData['firstName'], $actualData[0]['firstName']);
-        self::assertSame($userData['lastName'], $actualData[0]['lastName']);
-        self::assertSame($userData['email'], $actualData[0]['email']);
-        self::assertSame($userData['password'], $actualData[0]['password']);
-
-
+        self::assertSame($userData['firstName'], $userDTO->firstName);
+        self::assertSame($userData['lastName'], $userDTO->lastName);
+        self::assertSame($userData['email'], $userDTO->email);
+        self::assertSame($userData['password'], $userDTO->password);
     }
 
 
     public function testUserDifferentMail(): void
     {
-
         $stubRepository = $this->createStub(UserRepository::class);
         $stubRepository->method('getFilePath')
             ->willReturn($this->path);
@@ -91,8 +97,8 @@ class UserEntityManagerTest extends TestCase
             'email' => 'catinger@gmail.com',
             'password' => 'ewqwh1262624rh',
         ];
-
-        $this->entityManager->save($userData2);
+        $userDTO = $this->userMapper->createDTO($userData2);
+        $this->entityManager->save($userDTO);
         $actual2Data = json_decode(file_get_contents($stubRepository->getFilePath()), true);
 
         self::assertCount(2, $actual2Data);

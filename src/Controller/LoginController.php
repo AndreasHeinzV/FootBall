@@ -4,26 +4,34 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\Validation;
+use App\Core\View;
 use App\Core\ViewInterface;
+use App\Model\DTOs\ErrorsDTO;
+use App\Model\DTOs\UserDTO;
+use App\Model\Mapper\UserMapper;
 use App\Model\UserRepository;
+use PHPUnit\TextUI\XmlConfiguration\Validator;
 
 class LoginController implements Controller
 {
     private UserRepository $repository;
-    private array $templateVars;
+    public array $templateVars = [];
+    public UserDTO $userDTO;
+    public ErrorsDTO $errorsDTO;
 
-
+    public Validation $validator;
+    public UserMapper $userMapper;
+    public array $temp;
     public function __construct(UserRepository $repository)
     {
         $this->repository = $repository;
-        $this->templateVars = [];
     }
 
     public function load(ViewInterface $view): void
     {
         $this->handlePost();
-
-       // return (object)$this->templateVars;
+        $this->setupView($view);
     }
 
     private function handlePost(): void
@@ -35,10 +43,11 @@ class LoginController implements Controller
             $password = $_POST['password'] ?? '';
             $errors = [];
 
-            $errors = $this->checkAndGetErrors($existingUsers, $email, $password, $errors);
+            $this->userDTO = $this->userMapper->createDTO($this->temp);
+            $errorsDTO = $this->validator->getErrors($existingUsers, $this->userDTO);
+            $validation = $this->validator->validateErrors($this->errorsDTO);
 
-
-            if (empty($errors)) {
+            if (empty($validation)) {
                 $userName = $this->repository->getUserName($existingUsers, $email);
 
                 $this->templateVars['email'] = '';
@@ -55,23 +64,7 @@ class LoginController implements Controller
         }
     }
 
-    private function checkAndGetErrors(array $existingUsers, string $email, string $password, array $errors): array
-    {
-        if (!empty($email)) {
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors['emailError'] = "Invalid email address.";
-            } elseif (!$this->checkLoginData($existingUsers, $email, $password)) {
-                $errors['dataError'] = 'email and data is wrong';
-            }
-        } else {
-            $errors['emailEmptyError'] = "Email is required.";
-        }
-        if (empty($password)) {
-            $errors['passwordEmptyError'] = "Password is empty.";
-        }
 
-        return $errors;
-    }
 
     private function checkLoginData($existingUsers, $emailToCheck, $passwordToCheck): bool
     {
@@ -81,5 +74,13 @@ class LoginController implements Controller
             }
         }
         return false;
+    }
+
+    private function setupView(ViewInterface $view): void
+    {
+        $view->addParameter('errors', $this->errorsDTO);
+        $view->addParameter('userDto', $this->userDTO);
+
+        $view->setTemplate('login.twig');
     }
 }

@@ -23,12 +23,10 @@
     <label for="password">Password:</label>
     <input type="text" id="password" name="password" value="{{ errors ? userDto.password|default('') }}">
 
-    {% if errors.passwordEmptyError %}
-        <div class="error">{{ errors.passwordEmptyError }}</div>
-    {% endif %}
     {% if errors.passwordError %}
         <div class="error">{{ errors.passwordError }}</div>
     {% endif %}
+
     <br><br>
 
 
@@ -38,9 +36,7 @@
     {% if errors.emailError %}
         <div class="error">{{ errors.emailError }}</div>
     {% endif %}
-    {% if errors.emailEmptyError %}
-        <div class="error">{{ errors.emailEmptyError }}</div>
-    {% endif %}
+
     <br><br>
 
     <input type="submit" value="push" name="registerMe" id="push">

@@ -43,7 +43,7 @@ class RegisterController implements Controller
     public function load(ViewInterface $view): void
     {
         $this->userDTO = new UserDTO('', '', '', '');
-        $this->errorsDTO = new ErrorsDTO('', '', '', '', '', '');
+        $this->errorsDTO = new ErrorsDTO('', '', '', '');
         $this->handlePost();
         $this->setupView($view);
     }
@@ -58,7 +58,7 @@ class RegisterController implements Controller
 
             $this->userDTO = $this->userMapper->createDTO($this->temp);
             $this->errorsDTO = $this->validation->userRegisterValidation($this->userDTO);
-            $inputValidation = $this->validation->checkForNoErrors($this->errorsDTO);
+            $inputValidation = $this->validation->validateErrors($this->errorsDTO);
 
             if ($inputValidation) {
                 $this->userDTO = new UserDTO(

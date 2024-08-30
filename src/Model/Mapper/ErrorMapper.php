@@ -13,8 +13,6 @@ class ErrorMapper
         return new ErrorsDTO(
             $errors['firstNameEmptyError'] ?? '',
             $errors['lastNameEmptyError'] ?? '',
-            $errors['emailEmptyError'] ?? '',
-            $errors['passwordEmptyError'] ?? '',
             $errors['emailError'] ?? '',
             $errors['passwordError'] ?? ''
         );
@@ -25,8 +23,6 @@ class ErrorMapper
         return [
             'firstNameEmptyError' => $errorsDTO->firstNameEmptyError,
             'lastNameEmptyError' => $errorsDTO->lastNameEmptyError,
-            'emailEmptyError' => $errorsDTO->emailEmptyError,
-            'passwordEmptyError' => $errorsDTO->passwordEmptyError,
             'emailError' => $errorsDTO->emailError,
             'passwordError' => $errorsDTO->passwordError,
         ];

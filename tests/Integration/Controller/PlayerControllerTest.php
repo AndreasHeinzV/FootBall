@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Interagtion\Controller;
+namespace App\Tests\Integration\Controller;
 
 use App\Controller\PlayerController;
-use App\Model\Mapper\PlayerMapper;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class PlayerControllerTest extends TestCase
 {
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $_GET['id'] = '348';
         $view = new ViewFaker();
