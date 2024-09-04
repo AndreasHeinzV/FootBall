@@ -29,7 +29,7 @@ class DependencyProvider
     public function fill(Container $container): void
     {
         $container->set(ApiRequester::class, new ApiRequester());
-
+        $container->set(SessionHandler::class, new SessionHandler());
         $container->set(LogoutController::class, new LogoutController());
 
         $container->set(Validation::class, new Validation());
@@ -53,7 +53,6 @@ class DependencyProvider
 
         $container->set(SessionHandler::class, new SessionHandler());
 
-
         $container->set(FootballRepository::class, new FootballRepository(
             $container->get(ApiRequester::class),
             $container->get(LeaguesMapper::class),
@@ -68,9 +67,13 @@ class DependencyProvider
 
         $container->set(View::class, new View(
             $container->get(Environment::class),
+            $container->get(SessionHandler::class),
         ));
         $container->set(LoginController::class, new LoginController(
-            $container->get(UserRepository::class)
+            $container->get(UserRepository::class),
+            $container->get(UserMapper::class),
+            $container->get(Validation::class),
+            $container->get(SessionHandler::class),
         ));
 
         $container->set(RegisterController::class, new RegisterController(
@@ -91,7 +94,8 @@ class DependencyProvider
         ));
 
         $container->set(HomeController::class, new HomeController(
-            $container->get(FootballRepository::class)
+            $container->get(FootballRepository::class),
+            $container->get(SessionHandler::class),
         ));
     }
 }

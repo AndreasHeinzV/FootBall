@@ -1,4 +1,7 @@
 <html>
+{% block header %}
+    {% include 'base.twig' %}
+{% endblock %}
 <head>
     <h1>Login</h1>
 
@@ -10,12 +13,8 @@
     <label for="password">Password:</label>
     <input type="text" id="password" name="password" value="{{ errors ? password|default('') }}">
 
-    {% if errors.passwordEmptyError %}
-        <div class="error">{{ errors.passwordEmptyError }}</div>
-    {% endif %}
-
-    {% if errors.loginFailedError %}
-        <div class="error">{{ errors.loginFailedError }}</div>
+    {% if errors.passwordError %}
+        <div class="error">{{ errors.passwordError }}</div>
     {% endif %}
 
     <br><br>
@@ -29,9 +28,7 @@
     {% if errors.emailError %}
         <div class="error">{{ errors.emailError }}</div>
     {% endif %}
-    {% if errors.dataError %}
-        <div class="error">{{ errors.dataError }}</div>
-    {% endif %}
+
     <br><br>
 
     <input type="submit" value="login" name="loginButton" id="login">
@@ -39,10 +36,6 @@
     <a href="/register.php" > No Account Login page yet?</a>   <a href="/index.php" > Index </a><br>
 </form>
 
-{% if not errors %}
 
-    <p>{{ successMessage }}</p>
-
-{% endif %}
 </body>
 </html>

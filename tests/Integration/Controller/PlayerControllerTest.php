@@ -35,5 +35,4 @@ class PlayerControllerTest extends TestCase
         self::assertSame('player.twig', $view->getTemplate());
         self::assertSame('Rafinha', $parameters['playerName']);
     }
-
 }

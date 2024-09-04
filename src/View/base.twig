@@ -1,0 +1,20 @@
+<html>
+
+{% if not status %}
+    <a href="index.php/?page=register">
+        <button type="submit" name="page" value="register">Register</button>
+    </a>
+
+    <a href="/index.php/?page=login">
+        <button type="submit" name="page" value="login">Login</button>
+    </a>
+{% else  %}
+    <a href="index.php/?page=logout">
+        <button type="submit" name="page" value="logout">Logout</button>
+    </a>
+    <h1> Welcome: {{ userDto.userName }}</h1>
+
+{% endif %}
+
+
+</html>

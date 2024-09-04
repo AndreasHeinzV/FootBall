@@ -1,5 +1,7 @@
 <html lang="DE">
-
+{% block header %}
+    {% include 'base.twig' %}
+{% endblock %}
 <h1>{{ playerName }}</h1>
 <ul>
     <li>{{ playerData.position }}</li>

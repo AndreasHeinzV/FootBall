@@ -59,7 +59,7 @@ class RegisterControllerTest extends TestCase
 
         //var_export($errorDTO);
         self::assertNotEmpty($this->viewFaker->getTemplate());
-        self::assertSame('', $errorDTO->emailEmptyError);
+        self::assertSame('', $errorDTO->emailError);
     }
 
     public function testRegisterUserRightValues(): void
@@ -84,6 +84,6 @@ class RegisterControllerTest extends TestCase
 
         //var_export($errorDTO);
         self::assertNotEmpty($this->viewFaker->getTemplate());
-        self::assertSame('', $errorDTO->emailEmptyError);
+        self::assertSame('', $errorDTO->emailError);
     }
 }

@@ -15,8 +15,8 @@ class UserMapper implements UserMapperInterface
     public function createDTO(array $userData): UserDTO
     {
         return new UserDTO(
-            $userData['firstName'],
-            $userData['lastName'],
+            $userData['firstName'] ?? '',
+            $userData['lastName'] ?? '',
             $userData['email'],
             $userData['password']
         );

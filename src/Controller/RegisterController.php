@@ -57,7 +57,7 @@ class RegisterController implements Controller
             $this->temp['password'] = htmlspecialchars($_POST['password'] ?? '');
 
             $this->userDTO = $this->userMapper->createDTO($this->temp);
-            $this->errorsDTO = $this->validation->userRegisterValidation($this->userDTO);
+            $this->errorsDTO = $this->validation->userRegisterGetErrors($this->userDTO);
             $inputValidation = $this->validation->validateErrors($this->errorsDTO);
 
             if ($inputValidation) {

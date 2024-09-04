@@ -32,7 +32,7 @@ class Validation implements ValidationInterface
         return false;
     }
 
-    public function userRegisterValidation(UserDTO $userDTO): ErrorsDTO
+    public function userRegisterGetErrors(UserDTO $userDTO): ErrorsDTO
     {
         $errors = [];
         $errors['firstNameEmptyError'] = $this->checkForEmptyFirstName($userDTO->firstName);
@@ -44,7 +44,7 @@ class Validation implements ValidationInterface
         return (new ErrorMapper())->createErrorDTO($errors);
     }
 
-    private function checkLoginData(array $existingUsers, UserDTO $userDTO): bool
+    private function validateLogin(array $existingUsers, UserDTO $userDTO): bool
     {
         foreach ($existingUsers as $user) {
             if ($user['email'] === $userDTO->email) {
@@ -55,19 +55,15 @@ class Validation implements ValidationInterface
     }
 
 
-    public function getErrors(array $existingUsers, UserDTO $userDTO): ErrorsDTO
+    public function userLoginGetErrors(array $existingUsers, UserDTO $userDTO): ErrorsDTO
     {
-            $errors = [];
-        $errors['emailError']=$this->validateEmail($userDTO->email);
-        $errors['passwordError'] = $this->validatePasswordRegister($userDTO->password);
-
-            if (!$this->checkLoginData($existingUsers,$userDTO)) {
-                $errors['passwordError'] = 'email or password is wrong';
-            }
-
+        $errors = [];
+        $errors['emailError'] = $this->validateEmail($userDTO->email);
+        $errors['passwordError'] = $this->validatePasswordLogin($existingUsers, $userDTO);
 
         return (new ErrorMapper())->createErrorDTO($errors);
     }
+
     /*
         public function userLoginValidation(UserDTO $userDTO): ErrorsDTO
         {
@@ -121,13 +117,16 @@ class Validation implements ValidationInterface
         }
         return "";
     }
-    private function validatePasswordLogin(string $password): string
+
+    private function validatePasswordLogin(array $existingUsers, $userDTO): string
     {
-        if (empty($password)) {
+        if (empty($userDTO->password)) {
             return "Password is empty.";
         }
 
-
+        if (!$this->validateLogin($existingUsers, $userDTO)) {
+           return 'email or password is wrong';
+        }
         return "";
     }
 }

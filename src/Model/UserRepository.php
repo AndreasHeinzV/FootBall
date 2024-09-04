@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Model\DTOs\UserDTO;
+use App\Model\Mapper\UserMapper;
+
 class UserRepository implements UserRepositoryInterface
 {
     private string $filePath;
@@ -20,12 +23,22 @@ class UserRepository implements UserRepositoryInterface
     public function getUserName(array $existingUsers, string $email): string
     {
         foreach ($existingUsers as $existingUser) {
-
             if ($existingUser['email'] === $email) {
                 return $existingUser['firstName'];
             }
         }
         return '';
+    }
+
+    public function getUser(array $existingUsers, string $email): UserDTO
+    {
+        $userMapper = new UserMapper();
+        foreach ($existingUsers as $existingUser) {
+            if ($existingUser['email'] === $email) {
+                return $userMapper->createDTO($existingUser);
+            }
+        }
+        return new UserDTO('', '', '', '');
     }
 
     public function getUsers(): array

@@ -10,7 +10,7 @@ interface ValidationInterface
 
     public function checkDuplicateMail(array $existingUsers, string $mailToCheck): bool;
 
-    public function userRegisterValidation(UserDTO $userDTO): ErrorsDTO;
+    public function userRegisterGetErrors(UserDTO $userDTO): ErrorsDTO;
 
     public function validateErrors(ErrorsDTO $errorsDTO);
 }

@@ -43,7 +43,7 @@ class ValidationTest extends TestCase
         one uppercase letter, one number, and one special character like ?!*$#@%^&.";
 
 
-        $errorDTO = $this->validation->userRegisterValidation($this->userDTO);
+        $errorDTO = $this->validation->userRegisterGetErrors($this->userDTO);
 
         // self::assertInstanceOf(ErrorsDTO::class, $errorDTO);
 
@@ -59,12 +59,12 @@ class ValidationTest extends TestCase
         one uppercase letter, one number, and one special character like ?!*$#@%^&.";
 
         $userDTO = new UserDTO('','', '', '');
-        $errorDTO = $this->validation->userRegisterValidation($userDTO);
+        $errorDTO = $this->validation->userRegisterGetErrors($userDTO);
 
         // self::assertInstanceOf(ErrorsDTO::class, $errorDTO);
 
-        self::assertSame($errorDTO->emailEmptyError, 'Email is empty.');
-        self::assertSame($errorDTO->passwordEmptyError, 'Password is empty.');
+        self::assertSame($errorDTO->emailError, 'Email is empty.');
+        self::assertSame($errorDTO->passwordError, 'Password is empty.');
         self::assertSame($errorDTO->firstNameEmptyError, 'First name is empty.');
         self::assertSame($errorDTO->lastNameEmptyError, 'Last name is empty.');
 
@@ -80,7 +80,7 @@ class ValidationTest extends TestCase
             'password' => 'passw0rd',
         ];
         $userDTO = $this->userMapper->createDTO($testData);
-        $errorDTO = $this->validation->userRegisterValidation($userDTO);
+        $errorDTO = $this->validation->userRegisterGetErrors($userDTO);
         self::assertSame($errorMessage, $errorDTO->emailError);
     }
     public function testCheckForNoErrors(): void

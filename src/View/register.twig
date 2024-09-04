@@ -1,6 +1,8 @@
 <html>
 <body>
-
+{% block header %}
+    {% include 'base.twig' %}
+{% endblock %}
 <form action="/?page=register" method="POST">
     <label for="fName">First name:</label>
     <input type="text" id="fName" name="fName" value="{{ errors ? userDto.firstName|default('') }}">
