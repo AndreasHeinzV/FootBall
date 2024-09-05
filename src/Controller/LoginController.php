@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\RedirectInterface;
 use App\Core\SessionHandler;
 use App\Core\Validation;
 use App\Core\View;
@@ -29,6 +30,7 @@ class LoginController implements Controller
         public UserMapperInterface $userMapper,
         public Validation $validator,
         public SessionHandler $sessionHandler,
+        public RedirectInterface $redirect,
     ) {
     }
 
@@ -54,15 +56,11 @@ class LoginController implements Controller
             $validation = $this->validator->validateErrors($this->errorsDTO);
 
             if ($validation) {
-                $this->sessionHandler->setStatus(true);
-                // $_SESSION["loginStatus"] = true;
-                //   $_SESSION['userName'] = $this->repository->getUserName($existingUsers, $this->userDTO->email);
+                $this->sessionHandler->startSession();
                 $this->userDTO = $this->repository->getUser($existingUsers, $this->userDTO->email);
                 $this->sessionHandler->setUserDTO($this->userDTO);
-                header("Location: /index.php");
-            } else {
-                $this->sessionHandler->setStatus(false);
-                //$_SESSION['loginStatus'] = false;
+                $this->sessionHandler->setUserDTO($this->userDTO);
+               $this->redirect->to('index.php');
             }
         }
     }
@@ -70,7 +68,7 @@ class LoginController implements Controller
     private function setupView(ViewInterface $view): void
     {
         $view->addParameter('errors', $this->errorsDTO);
-        $view->addParameter('userDto', $this->sessionHandler->getUserDTO());
+        $view->addParameter('userDto', $this->userDTO);
         $view->setTemplate('login.twig');
     }
 

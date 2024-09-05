@@ -32,7 +32,8 @@ class userMapperTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->testData = [];
+        unset($this->testData, $this->userMapper);
+        parent::tearDown();
     }
 
     public function testCreateDTO(): void

@@ -17,6 +17,7 @@ class ControllerProvider
     private Container $container;
     private array $data;
 
+    public string $testData = "";
     public function __construct(Container $container)
     {
         $this->container = $container;
@@ -43,6 +44,9 @@ class ControllerProvider
         $controllerList = $this->getList();
 
         $controllerToRender = $controllerList[$page];
+        if ($_ENV['test']){
+            $this->testData = $controllerToRender;
+        }
         $controller = $this->container->get($controllerToRender);
         $view = $this->container->get(View::class);
         $controller->load($view);

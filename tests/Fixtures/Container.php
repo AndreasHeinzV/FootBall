@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Fixtures;
 
+use App\Controller\LogoutController;
+use App\Core\Redirect;
+use App\Core\SessionHandler;
 use App\Core\Validation;
 use App\Model\FootballRepository;
 use App\Model\Mapper\CompetitionMapper;
@@ -21,21 +24,25 @@ class Container
     public static function getRepository(): FootballRepository
     {
         return new FootballRepository(
-            new ApiRequesterFaker(),
-            new LeaguesMapper(),
-            new CompetitionMapper(),
-            new TeamMapper(),
-            new PlayerMapper()
+            new ApiRequesterFaker(
+                new LeaguesMapper(),
+                new CompetitionMapper(),
+                new TeamMapper(),
+                new PlayerMapper()
+            ),
+
         );
     }
 
 
-    public static function getEntityManager(): UserEntityManager{
-        return  new UserEntityManager(
+    public static function getEntityManager(): UserEntityManager
+    {
+        return new UserEntityManager(
             new Validation(),
             new UserRepository(),
             new UserMapper(),
         );
-
     }
+
+
 }

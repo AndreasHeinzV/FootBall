@@ -28,18 +28,19 @@ class DependencyProvider
 
     public function fill(Container $container): void
     {
-        $container->set(ApiRequester::class, new ApiRequester());
-        $container->set(SessionHandler::class, new SessionHandler());
-        $container->set(LogoutController::class, new LogoutController());
-
         $container->set(Validation::class, new Validation());
-
         $container->set(UserMapper::class, new UserMapper());
         $container->set(LeaguesMapper::class, new LeaguesMapper());
         $container->set(CompetitionMapper::class, new CompetitionMapper());
         $container->set(TeamMapper::class, new TeamMapper());
         $container->set(PlayerMapper::class, new PlayerMapper());
-
+        $container->set(Redirect::class, new Redirect());
+        $container->set(ApiRequester::class, new ApiRequester(
+            $container->get(LeaguesMapper::class),
+            $container->get(CompetitionMapper::class),
+            $container->get(TeamMapper::class),
+            $container->get(PlayerMapper::class)
+        ));
         $container->set(FilesystemLoader::class, new FilesystemLoader(__DIR__ . '/../View'));
 
         $container->set(UserRepository::class, new UserRepository());
@@ -51,14 +52,16 @@ class DependencyProvider
 
         ));
 
-        $container->set(SessionHandler::class, new SessionHandler());
-
+        $container->set(SessionHandler::class, new SessionHandler(
+            $container->get(UserMapper::class)
+        ));
+        $container->set(LogoutController::class, new LogoutController(
+            $container->get(SessionHandler::class),
+            $container->get(Redirect::class),
+        ));
         $container->set(FootballRepository::class, new FootballRepository(
             $container->get(ApiRequester::class),
-            $container->get(LeaguesMapper::class),
-            $container->get(CompetitionMapper::class),
-            $container->get(TeamMapper::class),
-            $container->get(PlayerMapper::class)
+
         ));
 
 
@@ -74,12 +77,14 @@ class DependencyProvider
             $container->get(UserMapper::class),
             $container->get(Validation::class),
             $container->get(SessionHandler::class),
+            $container->get(Redirect::class)
         ));
 
         $container->set(RegisterController::class, new RegisterController(
             $container->get(UserEntityManager::class),
             $container->get(Validation::class),
-            $container->get(UserMapper::class)
+            $container->get(UserMapper::class),
+            $container->get(Redirect::class)
         ));
 
         $container->set(PlayerController::class, new PlayerController(

@@ -11,6 +11,7 @@ use App\Model\Mapper\ErrorMapper;
 use App\Model\Mapper\UserMapper;
 use App\Model\UserEntityManager;
 use App\Model\UserRepository;
+use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
 
@@ -26,6 +27,7 @@ class RegisterControllerTest extends TestCase
     public Validation $validation;
 
     public ErrorMapper $errorMapper;
+    public RedirectSpy $redirectSpy;
 
     protected function setUp(): void
     {
@@ -35,6 +37,7 @@ class RegisterControllerTest extends TestCase
         $this->userMapper = new UserMapper();
         $this->validation = new Validation();
         $this->errorMapper = new ErrorMapper();
+        $this->redirectSpy = new RedirectSpy();
     }
 
     public function testRegisterUserWrongValues(): void
@@ -48,16 +51,20 @@ class RegisterControllerTest extends TestCase
         $_POST['password'] = 'wgw';
 
         $userEntityManager = new UserEntityManager($this->validation, new UserRepository(), $this->userMapper,);
-        $userRegisterController = new RegisterController($userEntityManager, $this->validation, $this->userMapper);
+        $userRegisterController = new RegisterController(
+            $userEntityManager,
+            $this->validation,
+            $this->userMapper,
+            $this->redirectSpy
+        );
 
         $userRegisterController->load($this->viewFaker);
         $parameters = $this->viewFaker->getParameters();
 
         $errorData = $parameters['errors'];
         $errorDTO = $this->errorMapper->createErrorDTO($errorData);
-        //var_export($viewFaker->getTemplate());
 
-        //var_export($errorDTO);
+
         self::assertNotEmpty($this->viewFaker->getTemplate());
         self::assertSame('', $errorDTO->emailError);
     }
@@ -73,16 +80,20 @@ class RegisterControllerTest extends TestCase
         $_POST['password'] = 'CatIsCute1!';
 
         $userEntityManager = new UserEntityManager($this->validation, new UserRepository(), $this->userMapper,);
-        $userRegisterController = new RegisterController($userEntityManager, $this->validation, $this->userMapper);
+        $userRegisterController = new RegisterController(
+            $userEntityManager,
+            $this->validation,
+            $this->userMapper,
+            $this->redirectSpy
+        );
 
         $userRegisterController->load($this->viewFaker);
         $parameters = $this->viewFaker->getParameters();
 
         $errorData = $parameters['errors'];
         $errorDTO = $this->errorMapper->createErrorDTO($errorData);
-        //var_export($viewFaker->getTemplate());
 
-        //var_export($errorDTO);
+
         self::assertNotEmpty($this->viewFaker->getTemplate());
         self::assertSame('', $errorDTO->emailError);
     }

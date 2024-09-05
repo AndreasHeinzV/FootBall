@@ -35,6 +35,13 @@ class ValidationTest extends TestCase
 
         $this->userMapper = new UserMapper();
         $this->userDTO = $this->userMapper->createDTO($this->testData);
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        unset($this->validation, $this->userDTO, $this->userMapper, $this->testData);
+        parent::tearDown();
     }
 
     public function testUserRegisterValidation(): void
@@ -58,7 +65,7 @@ class ValidationTest extends TestCase
         $errorMessage = "Password must be at least 7 characters long and include at least one lowercase letter, 
         one uppercase letter, one number, and one special character like ?!*$#@%^&.";
 
-        $userDTO = new UserDTO('','', '', '');
+        $userDTO = new UserDTO('', '', '', '');
         $errorDTO = $this->validation->userRegisterGetErrors($userDTO);
 
         // self::assertInstanceOf(ErrorsDTO::class, $errorDTO);
@@ -67,8 +74,8 @@ class ValidationTest extends TestCase
         self::assertSame($errorDTO->passwordError, 'Password is empty.');
         self::assertSame($errorDTO->firstNameEmptyError, 'First name is empty.');
         self::assertSame($errorDTO->lastNameEmptyError, 'Last name is empty.');
-
     }
+
     public function testUserRegisterInvalidMail(): void
     {
         $errorMessage = "Invalid email address.";
@@ -83,6 +90,7 @@ class ValidationTest extends TestCase
         $errorDTO = $this->validation->userRegisterGetErrors($userDTO);
         self::assertSame($errorMessage, $errorDTO->emailError);
     }
+
     public function testCheckForNoErrors(): void
     {
         $errorDTO = new ErrorsDTO('', '', '', '', '', '');

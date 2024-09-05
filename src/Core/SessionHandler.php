@@ -5,35 +5,52 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Model\DTOs\UserDTO;
+use App\Model\Mapper\UserMapper;
 
 class SessionHandler
 {
-    private bool $status;
-    public UserDTO $user;
 
-    public function __construct()
+    public UserDTO $emptyUser;
+
+    public UserMapper $mapper;
+
+    //  public UserMapper $mapper;
+    public function __construct(UserMapper $mapper)
     {
-        $this->user = new UserDTO('','','','');
-        $this->status = false;
+
+        $this->mapper = $mapper;
     }
 
 
-    public function setStatus(bool $status): void
+    public function startSession(): void
     {
-        $this->status = $status;
+        $_SESSION['status'] = true;
+    }
+
+    public function stopSession(): void
+    {
+        $_SESSION['status'] = false;
     }
 
     public function setUserDTO(UserDTO $userDTO): void
     {
-        $this->user = $userDTO;
+        $_SESSION['userDto'] = $this->mapper->getUserData($userDTO);
     }
 
 
     public function getUserDTO(): UserDTO
     {
-        return $this->user;
+        if (isset($_SESSION['userDto'])) {
+            $this->emptyUser = $this->mapper->createDTO($_SESSION['userDto']);
+        } else {
+            $this->emptyUser = new UserDTO('', '', '', '');
+        }
+        return $this->emptyUser;
     }
-    public function getStatus(): bool{
-        return $this->status;
+
+    public function getStatus(): bool
+    {
+        return isset($_SESSION['status']) ? $_SESSION['status'] : false;
+
     }
 }

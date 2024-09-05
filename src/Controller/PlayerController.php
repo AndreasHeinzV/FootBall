@@ -26,7 +26,6 @@ class PlayerController implements Controller
             $playerDTO = $this->repository->getPlayer($id);
 
             $view->setTemplate('player.twig');
-
             $view->addParameter('playerName', $playerDTO->name);
             $view->addParameter('playerData', $playerDTO);
         }

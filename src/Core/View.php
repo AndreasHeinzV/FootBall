@@ -36,6 +36,7 @@ class View implements ViewInterface
     public function display(): void
     {
         $this->addParameter('status', $this->sessionHandler->getStatus());
+        $this->addParameter('userDto', $this->sessionHandler->getUserDTO());
         dump($this->parameters);
         echo $this->twig->render($this->template, $this->parameters);
     }

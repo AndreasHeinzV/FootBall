@@ -6,16 +6,20 @@ namespace App\Tests\Integration\Controller;
 
 use App\Controller\HomeController;
 use App\Controller\LoginController;
+use App\Core\SessionHandler;
 use App\Core\Validation;
 use App\Model\Mapper\UserMapper;
 use App\Model\UserRepository;
 use App\Tests\Fixtures\Container;
+use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\TextUI\XmlConfiguration\Validator;
 
 class HomeControllerTest extends TestCase
 {
+    public SessionHandler $sessionHandler;
+
     protected function setUp(): void
     {
         $_ENV['test'] = 1;
@@ -35,12 +39,22 @@ class HomeControllerTest extends TestCase
             ],
         ];
         file_put_contents($this->path, json_encode($testData));
+
+        $mapper = new UserMapper();
+        $this->sessionHandler = new SessionHandler($mapper);
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        unset($_ENV['test'], $_SERVER['REQUEST_METHOD'], $_POST['loginButton'], $_POST['email'], $_POST['password']);
+        parent::tearDown();
     }
 
     public function testIndex(): void
     {
         $view = new ViewFaker();
-        $teamController = new HomeController(Container::getRepository());
+        $teamController = new HomeController(Container::getRepository(), $this->sessionHandler);
         $teamController->load($view);
         $parameters = $view->getParameters();
 
@@ -58,21 +72,22 @@ class HomeControllerTest extends TestCase
         $userRepository = new UserRepository();
         $userMapper = new UserMapper();
         $validation = new Validation();
-
+        $redirectSpy = new RedirectSpy();
+        $sessionHandler = new SessionHandler($userMapper);
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['loginButton'] = 'login';
         $_POST['email'] = 'ilovecats@gmail.com';
         $_POST['password'] = '1LoveCats!';
 
-        $loginController = new LoginController($userRepository, $userMapper, $validation);
+        $loginController = new LoginController(
+            $userRepository, $userMapper, $validation, $sessionHandler, $redirectSpy
+        );
+
         $loginController->load($view);
-
-
-        $teamController = new HomeController(Container::getRepository());
+        $teamController = new HomeController(Container::getRepository(), $sessionHandler);
         $teamController->load($view);
-        $parameters = $view->getParameters();
-        $loginStatus = $parameters['status'];
-       // var_dump($parameters);
+        $loginStatus = $sessionHandler->getStatus();
+
         self::assertTrue($loginStatus);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 
+use App\Core\RedirectInterface;
 use App\Core\ValidationInterface;
 use App\Core\View;
 use App\Core\ViewInterface;
@@ -26,17 +27,22 @@ class RegisterController implements Controller
     private UserDTO $userDTO;
 
     private ErrorsDTO $errorsDTO;
+
+    public RedirectInterface $redirect;
     public array $temp;
+
 
     public function __construct(
         UserEntityManager $userEntityManager,
         ValidationInterface $validation,
         UserMapperInterface $userMapper,
+        RedirectInterface $redirect,
 
     ) {
         $this->userEntityManager = $userEntityManager;
         $this->userMapper = $userMapper;
         $this->validation = $validation;
+        $this->redirect = $redirect;
     }
 
 
@@ -68,7 +74,7 @@ class RegisterController implements Controller
                     password_hash($this->temp['password'], PASSWORD_DEFAULT),
                 );
                 $this->userEntityManager->save($this->userDTO);
-                header('Location: /');
+               $this->redirect->to('');
             }
         }
     }

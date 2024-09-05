@@ -34,7 +34,7 @@
 
 
     <label for="email">Email:</label>
-    <input type="text" id="email" name="email" value="{{ errors? userDto.email|default('') }}">
+    <input type="text" id="email" name="email" value="{{ userDto.email }}">
     {% if errors.emailError %}
         <div class="error">{{ errors.emailError }}</div>
     {% endif %}

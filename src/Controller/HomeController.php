@@ -23,11 +23,13 @@ class HomeController implements Controller
 
     public function load(ViewInterface $view): void
     {
+        /*
         if (!isset($_GET['page'])  && $this->sessionHandler->getStatus() === true) {
 
           //  $this->value['userName'] =$_SESSION['userName'] ?? '';
            // $this->value['status'] = true;
         }
+        */
        $this->setupView($view);
     }
 
@@ -37,7 +39,7 @@ class HomeController implements Controller
         //var_export($this->repository->getLeagues());
        // $view->addParameter('userName', $this->value['userName'] ?? '');
         $view->addParameter('leagues', $this->repository->getLeagues() ?? []);
-        $view->addParameter('userDto', $this->sessionHandler->getUserDto());
+     //   $view->addParameter('userDto', $this->sessionHandler->getUserDto());
      //$view->addParameter('status', $this->value['status'] ?? false);
     }
 }
