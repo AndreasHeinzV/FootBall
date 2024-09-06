@@ -68,7 +68,7 @@ class ValidationTest extends TestCase
         $userDTO = new UserDTO('', '', '', '');
         $errorDTO = $this->validation->userRegisterGetErrors($userDTO);
 
-        // self::assertInstanceOf(ErrorsDTO::class, $errorDTO);
+
 
         self::assertSame($errorDTO->emailError, 'Email is empty.');
         self::assertSame($errorDTO->passwordError, 'Password is empty.');
@@ -104,5 +104,18 @@ class ValidationTest extends TestCase
         $errorStatus = $this->validation->validateErrors($errorDTO);
         assertFalse($errorStatus);
     }
-
+    /*
+    public function testPasswordEmpty(): void
+    {
+        $testData = [
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'doggmail.com',
+            'password' => '',
+        ];
+        $userDTO = $this->userMapper->createDTO($testData);
+        $validation = new Validation();
+        $validation->userLoginGetErrors(,$userDTO);
+    }
+    */
 }

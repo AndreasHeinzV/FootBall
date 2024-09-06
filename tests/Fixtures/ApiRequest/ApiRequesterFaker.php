@@ -91,7 +91,7 @@ class ApiRequesterFaker implements ApiRequesterInterface
             $team['goalDifference'] = $table['goalDifference'];;
             $teams[] = $this->competitionMapper->createCompetitionDTO($team);
         }
-        // var_dump($teams);
+
         return $teams;
     }
 
@@ -101,7 +101,7 @@ class ApiRequesterFaker implements ApiRequesterInterface
         $matches = $this->parRequest($uri);
         $leaguesArray = [];
 
-        //var_export($matches['competitions']);
+
         foreach ($matches['competitions'] as $competition) {
             $leagueArray = [];
             $leagueArray['id'] = $competition['id'];

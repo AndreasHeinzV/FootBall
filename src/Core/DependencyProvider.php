@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Controller\FavoriteController;
 use App\Controller\HomeController;
 use App\Controller\LeaguesController;
 use App\Controller\LoginController;
@@ -12,6 +13,7 @@ use App\Controller\PlayerController;
 use App\Controller\RegisterController;
 use App\Controller\TeamController;
 use App\Model\ApiRequester;
+use App\Model\DTOs\UserDTO;
 use App\Model\FootballRepository;
 use App\Model\Mapper\CompetitionMapper;
 use App\Model\Mapper\LeaguesMapper;
@@ -51,7 +53,7 @@ class DependencyProvider
             $container->get(UserMapper::class)
 
         ));
-
+        $container->set(FavoriteHandler::class, new FavoriteHandler());
         $container->set(SessionHandler::class, new SessionHandler(
             $container->get(UserMapper::class)
         ));
@@ -63,7 +65,10 @@ class DependencyProvider
             $container->get(ApiRequester::class),
 
         ));
-
+        $container->set(FavoriteController::class, new FavoriteController(
+            $container->get(SessionHandler::class),
+            $container->get(FavoriteHandler::class)
+        ));
 
         $container->set(Environment::class, new Environment(
             $container->get(FilesystemLoader::class)));
@@ -103,4 +108,6 @@ class DependencyProvider
             $container->get(SessionHandler::class),
         ));
     }
+
+
 }

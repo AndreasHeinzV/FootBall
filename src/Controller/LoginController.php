@@ -45,7 +45,7 @@ class LoginController implements Controller
     private function handlePost(): void
     {
         if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['loginButton'] === 'login') {
-            $filePath = __DIR__ . '/../../users.json';
+           // $filePath = __DIR__ . '/../../users.json';
 
             $existingUsers = $this->repository->getUsers();
             $this->temp['email'] = htmlspecialchars($_POST['email'] ?? '');

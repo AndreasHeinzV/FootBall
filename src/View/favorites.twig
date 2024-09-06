@@ -1,0 +1,8 @@
+<html>
+<h1>Favorite clubs</h1>
+{% for favorite in favorites %}
+
+
+    <li><a href="{{ favorite.link}}" >{{ favorite.name }}</a></li>
+{% endfor %}
+</html>

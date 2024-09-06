@@ -37,7 +37,6 @@ class ApiRequesterTest extends TestCase
 
     protected function tearDown(): void
     {
-
         parent::tearDown();
     }
 
@@ -47,4 +46,32 @@ class ApiRequesterTest extends TestCase
         self::assertNotEmpty($playerDTO);
         self::assertNotSame('', $playerDTO->name);
     }
+
+    public function testApiRequestGetCompetition(): void
+    {
+        $competition = $this->apiRequester->getCompetition('BSA');
+
+        self::assertCount(20, $competition);
+        self::assertNotSame('', $competition[0]->name);
+    }
+
+    public function testApiRequestGetTeam(): void
+    {
+        $team = $this->apiRequester->getTeam('3984');
+        self::assertNotEmpty($team[0]->name);
+    }
+
+    public function testApiRequestGetPlayers(): void
+    {
+        $leagues = $this->apiRequester->getLeagues();
+
+        $bool = false;
+        foreach ($leagues as $league) {
+            if ($league->name === 'Bundesliga') {
+                $bool = true;
+            }
+        }
+        self::assertTrue($bool);
+    }
+
 }

@@ -44,6 +44,15 @@ class Validation implements ValidationInterface
         return (new ErrorMapper())->createErrorDTO($errors);
     }
 
+    public function userLoginGetErrors(array $existingUsers, UserDTO $userDTO): ErrorsDTO
+    {
+        $errors = [];
+        $errors['emailError'] = $this->validateEmail($userDTO->email);
+        $errors['passwordError'] = $this->validatePasswordLogin($existingUsers, $userDTO);
+
+        return (new ErrorMapper())->createErrorDTO($errors);
+    }
+
     private function validateLogin(array $existingUsers, UserDTO $userDTO): bool
     {
         foreach ($existingUsers as $user) {
@@ -54,28 +63,6 @@ class Validation implements ValidationInterface
         return false;
     }
 
-
-    public function userLoginGetErrors(array $existingUsers, UserDTO $userDTO): ErrorsDTO
-    {
-        $errors = [];
-        $errors['emailError'] = $this->validateEmail($userDTO->email);
-        $errors['passwordError'] = $this->validatePasswordLogin($existingUsers, $userDTO);
-
-        return (new ErrorMapper())->createErrorDTO($errors);
-    }
-
-    /*
-        public function userLoginValidation(UserDTO $userDTO): ErrorsDTO
-        {
-            if (empty($userDTO->firstName)) {
-                $errors['firstNameEmptyError'] = "First name is empty.";
-            }
-
-            if (empty($userDTO->lastName)) {
-                $errors['lastNameEmptyError'] = "Last name is empty.";
-            }
-        }
-    */
 
     private function checkForEmptyFirstName(string $firstName): string
     {
@@ -125,7 +112,7 @@ class Validation implements ValidationInterface
         }
 
         if (!$this->validateLogin($existingUsers, $userDTO)) {
-           return 'email or password is wrong';
+            return 'email or password is wrong';
         }
         return "";
     }

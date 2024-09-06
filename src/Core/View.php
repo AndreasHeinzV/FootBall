@@ -11,12 +11,11 @@ class View implements ViewInterface
     protected array $parameters = [];
     protected string $template = 'home.twig';
 
+    public string $test;
     public function __construct(
         private readonly Environment $twig,
         public SessionHandler $sessionHandler,
-    )
-    {
-
+    ) {
     }
 
     public function addParameter(string $key, mixed $value): void
@@ -37,7 +36,10 @@ class View implements ViewInterface
     {
         $this->addParameter('status', $this->sessionHandler->getStatus());
         $this->addParameter('userDto', $this->sessionHandler->getUserDTO());
-        dump($this->parameters);
+        if (isset($_ENV['test'])){
+            $this->test = $this->twig->render($this->template, $this->parameters);
+        }
+
         echo $this->twig->render($this->template, $this->parameters);
     }
 }

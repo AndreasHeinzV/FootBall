@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Controller\FavoriteController;
 use App\Controller\HomeController;
 use App\Controller\LeaguesController;
 use App\Controller\LoginController;
@@ -15,7 +16,7 @@ use App\Controller\TeamController;
 class ControllerProvider
 {
     private Container $container;
-    private array $data;
+    private array $data = [];
 
     public string $testData = "";
     public function __construct(Container $container)
@@ -33,7 +34,7 @@ class ControllerProvider
             'register' => RegisterController::class,
             'login' => LoginController::class,
             'logout' => LogoutController::class,
-
+            'favorites' => FavoriteController::class,
 
         ];
     }

@@ -9,6 +9,8 @@ namespace App\Tests\Model\Repository;
 use App\Model\UserRepository;
 use PHPUnit\Framework\TestCase;
 
+use function PHPUnit\Framework\assertSame;
+
 class UserRepositoryTest extends TestCase
 {
     private string $path;
@@ -53,6 +55,16 @@ class UserRepositoryTest extends TestCase
         $noFoundUser = $userRepository->getUserName($users,'eqwhwhw@g.com');
         self::assertSame($username, $testData[0]['firstName']);
         self::assertSame($noFoundUser, '');
+
+    }
+
+    public function testGetUserFail(): void
+    {
+        $userRepository = new UserRepository();
+
+        $users = $userRepository->getUsers();
+        $userDTO = $userRepository->getUser($users,'bongo@g.com');
+            assertSame('', $userDTO->email);
 
     }
 }

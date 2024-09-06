@@ -34,7 +34,7 @@ class ControllerProviderTest extends TestCase
     public function testControllerProvider(): void{
 
         $_GET['page'] = 'logout';
-        $_ENV['test']= 'banana';
+        $_ENV['test']= '1';
 
         $container = new Container();
         $container->set(FilesystemLoader::class, new FilesystemLoader(__DIR__ . '/../../src/View'));
@@ -66,7 +66,7 @@ class ControllerProviderTest extends TestCase
         self::assertNotSame(HomeController::class, $controllerProvider->testData);
     }
     public function testControllerProviderNoPage(): void{
-        $_ENV['test']= 'banana';
+        $_ENV['test']= '';
 
         $container = new Container();
         $container->set(FilesystemLoader::class, new FilesystemLoader(__DIR__ . '/../../src/View'));
@@ -105,7 +105,7 @@ class ControllerProviderTest extends TestCase
         $controllerProvider = new ControllerProvider($container);
         $controllerProvider->handlePage();
 
-        dump($controllerProvider->testData);
+
 
         self::assertSame($controllerProvider->testData, HomeController::class);
     }

@@ -28,8 +28,11 @@ class LogoutController implements Controller
 
     private function handleLogout(): void
     {
-        session_destroy();
-        $this->sessionHandler->stopSession();
-       $this->redirect->to('');
+        if (!(session_status() === PHP_SESSION_NONE)) {
+            session_destroy();
+            $this->sessionHandler->stopSession();
+            $this->redirect->to('');
+        }
+
     }
 }

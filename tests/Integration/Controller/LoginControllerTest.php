@@ -137,4 +137,37 @@ class LoginControllerTest extends TestCase
         self::assertTrue($this->sessionHandler->getStatus(), "expected value is true");
         self::assertSame('ilovecats@gmail.com', $userDto->email, "expected email");
     }
+
+    public function testLoginFailEmptyPassword(): void
+    {
+        $_ENV['test'] = 1;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['loginButton'] = 'login';
+        $_POST['email'] = 'gewg@g.com';
+        $_POST['password'] = '';
+
+        $loginController = new LoginController(
+            $this->userRepository,
+            $this->userMapper,
+            $this->validation,
+            $this->sessionHandler,
+            $this->redirectSpy
+        );
+
+        $loginController->load($this->viewFaker);
+        $loginStatus = $this->sessionHandler->getStatus();
+        $parameters = $this->viewFaker->getParameters();
+
+        $template = $this->viewFaker->getTemplate();
+        $errors = $this->errorMapper->createErrorDTO($parameters['errors']);
+        $userDto = $this->userMapper->createDTO($parameters['userDto']);
+
+
+        self::assertSame('login.twig', $template);
+        self::assertArrayHasKey('errors', $parameters, "check for existing parameters");
+        self::assertArrayHasKey('userDto', $parameters);
+        self::assertFalse($loginStatus, "expected value is false");
+        self::assertSame('Password is empty.', $errors->passwordError, "expected message");
+        self::assertSame('gewg@g.com', $userDto->email, "expected email");
+    }
 }

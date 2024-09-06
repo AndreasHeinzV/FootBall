@@ -7,10 +7,10 @@ namespace App\Core;
 class Redirect implements RedirectInterface
 {
 
-    private string $url = 'http://localhost:8080/';
+    private string $url = 'http://localhost:8000/';
 
     public function to(string $location): void
     {
-        header("Location: '$this->url. $location");
+        header("Location: $this->url$location");
     }
 }

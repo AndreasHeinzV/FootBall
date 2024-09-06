@@ -101,7 +101,6 @@ class ApiRequester implements ApiRequesterInterface
         $matches = $this->parRequest($uri);
         $leaguesArray = [];
 
-        //var_export($matches['competitions']);
         foreach ($matches['competitions'] as $competition) {
             $leagueArray = [];
             $leagueArray['id'] = $competition['id'];
