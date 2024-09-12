@@ -21,7 +21,8 @@ class TeamControllerTest extends TestCase
 
         self::assertArrayHasKey('players', $parameters);
         $playerData = $parameters['players'];
-        self::assertCount(45, $playerData);
-        self::assertSame(1631, $playerData[0]->playerID);
+      //  dump($playerData);
+        self::assertCount(45, $playerData['squad']);
+        self::assertSame(1631, $playerData['squad'][0]->playerID);
     }
 }

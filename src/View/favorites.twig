@@ -3,6 +3,7 @@
 {% for favorite in favorites %}
 
 
-    <li><a href="{{ favorite.link}}" >{{ favorite.name }}</a></li>
+    <li><a href="{{ favorite.teamName}}" >{{ favorite.teamName }}</a><img width="80"src="{{ favorite.crest}}"></li>
 {% endfor %}
 </html>
+

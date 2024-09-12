@@ -39,13 +39,13 @@ class UserEntityManager
         }
     }
 
-    public function saveUserFavorites(UserDTO $userDTO, CompetitionDTO $competitionDTO): void
+    public function saveUserFavorites(UserDTO $userDTO, array $teamData): void
     {
         $favorites = $this->repository->getFavorites();
         if (!isset($favorites[$userDTO->email])) {
             $favorites[$userDTO->email] = [];
         }
-        $favorites[$userDTO->email][] = $competitionDTO;
+        $favorites[$userDTO->email][] = $teamData;
         $this->putFavIntoJson($favorites);
     }
 
@@ -73,6 +73,11 @@ class UserEntityManager
         $path = $this->repository->getFilePath();
 
         file_put_contents($path, json_encode($existingUsers, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+    }
+
+    public function saveFavorites(array $favorites)
+    {
+        $this->putFavIntoJson($favorites);
     }
 
 }

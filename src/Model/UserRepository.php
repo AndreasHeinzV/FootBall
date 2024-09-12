@@ -69,6 +69,8 @@ class UserRepository implements UserRepositoryInterface
 
     public function getFavorites(): array
     {
-        return file_exists($this->favFilePath) ? json_decode(file_get_contents($this->favFilePath), true) : [];
+        $favoritesData = file_exists($this->favFilePath) ? file_get_contents($this->favFilePath) : '';
+        return $favoritesData !== '' ? json_decode($favoritesData, true) : [];
+
     }
 }

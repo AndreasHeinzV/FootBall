@@ -58,13 +58,16 @@ class ApiRequester implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/teams/' . $id;
         $team = $this->parRequest($uri);
         $playersArray = [];
-
+        $playersArray['teamName'] = $team['name'];
+        $playersArray['teamID'] = $team['id'];
+        $playersArray['crest'] = $team['crest'];
         foreach ($team['squad'] as $player) {
             //$playerArray = [];
+
             $playerArray['playerID'] = $player['id'];
             $playerArray['link'] = "/index.php?page=player&id=" . $player['id'];
             $playerArray['name'] = $player['name'];
-            $playersArray[] = $this->teamMapper->createTeamDTO($playerArray);
+            $playersArray['squad'][] = $this->teamMapper->createTeamDTO($playerArray);
         }
         return $playersArray;
     }

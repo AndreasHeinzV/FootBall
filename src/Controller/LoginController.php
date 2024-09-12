@@ -59,7 +59,6 @@ class LoginController implements Controller
                 $this->sessionHandler->startSession();
                 $this->userDTO = $this->repository->getUser($existingUsers, $this->userDTO->email);
                 $this->sessionHandler->setUserDTO($this->userDTO);
-                $this->sessionHandler->setUserDTO($this->userDTO);
                $this->redirect->to('index.php');
             }
         }

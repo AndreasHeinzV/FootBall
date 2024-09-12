@@ -11,6 +11,11 @@ class TeamMapper
     public function createTeamDTO(array $userData): TeamDTO
     {
         return new TeamDTO(
+            /*
+            $userData['teamName'],
+            $userData['teamID'],
+            $userData['crest'],
+            */
             $userData['playerID'],
             $userData['link'],
             $userData['name']
@@ -20,6 +25,11 @@ class TeamMapper
     public function getTeamData(TeamDTO $teamDTO): array
     {
         return [
+            /*
+            'teamName' => $teamDTO->teamName,
+            'teamID' => $teamDTO->teamID,
+            'crest' => $teamDTO->crest,
+            */
             'playerID' => $teamDTO->playerID,
             'link' => $teamDTO->link,
             'name' => $teamDTO->name,

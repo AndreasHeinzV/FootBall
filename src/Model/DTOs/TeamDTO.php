@@ -8,6 +8,11 @@ readonly class TeamDTO
 {
 
     public function __construct(
+        /*
+        public string $teamName,
+        public int $teamID,
+        public string $crest,
+        */
         public int $playerID,
         public string $link,
         public string $name,

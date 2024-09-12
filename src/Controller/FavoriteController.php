@@ -23,7 +23,7 @@ class FavoriteController implements Controller
     public function load(ViewInterface $view): void
     {
         $this->user = $this->sessionHandler->getUserDTO();
-        $this->favoriteHandler->getFavorites($this->user);
+        $this->favoriteHandler->getFavorites($this->user) ?? [];
 
         $this->handlePost();
         $this->setupView($view);
@@ -31,19 +31,6 @@ class FavoriteController implements Controller
 
     private function handlePost(): void
     {
-        $link = $_GET;
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            return;
-        }
-
-        if ($_POST['favorite'] === 'add') {
-
-        $this->favoriteHandler->addFavorite($this->user, );
-        }
-        if ($_POST['favorite'] === 'delete') {
-
-            $this->favoriteHandler->removeFavorite($this->user, );
-        }
     }
 
     private function setupView(ViewInterface $view): void
