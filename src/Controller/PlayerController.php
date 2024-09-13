@@ -12,11 +12,10 @@ use App\Model\FootballRepositoryInterface;
 
 class PlayerController implements Controller
 {
-    private FootballRepositoryInterface $repository;
 
-    public function __construct(FootballRepositoryInterface $repository)
+
+    public function __construct(private readonly FootballRepositoryInterface $repository)
     {
-        $this->repository = $repository;
     }
 
     public function load(ViewInterface $view): void

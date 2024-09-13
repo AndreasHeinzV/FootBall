@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\FavoriteHandler;
+use App\Core\ManageFavorites;
 use App\Core\SessionHandler;
 use App\Core\View;
 use App\Core\ViewInterface;
@@ -25,7 +26,7 @@ class TeamController implements Controller
     public function __construct(
         private readonly FootballRepository $repository,
         private readonly FavoriteHandler $favoriteHandler,
-        private SessionHandler $sessionHandler,
+        private ManageFavorites $manageFavorites,
     ) {
 //        $this->repository = $repository;
         //$this->favoriteHandler = $favoriteHandler;
@@ -33,16 +34,9 @@ class TeamController implements Controller
 
     public function load(ViewInterface $view): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['favorites'] === 'add') {
-            $link = $_GET;
-            $teamID = $_GET['id'];
-            $user =$this->sessionHandler->getUserDTO();
-            $this->favoriteHandler->addFavorite($user, $teamID);
-        }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['favorites'] === 'delete') {
-            $teamID = $_GET['id'];
-            $user =$this->sessionHandler->getUserDTO();
-            $this->favoriteHandler->removeFavorite($user, $teamID);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST)) {
+            $this->manageFavorites->manageFav($_POST);
         }
 
         $this->id = $_GET['id'];

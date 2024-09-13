@@ -72,9 +72,15 @@ class DependencyProvider
             $container->get(UserEntityManager::class),
             $container->get(UserRepository::class),
         ));
+        $container->set(ManageFavorites::class, new ManageFavorites(
+            $container->get(SessionHandler::class),
+            $container->get(FavoriteHandler::class),
+        ));
+
         $container->set(FavoriteController::class, new FavoriteController(
             $container->get(SessionHandler::class),
-            $container->get(FavoriteHandler::class)
+            $container->get(FavoriteHandler::class),
+            $container->get(ManageFavorites::class),
         ));
         $container->set(Environment::class, new Environment(
             $container->get(FilesystemLoader::class)));
@@ -105,7 +111,8 @@ class DependencyProvider
         $container->set(TeamController::class, new TeamController(
             $container->get(FootballRepository::class),
             $container->get(FavoriteHandler::class),
-            $container->get(SessionHandler::class),
+            $container->get(ManageFavorites::class),
+
         ));
         $container->set(LeaguesController::class, new LeaguesController(
             $container->get(FootballRepository::class)
@@ -113,7 +120,6 @@ class DependencyProvider
 
         $container->set(HomeController::class, new HomeController(
             $container->get(FootballRepository::class),
-            $container->get(SessionHandler::class),
         ));
     }
 

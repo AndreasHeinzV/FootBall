@@ -12,18 +12,11 @@ use App\Model\Mapper\UserMapperInterface;
 
 class UserEntityManager
 {
-    private ValidationInterface $validation;
-    private UserRepositoryInterface $repository;
-    private UserMapper $userMapper;
-
     public function __construct(
-        ValidationInterface $validation,
-        UserRepositoryInterface $repository,
-        UserMapperInterface $userMapper
+        private readonly ValidationInterface $validation,
+        private readonly UserRepositoryInterface $repository,
+        private readonly UserMapperInterface $userMapper
     ) {
-        $this->validation = $validation;
-        $this->repository = $repository;
-        $this->userMapper = $userMapper;
     }
 
 

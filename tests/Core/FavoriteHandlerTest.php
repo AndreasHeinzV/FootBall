@@ -16,6 +16,6 @@ class FavoriteHandlerTest extends TestCase
         $userDTO = new UserDTO('', '','','');
         $handler = new FavoriteHandler();
 
-        $handler->addFavorite();
+        $handler->addUserFavorite();
     }
 }

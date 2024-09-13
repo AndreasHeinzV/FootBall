@@ -19,30 +19,20 @@ class RegisterController implements Controller
 {
 
 
-    private ValidationInterface $validation;
-
-
-    private UserMapper $userMapper;
-    private UserEntityManager $userEntityManager;
     private UserDTO $userDTO;
 
     private ErrorsDTO $errorsDTO;
 
-    public RedirectInterface $redirect;
     public array $temp;
 
 
     public function __construct(
-        UserEntityManager $userEntityManager,
-        ValidationInterface $validation,
-        UserMapperInterface $userMapper,
-        RedirectInterface $redirect,
+        private readonly UserEntityManager $userEntityManager,
+        private readonly ValidationInterface $validation,
+        private readonly UserMapperInterface $userMapper,
+        private readonly RedirectInterface $redirect,
 
     ) {
-        $this->userEntityManager = $userEntityManager;
-        $this->userMapper = $userMapper;
-        $this->validation = $validation;
-        $this->redirect = $redirect;
     }
 
 
@@ -74,7 +64,7 @@ class RegisterController implements Controller
                     password_hash($this->temp['password'], PASSWORD_DEFAULT),
                 );
                 $this->userEntityManager->save($this->userDTO);
-               $this->redirect->to('');
+                $this->redirect->to('');
             }
         }
     }

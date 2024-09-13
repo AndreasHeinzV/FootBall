@@ -12,13 +12,8 @@ class SessionHandler
 
     public UserDTO $emptyUser;
 
-    public UserMapper $mapper;
-
-    //  public UserMapper $mapper;
-    public function __construct(UserMapper $mapper)
+    public function __construct(private readonly UserMapper $mapper)
     {
-
-        $this->mapper = $mapper;
     }
 
 
@@ -51,6 +46,5 @@ class SessionHandler
     public function getStatus(): bool
     {
         return isset($_SESSION['status']) ? $_SESSION['status'] : false;
-
     }
 }

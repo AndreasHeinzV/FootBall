@@ -3,25 +3,25 @@
     {% include 'base.twig' %}
 {% endblock %}
 <form action="" method="POST">
-<h1>Team: {{ players.teamName }}
+    <h1>Team: {{ players.teamName }}
 
-    {% if status %}
-        {% if favoriteStatus %}
-            <input type="submit" value="delete" name="favorites" id="delete">
-        {% else %}
-            <input type="submit" value="add" name="favorites" id="add">
+        {% if status %}
+            {% if favoriteStatus %}
+                <button type="submit" value="{{ players.teamID }}" name="delete">delete</button>
+            {% else %}
+                <button type="submit" value="{{ players.teamID }}" name="add">add</button>
+            {% endif %}
         {% endif %}
-    {% endif %}
-</h1>
+    </h1>
 
-<ul>
+    <ul>
 
-    {% for player in players.squad %}
+        {% for player in players.squad %}
 
 
-        <li><a href="{{ player.link }}">{{ player.name }}</a></li>
-    {% endfor %}
-</ul>
+            <li><a href="{{ player.link }}">{{ player.name }}</a></li>
+        {% endfor %}
+    </ul>
 </form>
 </html>
 

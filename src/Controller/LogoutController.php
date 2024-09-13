@@ -11,19 +11,16 @@ use App\Core\ViewInterface;
 
 class LogoutController implements Controller
 {
-    public  SessionHandler $sessionHandler;
-    public RedirectInterface $redirect;
 
-    public function __construct(SessionHandler $sessionHandler, RedirectInterface $redirect)
-    {
-        $this->sessionHandler = $sessionHandler;
-        $this->redirect = $redirect;
+    public function __construct(
+        private readonly SessionHandler $sessionHandler,
+        private readonly RedirectInterface $redirect
+    ) {
     }
+
     public function load(ViewInterface $view): void
     {
-
         $this->handleLogout();
-
     }
 
     private function handleLogout(): void
@@ -33,6 +30,5 @@ class LogoutController implements Controller
             $this->sessionHandler->stopSession();
             $this->redirect->to('');
         }
-
     }
 }

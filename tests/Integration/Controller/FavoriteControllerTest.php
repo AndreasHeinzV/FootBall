@@ -7,7 +7,9 @@ namespace App\Tests\Integration\Controller;
 use App\Controller\FavoriteController;
 use App\Controller\HomeController;
 use App\Controller\LoginController;
+use App\Controller\TeamController;
 use App\Core\FavoriteHandler;
+use App\Core\ManageFavorites;
 use App\Core\SessionHandler;
 use App\Core\Validation;
 use App\Model\ApiRequester;
@@ -28,48 +30,62 @@ use PHPUnit\Framework\TestCase;
 class FavoriteControllerTest extends TestCase
 {
 
+    //toDo write case list empty, multiple users in favorites_json
+    protected function setUp(): void
+    {
+        $jsonfile =file_get_contents(__DIR__.'/../../Fixtures/FavoritesBasic/favorites_test.json');
+        file_put_contents(__DIR__.'/../../../favorites_test.json', $jsonfile);
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        unlink(__DIR__.'/../../../favorites_test.json');
+        parent::tearDown();
+    }
     public function testAdd(): void
     {
         $_ENV['test'] = 1;
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['loginButton'] = 'login';
-        $_POST['email'] = 'ilovecats@gmail.com';
-        $_POST['password'] = '1LoveCats!';
-        $_GET['id'] = 1770;
-        $_GET['favorite'] ='add';
+        $_GET['id'] = "1770";
+        $_GET['favorite'] = 'add';
 
-        $view = new ViewFaker();
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "ilovecats@gmail.com",
+            'password' => "1LoveCats!",
+        ];
+
         $userMapper = new UserMapper();
         $userRepository = new UserRepository();
         $validation = new Validation();
-        $redirectSpy = new RedirectSpy();
         $sessionHandler = new SessionHandler($userMapper);
         $view = new ViewFaker();
-        $loginController = new LoginController(
-            $userRepository, $userMapper, $validation, $sessionHandler, $redirectSpy
+        $apiRequester = new ApiRequester(
+            new LeaguesMapper(),
+            new CompetitionMapper(),
+            new TeamMapper(),
+            new PlayerMapper()
         );
-        $apiRequester = new ApiRequester(new LeaguesMapper(), new CompetitionMapper(),new TeamMapper(),new PlayerMapper());
+
         $repo = new FootballRepository($apiRequester);
-       // $userDTO = new UserDTO('testname', '', '', '');
         $userEntityManager = new UserEntityManager($validation, $userRepository, $userMapper);
-
-        $favoriteHandler = new FavoriteHandler($sessionHandler, $repo, $userEntityManager);
-        $favController = new FavoriteController($sessionHandler, $favoriteHandler);
-
-
+        $favoriteHandler = new FavoriteHandler($sessionHandler, $repo, $userEntityManager, $userRepository);
+        $manageFavorites = new ManageFavorites($sessionHandler, $favoriteHandler);
+        $favController = new FavoriteController($sessionHandler, $favoriteHandler, $manageFavorites);
 
 
-        $loginController->load($view);
-        $teamController = new HomeController(Container::getRepository(), $sessionHandler);
-        $teamController->load($view);
         $favController->load($view);
-
         $parameters = $view->getParameters();
-        dump($parameters);
         $template = $view->getTemplate();
 
 
+        $favorites = $parameters['favorites'];
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
+        self::assertSame("Botafogo FR", $favorites[0]['teamName']);
     }
+
 }

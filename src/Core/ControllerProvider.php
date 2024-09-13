@@ -15,12 +15,11 @@ use App\Controller\TeamController;
 
 class ControllerProvider
 {
-    private Container $container;
 
     public string $testData = "";
-    public function __construct(Container $container)
+    public function __construct(private readonly Container $container)
     {
-        $this->container = $container;
+
     }
 
     public function getList(): array

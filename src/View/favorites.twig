@@ -1,9 +1,42 @@
 <html>
-<h1>Favorite clubs</h1>
-{% for favorite in favorites %}
+<form action="/?page=favorites" method="POST">
+    <h1>Favorite clubs</h1>
+    {% for favorite in favorites %}
+
+        {% if loop.first and loop.length >= 2 %}
+            <li>{{ favorite.teamName }}<img width="80" src="{{ favorite.crest }}">
+                <button type="submit" value="{{ favorite.teamID }}" name="delete">delete</button>
+                <button type="submit" value="{{ favorite.teamID }}" name="down">down</button>
+            </li>
+
+        {% elseif loop.first and loop.length <2 %}
+            <li>{{ favorite.teamName }}<img width="80" src="{{ favorite.crest }}">
+                <button type="submit" value="{{ favorite.teamID }}" name="delete">delete</button>
+
+            </li>
+
+        {% elseif loop.last and loop.length >=2 %}
+            <li>{{ favorite.teamName }}<img width="80" src="{{ favorite.crest }}">
+                <button type="submit" value="{{ favorite.teamID }}" name="delete">delete</button>
+                <button type="submit" value="{{ favorite.teamID }}" name="up">up</button>
+            </li>
+
+        {% elseif loop.last and loop.length <2 %}
+            <li>{{ favorite.teamName }}<img width="80" src="{{ favorite.crest }}">
+                <button type="submit" value="{{ favorite.teamID }}" name="delete">delete</button>
+            </li>
+        {% else %}
+
+            <li>{{ favorite.teamName }}<img width="80" src="{{ favorite.crest }}">
+                <button type="submit" value="{{ favorite.teamID }}" name="delete">delete</button>
+                <button type="submit" value="{{ favorite.teamID }}" name="up">up</button>
+                <button type="submit" value="{{ favorite.teamID }}" name="down">down</button>
+            </li>
+        {% endif %}
 
 
-    <li><a href="{{ favorite.teamName}}" >{{ favorite.teamName }}</a><img width="80"src="{{ favorite.crest}}"></li>
-{% endfor %}
+
+    {% endfor %}
+</form>
 </html>
 
