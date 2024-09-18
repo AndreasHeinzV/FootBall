@@ -61,13 +61,13 @@ class FootballRepositoryTest extends TestCase
         $teamData = $this->footballRepository->getTeam('3984');
         //var_export($teamData);
 
-        $this->teamDTO = $teamData[0];
+        $this->teamDTO = $teamData['squad'][0];
         self::assertSame($this->teamDTO->playerID, 1631);
 
         //$this->teamDTO = $teamData[1];
-        self::assertSame($teamData[1]->playerID, 1662);
-        self::assertSame($teamData[1]->name, 'Santos');
-        self::assertSame($teamData[3]->name, 'Magrão');
+        self::assertSame($teamData['squad'][1]->playerID, 1662);
+        self::assertSame($teamData['squad'][1]->name, 'Santos');
+        self::assertSame($teamData['squad'][3]->name, 'Magrão');
     }
 
     public function testGetCompetition(): void

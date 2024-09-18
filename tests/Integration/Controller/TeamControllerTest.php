@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller;
 
 use App\Controller\TeamController;
+use App\Core\ManageFavorites;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +16,17 @@ class TeamControllerTest extends TestCase
     {
         $_GET['id'] = '3984';
         $view = new ViewFaker();
-        $teamController = new TeamController(Container::getRepository());
+      //  $teamController = new TeamController(Container::getRepository());
+
+        $teamController = new TeamController(
+            Container::getRepository(),
+            Container::getFavoriteHandler(),
+            new ManageFavorites(Container::getSessionHandler(),Container::getFavoriteHandler()
+            ),
+        );
+      //  $teamController->load($view);
+
+
         $teamController->load($view);
         $parameters = $view->getParameters();
 

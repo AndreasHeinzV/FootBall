@@ -43,7 +43,7 @@ class ControllerProvider
         $controllerList = $this->getList();
 
         $controllerToRender = $controllerList[$page];
-        if (isset($_ENV) && $_ENV['test']){
+        if (isset($_ENV['test'])){
             $this->testData = $controllerToRender;
         }
         $controller = $this->container->get($controllerToRender);

@@ -58,7 +58,7 @@ class ApiRequesterTest extends TestCase
     public function testApiRequestGetTeam(): void
     {
         $team = $this->apiRequester->getTeam('3984');
-        self::assertNotEmpty($team[0]->name);
+        self::assertNotEmpty($team['squad'][0]->name);
     }
 
     public function testApiRequestGetPlayers(): void

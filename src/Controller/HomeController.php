@@ -8,22 +8,17 @@ use App\Core\SessionHandler;
 use App\Core\ViewInterface;
 use App\Model\FootballRepository;
 
-class HomeController implements Controller
+readonly class HomeController implements Controller
 {
 
 
     public function __construct(
-        private readonly FootballRepository $repository
+        private FootballRepository $repository
     ) {
     }
 
 
     public function load(ViewInterface $view): void
-    {
-        $this->setupView($view);
-    }
-
-    private function setupView(ViewInterface $view): void
     {
         $view->setTemplate('home.twig');
         $view->addParameter('leagues', $this->repository->getLeagues() ?? []);

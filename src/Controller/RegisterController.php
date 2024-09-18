@@ -23,8 +23,9 @@ class RegisterController implements Controller
 
     private ErrorsDTO $errorsDTO;
 
-    public array $temp;
+    private array $temp;
 
+    private ViewInterface $view;
 
     public function __construct(
         private readonly UserEntityManager $userEntityManager,
@@ -40,8 +41,9 @@ class RegisterController implements Controller
     {
         $this->userDTO = new UserDTO('', '', '', '');
         $this->errorsDTO = new ErrorsDTO('', '', '', '');
+        $this->view = $view;
         $this->handlePost();
-        $this->setupView($view);
+
     }
 
     private function handlePost(): void
@@ -67,13 +69,11 @@ class RegisterController implements Controller
                 $this->redirect->to('');
             }
         }
+        $this->view->setTemplate('register.twig');
+        $this->view->addParameter('userDto', $this->userDTO);
+        $this->view->addParameter('errors', $this->errorsDTO);
     }
 
 
-    private function setupView(Viewinterface $view): void
-    {
-        $view->setTemplate('register.twig');
-        $view->addParameter('userDto', $this->userDTO);
-        $view->addParameter('errors', $this->errorsDTO);
-    }
+
 }

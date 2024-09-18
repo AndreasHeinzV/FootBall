@@ -7,46 +7,61 @@ use App\Model\Mapper\CompetitionMapper;
 use App\Model\Mapper\LeaguesMapperInterface;
 use App\Model\Mapper\PlayerMapper;
 use App\Model\Mapper\TeamMapper;
+use Exception;
 
 class ApiRequester implements ApiRequesterInterface
 {
     private $apiKey;
-    private LeaguesMapperInterface $leaguesMapper;
 
-    private CompetitionMapper $competitionMapper;
-
-    private TeamMapper $teamMapper;
-
-    private PlayerMapper $playerMapper;
 
 //todo get Api key from jsonfile out of project
     public function __construct(
-        LeaguesMapperInterface $leaguesMapper,
-        CompetitionMapper $competitionMapper,
-        TeamMapper $teamMapper,
-        PlayerMapper $playerMapper
+        private readonly LeaguesMapperInterface $leaguesMapper,
+        private readonly CompetitionMapper $competitionMapper,
+        private readonly TeamMapper $teamMapper,
+        private readonly PlayerMapper $playerMapper
     ) {
-        $this->leaguesMapper = $leaguesMapper;
-        $this->competitionMapper = $competitionMapper;
-        $this->teamMapper = $teamMapper;
-        $this->playerMapper = $playerMapper;
         $this->apiKey = "f08428cacebe4e639816224794f01bd5";
     }
 
     public function parRequest($url): array
     {
-        $reqPref['http']['method'] = 'GET';
-        $reqPref['http']['header'] = 'X-Auth-Token: ' . $this->apiKey;
-        $stream_context = stream_context_create($reqPref);
-        $response = file_get_contents($url, false, $stream_context);
+        /*
+         // need this to get testData
+         //  $filename = str_replace(['https://api.football-data.org/v4/', '/'], [''], $url);
+         //  file_put_contents(__DIR__ . '/' . $filename . '.json', $response);
+     */
+        try {
+            $curl = curl_init($url);
 
-        // need this to get testData
-        //  $filename = str_replace(['https://api.football-data.org/v4/', '/'], [''], $url);
-        //  file_put_contents(__DIR__ . '/' . $filename . '.json', $response);
-        return json_decode($response, true);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_HEADER, false);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $this->apiKey]);
+
+            $response = curl_exec($curl);
+
+            if ($response === false) {
+                $error = curl_error($curl);
+                curl_close($curl);
+                error_log("Request Failed No ID found: " . $error);
+                return [];
+            }
+            $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+
+            if ($httpStatus !== 200) {
+                error_log("Request Failed HTTP Status: " . $httpStatus);
+                return [];
+            }
+            return json_decode($response, true);
+        } catch (Exception $e) {
+            error_log('Exception: ' . $e->getMessage());
+            curl_close($curl);
+        }
+        return [];
     }
 
-    public function getPlayer(string $playerID):PlayerDTO
+    public function getPlayer(string $playerID): PlayerDTO
     {
         $uri = 'https://api.football-data.org/v4/persons/' . $playerID;
         $player = $this->parRequest($uri);
@@ -58,6 +73,10 @@ class ApiRequester implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/teams/' . $id;
         $team = $this->parRequest($uri);
         $playersArray = [];
+        if (empty($team)) {
+            return [];
+        }
+
         $playersArray['teamName'] = $team['name'];
         $playersArray['teamID'] = $team['id'];
         $playersArray['crest'] = $team['crest'];
@@ -77,9 +96,12 @@ class ApiRequester implements ApiRequesterInterface
         $teams = [];
         $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
         $standings = $this->parRequest($uri);
+
+        if (!isset($standings)) {
+            return [];
+        }
+
         $teamID = $standings['standings'][0]['table'];
-
-
         foreach ($teamID as $table) {
             $team = [];
             $team['position'] = $table['position'];
@@ -95,15 +117,17 @@ class ApiRequester implements ApiRequesterInterface
             $team['goalDifference'] = $table['goalDifference'];;
             $teams[] = $this->competitionMapper->createCompetitionDTO($team);
         }
-        // var_dump($teams);
         return $teams;
     }
+
     public function getLeagues(): array
     {
         $uri = 'https://api.football-data.org/v4/competitions/';
         $matches = $this->parRequest($uri);
         $leaguesArray = [];
-
+        if (!isset($matches)) {
+            return [];
+        }
         foreach ($matches['competitions'] as $competition) {
             $leagueArray = [];
             $leagueArray['id'] = $competition['id'];

@@ -12,6 +12,7 @@ use App\Core\FavoriteHandler;
 use App\Core\ManageFavorites;
 use App\Core\SessionHandler;
 use App\Core\Validation;
+use App\Core\ViewInterface;
 use App\Model\ApiRequester;
 use App\Model\DTOs\UserDTO;
 use App\Model\FootballRepository;
@@ -31,24 +32,54 @@ class FavoriteControllerTest extends TestCase
 {
 
     //toDo write case list empty, multiple users in favorites_json
+    private SessionHandler $sessionHandler;
+    private UserMapper $userMapper;
+    private UserRepository $userRepository;
+    private Validation $validation;
+
+    private ViewFaker $view;
+
+    private ApiRequester $apiRequester;
+
+    private FootballRepository $repo;
+    private UserEntityManager $userEntityManager;
+
+
     protected function setUp(): void
     {
-        $jsonfile =file_get_contents(__DIR__.'/../../Fixtures/FavoritesBasic/favorites_test.json');
-        file_put_contents(__DIR__.'/../../../favorites_test.json', $jsonfile);
+        $jsonfile = file_get_contents(__DIR__ . '/../../Fixtures/FavoritesBasic/favorites_test.json');
+        file_put_contents(__DIR__ . '/../../../favorites_test.json', $jsonfile);
+
+        $_ENV['test'] = 1;
+        $this->userMapper = new UserMapper();
+        $this->userRepository = new UserRepository();
+        $this->validation = new Validation();
+        $this->sessionHandler = new SessionHandler($this->userMapper);
+        $this->view = new ViewFaker();
+        $this->apiRequester = new ApiRequester(
+            new LeaguesMapper(),
+            new CompetitionMapper(),
+            new TeamMapper(),
+            new PlayerMapper()
+        );
+
+        $this->repo = new FootballRepository($this->apiRequester);
+        $this->userEntityManager = new UserEntityManager($this->validation, $this->userRepository, $this->userMapper);
         parent::setUp();
     }
 
     protected function tearDown(): void
     {
-        unlink(__DIR__.'/../../../favorites_test.json');
+        unlink(__DIR__ . '/../../../favorites_test.json');
         parent::tearDown();
     }
+
     public function testAdd(): void
     {
         $_ENV['test'] = 1;
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_GET['id'] = "1770";
-        $_GET['favorite'] = 'add';
+        $_POST['add'] = "328";
+        //  $_POST['favorite'] = 'add';
 
         $_SESSION['status'] = true;
         $_SESSION['userDto'] = [
@@ -58,34 +89,29 @@ class FavoriteControllerTest extends TestCase
             'password' => "1LoveCats!",
         ];
 
-        $userMapper = new UserMapper();
-        $userRepository = new UserRepository();
-        $validation = new Validation();
-        $sessionHandler = new SessionHandler($userMapper);
-        $view = new ViewFaker();
-        $apiRequester = new ApiRequester(
-            new LeaguesMapper(),
-            new CompetitionMapper(),
-            new TeamMapper(),
-            new PlayerMapper()
+
+        $favoriteHandler = new FavoriteHandler(
+            $this->sessionHandler,
+            $this->repo,
+            $this->userEntityManager,
+            $this->userRepository
         );
-
-        $repo = new FootballRepository($apiRequester);
-        $userEntityManager = new UserEntityManager($validation, $userRepository, $userMapper);
-        $favoriteHandler = new FavoriteHandler($sessionHandler, $repo, $userEntityManager, $userRepository);
-        $manageFavorites = new ManageFavorites($sessionHandler, $favoriteHandler);
-        $favController = new FavoriteController($sessionHandler, $favoriteHandler, $manageFavorites);
+        $manageFavorites = new ManageFavorites($this->sessionHandler, $favoriteHandler);
+        $favController = new FavoriteController($this->sessionHandler, $favoriteHandler, $manageFavorites);
 
 
-        $favController->load($view);
-        $parameters = $view->getParameters();
-        $template = $view->getTemplate();
+        $favController->load($this->view);
+        $parameters = $this->view->getParameters();
+        $template = $this->view->getTemplate();
 
 
         $favorites = $parameters['favorites'];
+        // dump($favorites);
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
-        self::assertSame("Botafogo FR", $favorites[0]['teamName']);
+        self::assertSame("Botafogo FR", $favorites[0]['teamName'], "Base value");
+        self::assertNotEmpty($favorites[1]['teamName']);
+        self::assertNotEmpty($favorites[1]['teamName'], 'Burnley FC', "expected 2nd Team");
     }
 
 }

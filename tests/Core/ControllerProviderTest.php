@@ -99,7 +99,6 @@ class ControllerProviderTest extends TestCase
 
         $container->set(HomeController::class, new HomeController(
             $container->get(FootballRepository::class),
-            $container->get(SessionHandler::class),
         ));
 
         $controllerProvider = new ControllerProvider($container);
@@ -107,6 +106,6 @@ class ControllerProviderTest extends TestCase
 
 
 
-        self::assertSame($controllerProvider->testData, HomeController::class);
+        self::assertSame( HomeController::class, $controllerProvider->testData);
     }
 }

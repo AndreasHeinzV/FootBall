@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Fixtures;
 
 use App\Controller\LogoutController;
+use App\Core\FavoriteHandler;
 use App\Core\Redirect;
 use App\Core\SessionHandler;
 use App\Core\Validation;
@@ -45,4 +46,20 @@ class Container
     }
 
 
+    public static function getSessionHandler(): SessionHandler
+    {
+        return new SessionHandler(
+            new UserMapper()
+        );
+    }
+
+    public static function getFavoriteHandler(): FavoriteHandler
+    {
+        return new FavoriteHandler(
+            self::getSessionHandler(),
+            self::getRepository(),
+            self::getEntityManager(),
+            new UserRepository()
+        );
+    }
 }

@@ -10,30 +10,27 @@ use App\Core\SessionHandler;
 use App\Core\ViewInterface;
 use App\Model\DTOs\UserDTO;
 
-class FavoriteController implements Controller
+readonly class FavoriteController implements Controller
 {
-    private UserDTO $user;
+
 
     public function __construct(
-        private readonly SessionHandler $sessionHandler,
-        private readonly FavoriteHandler $favoriteHandler,
-        private readonly ManageFavorites $manageFavorites,
+        private SessionHandler $sessionHandler,
+        private FavoriteHandler $favoriteHandler,
+        private ManageFavorites $manageFavorites,
     ) {
     }
 
 
     public function load(ViewInterface $view): void
     {
-        $this->user = $this->sessionHandler->getUserDTO();
+        $user = $this->sessionHandler->getUserDTO();
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST)) {
             $this->manageFavorites->manageFav($_POST);
         }
-        $this->setupView($view);
+        $view->setTemplate('favorites.twig');
+        $view->addParameter('favorites', $this->favoriteHandler->getUserFavorites($user) ?? []);
     }
 
-    private function setupView(ViewInterface $view): void
-    {
-        $view->setTemplate('favorites.twig');
-        $view->addParameter('favorites', $this->favoriteHandler->getUserFavorites($this->user) ?? []);
-    }
+
 }

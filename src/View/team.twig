@@ -3,6 +3,7 @@
     {% include 'base.twig' %}
 {% endblock %}
 <form action="" method="POST">
+    {% if players is not empty %}
     <h1>Team: {{ players.teamName }}
 
         {% if status %}
@@ -22,6 +23,12 @@
             <li><a href="{{ player.link }}">{{ player.name }}</a></li>
         {% endfor %}
     </ul>
+    {% else %}
+
+    <h1> Page not found return to homepage</h1>
+        <a href="/">Index</a>
+    {% endif %}
 </form>
+
 </html>
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\Redirect;
 use App\Core\View;
 use App\Core\ViewInterface;
 use App\Model\FootballRepository;
@@ -22,17 +23,19 @@ class LeaguesController implements Controller
 
     public function load(ViewInterface $view): void
     {
-        if (isset($_GET['name'])) {
+
+        if(!isset($_GET['name'])) {
+            $redirect = new Redirect();
+            $redirect->to('/');
+        }
+
             $this->code = $_GET['name'];
             $this->competitions = $this->repository->getCompetition($this->code);
-        }
-        $this->setupView($view);
-    }
 
-    private function setupView(ViewInterface $view): void
-    {
         $view->setTemplate('competitions.twig');
         $view->addParameter('name', $this->code ?? '');
-        $view->addParameter('teams', $this->competitions ?? []);
+        $view->addParameter('teams', $this->competitions);
     }
+
+
 }

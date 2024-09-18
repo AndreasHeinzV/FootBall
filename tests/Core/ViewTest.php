@@ -17,6 +17,9 @@ use Twig\Loader\FilesystemLoader;
 class ViewTest extends TestCase
 {
 
+    /**
+     * @throws Exception
+     */
     public function testView(): void
     {
         $_ENV['test'] = '';
