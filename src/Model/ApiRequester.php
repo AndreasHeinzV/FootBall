@@ -21,7 +21,7 @@ class ApiRequester implements ApiRequesterInterface
         private readonly TeamMapper $teamMapper,
         private readonly PlayerMapper $playerMapper
     ) {
-        $this->apiKey = "f08428cacebe4e639816224794f01bd5";
+        $this->apiKey = (new ApiKey)->getApiKey();
     }
 
     public function parRequest($url): array
@@ -30,8 +30,9 @@ class ApiRequester implements ApiRequesterInterface
          // need this to get testData
          //  $filename = str_replace(['https://api.football-data.org/v4/', '/'], [''], $url);
          //  file_put_contents(__DIR__ . '/' . $filename . '.json', $response);
-     */
+
         try {
+        */
             $curl = curl_init($url);
 
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -54,18 +55,23 @@ class ApiRequester implements ApiRequesterInterface
                 return [];
             }
             return json_decode($response, true);
+            /*
         } catch (Exception $e) {
             error_log('Exception: ' . $e->getMessage());
             curl_close($curl);
         }
-        return [];
+            */
+     //  return [];
     }
 
-    public function getPlayer(string $playerID): PlayerDTO
+    public function getPlayer(string $playerID): ?PlayerDTO
     {
         $uri = 'https://api.football-data.org/v4/persons/' . $playerID;
-        $player = $this->parRequest($uri);
-        return $this->playerMapper->createTeamDTO($player);
+
+        if (empty($this->parRequest($uri))) {
+            return null;
+        }
+        return $this->playerMapper->createTeamDTO($this->parRequest($uri));
     }
 
     public function getTeam(string $id): array
@@ -80,9 +86,8 @@ class ApiRequester implements ApiRequesterInterface
         $playersArray['teamName'] = $team['name'];
         $playersArray['teamID'] = $team['id'];
         $playersArray['crest'] = $team['crest'];
-        foreach ($team['squad'] as $player) {
-            //$playerArray = [];
 
+        foreach ($team['squad'] as $player) {
             $playerArray['playerID'] = $player['id'];
             $playerArray['link'] = "/index.php?page=player&id=" . $player['id'];
             $playerArray['name'] = $player['name'];
@@ -97,7 +102,7 @@ class ApiRequester implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
         $standings = $this->parRequest($uri);
 
-        if (!isset($standings)) {
+        if (empty($standings)) {
             return [];
         }
 
@@ -125,9 +130,10 @@ class ApiRequester implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/competitions/';
         $matches = $this->parRequest($uri);
         $leaguesArray = [];
-        if (!isset($matches)) {
+        if (empty($matches)) {
             return [];
         }
+
         foreach ($matches['competitions'] as $competition) {
             $leagueArray = [];
             $leagueArray['id'] = $competition['id'];

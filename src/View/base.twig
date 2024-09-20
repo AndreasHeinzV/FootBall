@@ -1,5 +1,7 @@
 <html>
-
+<a href="/">
+    <button type="submit" name="page" value="index">Index</button>
+</a>
 {% if not status %}
     <a href="index.php/?page=register">
         <button type="submit" name="page" value="register">Register</button>
@@ -8,7 +10,7 @@
     <a href="/index.php/?page=login">
         <button type="submit" name="page" value="login">Login</button>
     </a>
-{% else  %}
+{% else %}
     <a href="index.php/?page=logout">
         <button type="submit" name="page" value="logout">Logout</button>
     </a>

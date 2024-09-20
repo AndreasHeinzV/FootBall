@@ -9,6 +9,7 @@ use App\Controller\HomeController;
 use App\Controller\LeaguesController;
 use App\Controller\LoginController;
 use App\Controller\LogoutController;
+use App\Controller\NoPageController;
 use App\Controller\PlayerController;
 use App\Controller\RegisterController;
 use App\Controller\TeamController;
@@ -33,7 +34,7 @@ class ControllerProvider
             'login' => LoginController::class,
             'logout' => LogoutController::class,
             'favorites' => FavoriteController::class,
-
+            '404' => NoPageController::class,
         ];
     }
 
@@ -42,7 +43,13 @@ class ControllerProvider
         $page = $_GET['page'] ?? 'home';
         $controllerList = $this->getList();
 
-        $controllerToRender = $controllerList[$page];
+
+        if (empty($controllerList[$page])) {
+            $controllerToRender = $controllerList['404'];
+        }else{
+            $controllerToRender = $controllerList[$page];
+        }
+
         if (isset($_ENV['test'])){
             $this->testData = $controllerToRender;
         }

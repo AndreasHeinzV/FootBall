@@ -21,6 +21,6 @@ readonly class HomeController implements Controller
     public function load(ViewInterface $view): void
     {
         $view->setTemplate('home.twig');
-        $view->addParameter('leagues', $this->repository->getLeagues() ?? []);
+        $view->addParameter('leagues', $this->repository->getLeagues());
     }
 }

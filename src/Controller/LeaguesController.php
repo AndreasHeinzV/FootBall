@@ -14,27 +14,29 @@ class LeaguesController implements Controller
 {
 
 
-    private array $competitions;
-    private string $code;
-
     public function __construct(private readonly FootballRepositoryInterface $repository)
     {
     }
 
     public function load(ViewInterface $view): void
     {
-
-        if(!isset($_GET['name'])) {
+        if (!isset($_GET['name'])) {
             $redirect = new Redirect();
             $redirect->to('/');
+            return;
         }
 
-            $this->code = $_GET['name'];
-            $this->competitions = $this->repository->getCompetition($this->code);
+        $code = $_GET['name'];
+        $competition = $this->repository->getCompetition($code);
+        if (empty($competition)) {
+            $redirect = new Redirect();
+            $redirect->to("/?page=404");
+            return;
+        }
 
         $view->setTemplate('competitions.twig');
-        $view->addParameter('name', $this->code ?? '');
-        $view->addParameter('teams', $this->competitions);
+       // $view->addParameter('name', $code);
+        $view->addParameter('teams', $competition);
     }
 
 

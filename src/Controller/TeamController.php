@@ -26,22 +26,26 @@ readonly class TeamController implements Controller
     public function load(ViewInterface $view): void
     {
 //&& $_SERVER['REQUEST_METHOD'] === 'POST'
-        if ( isset($_POST)) {
+        if (isset($_POST)) {
             $this->manageFavorites->manageFav($_POST);
         }
 
-        if(!isset($_GET['id'])) {
+        if (!isset($_GET['id'])) {
             $redirect = new Redirect();
             $redirect->to('/');
+            return;
         }
 
         $id = $_GET['id'];
         $team = $this->repository->getTeam($id);
-
+        if (empty($team)) {
+            $redirect = new Redirect();
+            $redirect->to("/?page=404");
+            return;
+        }
 
         $view->setTemplate('team.twig');
         $view->addParameter('players', $team);
         $view->addParameter('favoriteStatus', $this->favoriteHandler->getFavStatus($id));
     }
-
 }

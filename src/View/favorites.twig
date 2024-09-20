@@ -1,4 +1,7 @@
 <html>
+{% block header %}
+    {% include 'base.twig' %}
+{% endblock %}
 <form action="/?page=favorites" method="POST">
     <h1>Favorite clubs</h1>
     {% for favorite in favorites %}

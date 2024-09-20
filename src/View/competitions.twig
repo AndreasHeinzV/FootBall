@@ -3,7 +3,7 @@
     {% include 'base.twig' %}
 {% endblock %}
 <body>
-{% if teams is not empty %}
+
     <table>
         <tr>
             <th>Position</th>
@@ -38,9 +38,6 @@
             </tr>
         {% endfor %}
     </table>
-{% else %}
-    <h1> Page not found return to homepage</h1>
-    <a href="/">Index</a>
-{% endif %}
+
 </body>
 </html>

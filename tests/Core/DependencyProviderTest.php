@@ -12,7 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 class DependencyProviderTest extends TestCase
 {
-    public function testDependencies(): void{
+    public function testDependencies(): void
+    {
         $dependencyProvider = new DependencyProvider();
         $container = new Container();
         $dependencyProvider->fill($container);

@@ -6,6 +6,7 @@ namespace App\Tests\Core;
 
 use App\Controller\HomeController;
 use App\Controller\LogoutController;
+use App\Controller\NoPageController;
 use App\Core\Container;
 use App\Core\ControllerProvider;
 use App\Core\Redirect;
@@ -107,5 +108,26 @@ class ControllerProviderTest extends TestCase
 
 
         self::assertSame( HomeController::class, $controllerProvider->testData);
+    }
+    public function testNoPage(): void{
+        $_ENV['test']= '';
+        $_GET['page'] = 'wwagahah';
+        $container = new Container();
+        $container->set(FilesystemLoader::class, new FilesystemLoader(__DIR__ . '/../../src/View'));
+        $container->set(UserMapper::class, new UserMapper());
+        $container->set(Environment::class, new Environment(
+            $container->get(FilesystemLoader::class)));
+        $container->set(SessionHandler::class, new SessionHandler(
+            $container->get(UserMapper::class)
+        ));
+        $container->set(View::class, new View(
+            $container->get(Environment::class),
+            $container->get(SessionHandler::class),
+        ));
+        $container->set(NoPageController::class, new NoPageController());
+
+        $controllerProvider = new ControllerProvider($container);
+        $controllerProvider->handlePage();
+        self::assertSame(NoPageController::class, $controllerProvider->testData);
     }
 }

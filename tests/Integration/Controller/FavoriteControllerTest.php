@@ -71,6 +71,9 @@ class FavoriteControllerTest extends TestCase
     protected function tearDown(): void
     {
         unlink(__DIR__ . '/../../../favorites_test.json');
+        $_SESSION = [];
+        $_POST=[];
+        unset($_ENV);
         parent::tearDown();
     }
 
@@ -106,12 +109,149 @@ class FavoriteControllerTest extends TestCase
 
 
         $favorites = $parameters['favorites'];
-        // dump($favorites);
+        //dump($favorites);
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
-        self::assertSame("Botafogo FR", $favorites[0]['teamName'], "Base value");
-        self::assertNotEmpty($favorites[1]['teamName']);
-        self::assertNotEmpty($favorites[1]['teamName'], 'Burnley FC', "expected 2nd Team");
+        self::assertSame("Botafogo FR", $favorites[1]['teamName'], "Base value");
+        self::assertNotEmpty($favorites[2]['teamName']);
+        self::assertSame($favorites[3]['teamName'], 'Burnley FC', "expected 2nd Team");
+    }
+    public function testTryAddForDuplicate(): void
+    {
+        $_ENV['test'] = 1;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['add'] = "5";
+        //  $_POST['favorite'] = 'add';
+
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "ilovecats@gmail.com",
+            'password' => "1LoveCats!",
+        ];
+
+
+        $favoriteHandler = new FavoriteHandler(
+            $this->sessionHandler,
+            $this->repo,
+            $this->userEntityManager,
+            $this->userRepository
+        );
+        $manageFavorites = new ManageFavorites($this->sessionHandler, $favoriteHandler);
+        $favController = new FavoriteController($this->sessionHandler, $favoriteHandler, $manageFavorites);
+
+
+        $favController->load($this->view);
+        $parameters = $this->view->getParameters();
+        $template = $this->view->getTemplate();
+
+
+        $favorites = $parameters['favorites'];
+
+        self::assertSame('favorites.twig', $template);
+        self::assertNotEmpty($parameters);
+        self::assertSame("Botafogo FR", $favorites[1]['teamName'], "Base value");
+        self::assertCount(2, $favorites);
+
+
+    }
+    public function testDelete(): void{
+        $_ENV['test'] = 1;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['delete'] = "5";
+
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "ilovecats@gmail.com",
+            'password' => "1LoveCats!",
+        ];
+        $favoriteHandler = new FavoriteHandler(
+            $this->sessionHandler,
+            $this->repo,
+            $this->userEntityManager,
+            $this->userRepository
+        );
+        $manageFavorites = new ManageFavorites($this->sessionHandler, $favoriteHandler);
+        $favController = new FavoriteController($this->sessionHandler, $favoriteHandler, $manageFavorites);
+
+
+        $favController->load($this->view);
+        $parameters = $this->view->getParameters();
+        $template = $this->view->getTemplate();
+
+
+        $favorites = $parameters['favorites'];
+        self::assertCount(1, $favorites);
+        self::assertSame('favorites.twig', $template);
     }
 
+    public function testMoveUp(): void{
+        $_ENV['test'] = 1;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['up'] = "5";
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "ilovecats@gmail.com",
+            'password' => "1LoveCats!",
+        ];
+
+        $favoriteHandler = new FavoriteHandler(
+            $this->sessionHandler,
+            $this->repo,
+            $this->userEntityManager,
+            $this->userRepository
+        );
+        $manageFavorites = new ManageFavorites($this->sessionHandler, $favoriteHandler);
+        $favController = new FavoriteController($this->sessionHandler, $favoriteHandler, $manageFavorites);
+
+
+        $favController->load($this->view);
+        $parameters = $this->view->getParameters();
+        $template = $this->view->getTemplate();
+
+
+        $favorites = $parameters['favorites'];
+
+            self::assertSame('FC Bayern München', $favorites[1]['teamName']);
+            self::assertCount(2, $favorites);
+            self::assertSame('Botafogo FR', $favorites[2]['teamName']);
+    }
+    public function testMoveDown(): void{
+        $_ENV['test'] = 1;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['down'] = "1770";
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "ilovecats@gmail.com",
+            'password' => "1LoveCats!",
+        ];
+
+        $favoriteHandler = new FavoriteHandler(
+            $this->sessionHandler,
+            $this->repo,
+            $this->userEntityManager,
+            $this->userRepository
+        );
+        $manageFavorites = new ManageFavorites($this->sessionHandler, $favoriteHandler);
+        $favController = new FavoriteController($this->sessionHandler, $favoriteHandler, $manageFavorites);
+
+
+        $favController->load($this->view);
+        $parameters = $this->view->getParameters();
+        $template = $this->view->getTemplate();
+
+
+        $favorites = $parameters['favorites'];
+
+        self::assertSame('Botafogo FR', $favorites[2]['teamName']);
+        self::assertCount(2, $favorites);
+        self::assertSame('FC Bayern München', $favorites[1]['teamName']);
+    }
 }

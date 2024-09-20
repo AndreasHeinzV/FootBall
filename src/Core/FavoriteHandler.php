@@ -30,14 +30,15 @@ class FavoriteHandler
     public function addUserFavorite(UserDTO $userDTO, string $id): void
     {
         $team = $this->footballRepository->getTeam($id);
-        $this->favoritesList[$userDTO->email] = $team;
-        $this->userEntityManager->saveUserFavorites($userDTO, $this->favoritesList[$userDTO->email]);
+        if (!empty($team)) {
+            $favoritesList[$userDTO->email] = $this->getUserFavorites($userDTO);
+            if (!$this->getFavStatus( $id)) {
+                $favoritesList[$userDTO->email] = $team;
+                $this->userEntityManager->saveUserFavorites($userDTO, $favoritesList[$userDTO->email]);
+            }
+        }
     }
 
-    /*
-        //TODO add save
-        public
-    */
 
     public function removeUserFavorite(UserDTO $userDTO, string $id): void
     {
@@ -52,15 +53,15 @@ class FavoriteHandler
 
     public function getUserFavorites(UserDTO $userDTO): array
     {
-        $this->favoritesList[$userDTO->email] = $this->userRepo->getUserFavorites($userDTO);
-        return $this->favoritesList[$userDTO->email] ?? [];
+        $favoritesList[$userDTO->email] = $this->userRepo->getUserFavorites($userDTO);
+        return $favoritesList[$userDTO->email] ?? [];
     }
 
     public function getFavStatus(string $id): bool
     {
         $userDTO = $this->sessionHandler->getUserDTO();
         $this->favoritesList[$userDTO->email] = $this->userRepo->getUserFavorites($userDTO);
-        if (isset($this->favoritesList[$userDTO->email])) {
+        if (!empty($this->favoritesList[$userDTO->email])) {
             foreach ($this->favoritesList[$userDTO->email] as $favorite) {
                 if ($favorite['teamID'] === (int)$id) {
                     return true;
@@ -106,7 +107,7 @@ class FavoriteHandler
         foreach ($this->favoritesList[$this->userDTO->email] as $key => $favorite) {
             if ($favorite['teamID'] === (int)$id) {
                 $tempArray = $favorite;
-                if ((int)$key !== $length - 1 && $length >= 2) {
+                if ((int)$key !== $length && $length >= 2) {
                     $this->favoritesList[$this->userDTO->email][$key] = $this->favoritesList[$this->userDTO->email][$key + 1];
                     $this->favoritesList[$this->userDTO->email][$key + 1] = $tempArray;
                 }

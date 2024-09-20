@@ -1,17 +1,37 @@
 <html>
-{% block header %}
-  {% include 'base.twig' %}
-{% endblock %}
+<head>
+    {% block header %}
+        {% include 'base.twig' %}
+    {% endblock %}
+</head>
+<body>
 <form action="/index.php" method="GET">
+    {% if leagues is not empty %}
 
+        <ul>
+
+            {% for league in leagues %}
+
+
+                <li><a href="{{ league.link }}">{{ league.name }}</a></li>
+            {% endfor %}
+        </ul>
+
+    {% else %}
+
+            <style>
+                    body {
+                            background-image: url('https://i.imgur.com/e1IneGq.jpg');
+                            background-position: center;
+                            background-size:contain;
+                        background-repeat: no-repeat ;
+                            overflow: hidden;
+                            height: 100vh;
+                    }
+            </style>
+
+    {% endif %}
 </form>
-<ul>
-
-    {% for league in leagues %}
-
-
-        <li><a href="{{ league.link }}">{{ league.name }}</a></li>
-    {% endfor %}
-</ul>
-
+</body>
 </html>
+

@@ -15,7 +15,7 @@ class FootballRepository implements FootballRepositoryInterface
         $this->apiRequester = $apiRequester;
     }
 
-    public function getPlayer(string $id): PlayerDTO
+    public function getPlayer(string $id): ?PlayerDTO
     {
         return $this->apiRequester->getPlayer($id);
     }

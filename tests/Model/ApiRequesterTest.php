@@ -47,6 +47,13 @@ class ApiRequesterTest extends TestCase
         self::assertNotSame('', $playerDTO->name);
     }
 
+    public function testApiRequestGetNoPlayer(): void
+    {
+        $playerDTO = $this->apiRequester->getPlayer('129943458679');
+        self::assertEmpty($playerDTO);
+        //  self::assertNotSame('', $playerDTO->name);
+    }
+
     public function testApiRequestGetCompetition(): void
     {
         $competition = $this->apiRequester->getCompetition('BSA');
@@ -74,4 +81,9 @@ class ApiRequesterTest extends TestCase
         self::assertTrue($bool);
     }
 
+    public function testApiRequestBadRequest(): void
+    {
+        $respons = $this->apiRequester->parRequest('fseeh');
+        self::assertEmpty($respons);
+    }
 }

@@ -9,6 +9,7 @@ use App\Controller\HomeController;
 use App\Controller\LeaguesController;
 use App\Controller\LoginController;
 use App\Controller\LogoutController;
+use App\Controller\NoPageController;
 use App\Controller\PlayerController;
 use App\Controller\RegisterController;
 use App\Controller\TeamController;
@@ -36,6 +37,7 @@ class DependencyProvider
         $container->set(TeamMapper::class, new TeamMapper());
         $container->set(PlayerMapper::class, new PlayerMapper());
         $container->set(Redirect::class, new Redirect());
+        $container->set(NoPageController::class, new NoPageController());
         $container->set(ApiRequester::class, new ApiRequester(
             $container->get(LeaguesMapper::class),
             $container->get(CompetitionMapper::class),

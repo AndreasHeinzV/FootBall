@@ -11,26 +11,16 @@ use App\Model\Mapper\LeaguesMapperInterface;
 use App\Model\Mapper\PlayerMapper;
 use App\Model\Mapper\TeamMapper;
 
-class ApiRequesterFaker implements ApiRequesterInterface
+readonly class ApiRequesterFaker implements ApiRequesterInterface
 {
-    private LeaguesMapperInterface $leaguesMapper;
 
-    private CompetitionMapper $competitionMapper;
-
-    private TeamMapper $teamMapper;
-
-    private PlayerMapper $playerMapper;
 
     public function __construct(
-        LeaguesMapperInterface $leaguesMapper,
-        CompetitionMapper $competitionMapper,
-        TeamMapper $teamMapper,
-        PlayerMapper $playerMapper
+        private LeaguesMapperInterface $leaguesMapper,
+        private CompetitionMapper $competitionMapper,
+        private TeamMapper $teamMapper,
+        private PlayerMapper $playerMapper
     ) {
-        $this->leaguesMapper = $leaguesMapper;
-        $this->competitionMapper = $competitionMapper;
-        $this->teamMapper = $teamMapper;
-        $this->playerMapper = $playerMapper;
     }
 
     public function parRequest($url): array
@@ -45,11 +35,13 @@ class ApiRequesterFaker implements ApiRequesterInterface
         return json_decode(file_get_contents($path), true);
     }
 
-    public function getPlayer(string $playerID): PlayerDTO
+    public function getPlayer(string $playerID): ?PlayerDTO
     {
         $uri = 'https://api.football-data.org/v4/persons/' . $playerID;
-        $player = $this->parRequest($uri);
-        return $this->playerMapper->createTeamDTO($player);
+        if (empty($this->parRequest($uri))) {
+            return null;
+        }
+        return $this->playerMapper->createTeamDTO($this->parRequest($uri));
     }
 
     public function getTeam(string $id): array
@@ -57,9 +49,16 @@ class ApiRequesterFaker implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/teams/' . $id;
         $team = $this->parRequest($uri);
         $playersArray = [];
+
+        if (empty($team)) {
+            return [];
+        }
+
         $playersArray['teamName'] = $team['name'];
+        $playersArray['teamID'] = $team['id'];
+        $playersArray['crest'] = $team['crest'];
+
         foreach ($team['squad'] as $player) {
-            //$playerArray = [];
             $playerArray['playerID'] = $player['id'];
             $playerArray['link'] = "/index.php?page=player&id=" . $player['id'];
             $playerArray['name'] = $player['name'];
@@ -73,9 +72,12 @@ class ApiRequesterFaker implements ApiRequesterInterface
         $teams = [];
         $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
         $standings = $this->parRequest($uri);
+
+        if (empty($standings)) {
+            return [];
+        }
+
         $teamID = $standings['standings'][0]['table'];
-
-
         foreach ($teamID as $table) {
             $team = [];
             $team['position'] = $table['position'];
@@ -100,7 +102,9 @@ class ApiRequesterFaker implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/competitions/';
         $matches = $this->parRequest($uri);
         $leaguesArray = [];
-
+        if (empty($matches)) {
+            return [];
+        }
 
         foreach ($matches['competitions'] as $competition) {
             $leagueArray = [];

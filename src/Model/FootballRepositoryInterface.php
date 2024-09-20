@@ -12,5 +12,5 @@ interface FootballRepositoryInterface
 
     public function getTeam(string $id): array;
 
-    public function getPlayer(string $id): PlayerDTO;
+    public function getPlayer(string $id): ?PlayerDTO;
 }
