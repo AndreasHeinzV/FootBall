@@ -77,7 +77,8 @@ class FavoriteHandler
         $this->userDTO = $this->sessionHandler->getUserDTO();
         if ($movement === "up") {
             $this->moveFavUp($id);
-        } elseif ($movement === "down") {
+        }
+        if ($movement === "down") {
             $this->moveFavDown($id);
         }
         $this->userEntityManager->saveFavorites($this->favoritesList);

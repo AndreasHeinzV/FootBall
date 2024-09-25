@@ -51,7 +51,7 @@ class ApiRequester implements ApiRequesterInterface
             curl_close($curl);
 
             if ($httpStatus !== 200) {
-                error_log("Request Failed HTTP Status: " . $httpStatus);
+              error_log("Request Failed HTTP Status: " . $httpStatus);
                 return [];
             }
             return json_decode($response, true);
