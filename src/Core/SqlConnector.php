@@ -10,13 +10,13 @@ use PDOStatement;
 
 class SqlConnector
 {
-    private $dbName = 'football';
-    private $host = '127.0.0.1';
-    private $port = 3336;
+    private string $dbName = 'football';
+    private string $host = '127.0.0.1';
+    private int $port = 3336;
 
-    private $user = 'root';
+    private string $user = 'root';
 
-    private $pass = 'nexus123';
+    private string $pass = 'nexus123';
 
     private string $dsn;
     private PDO $pdo;
@@ -36,20 +36,65 @@ class SqlConnector
     public function createUserTable(): void
     {
         $statements =
-            'CREATE TABLE users(
+            'CREATE TABLE IF NOT EXISTS users(
     user_id INT AUTO_INCREMENT,
     user_email VARCHAR(255) NOT NULL,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     PRIMARY KEY(user_id)
                   )';
-
+        $stmtFavorites =
+            'CREATE TABLE IF NOT EXISTS favorites(
+            favorite_id INT AUTO_INCREMENT,
+            user_id INT NULL,
+            PRIMARY KEY(favorite_id),
+            CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) 
+        )';
         $this->pdo->exec($statements);
+        $this->pdo->exec($stmtFavorites);
     }
 
-    public function query(string $query, array $params = []): array
+    public function queryInsert(string $query, array $params = []): void
     {
-        $this->pdo->prepare($query);
-        return [];
+        $stmt = $this->pdo->prepare($query);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
     }
+
+    public function querySelect(string $query, array $params = []): array
+    {
+        $stmt = $this->pdo->prepare($query);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue(':' . $key, $value);
+        }
+
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function querySelectAll(string $query, array $params = []): array
+    {
+        $stmt = $this->pdo->prepare($query);
+        if (!empty($params)) {
+            foreach ($params as $key => $value) {
+                $stmt->bindValue(':' . $key, $value);
+            }
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function queryManipulate(string $query, array $params = []): void
+    {
+        $stmt = $this->pdo->prepare($query);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue(':' . $key, $value);
+        }
+        $stmt->execute();
+    }
+
 }

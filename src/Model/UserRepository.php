@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Core\SqlConnector;
 use App\Model\DTOs\UserDTO;
 use App\Model\Mapper\UserMapper;
 
@@ -12,7 +13,7 @@ class UserRepository implements UserRepositoryInterface
     private string $filePath;
     private string $favFilePath;
 
-    public function __construct()
+    public function __construct(public SqlConnector $sqlConnector)
     {
         $name = 'users.json';
         $fav = 'favorites.json';
@@ -48,7 +49,9 @@ class UserRepository implements UserRepositoryInterface
     public function getUsers(): array
 
     {
-        return file_exists($this->filePath) ? json_decode(file_get_contents($this->filePath), true) : [];
+        return $this->sqlConnector->querySelectAll('SELECT * FROM `users`', []);
+
+        //return file_exists($this->filePath) ? json_decode(file_get_contents($this->filePath), true) : [];
     }
 
 
@@ -62,15 +65,17 @@ class UserRepository implements UserRepositoryInterface
     }
     public function getUserFavorites(UserDTO $userDTO): array
     {
-        $favorites = $this->getFavorites();
-
-        return $favorites[$userDTO->email] ?? [];
+       // $favorites = $this->getFavorites();
+        //return $favorites[$userDTO->email] ?? [];
+        return $this->sqlConnector->querySelectAll('SELECT * FROM `favorites` WHERE ', []);
     }
 
     public function getFavorites(): array
     {
+        /*
         $favoritesData = file_exists($this->favFilePath) ? file_get_contents($this->favFilePath) : '';
         return $favoritesData !== '' ? json_decode($favoritesData, true) : [];
-
+*/
+        return $this->sqlConnector->querySelectAll('SELECT * FROM `favorites`', []);
     }
 }

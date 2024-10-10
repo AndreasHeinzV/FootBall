@@ -10,12 +10,12 @@ use App\Model\DTOs\UserDTO;
 use App\Model\Mapper\UserMapper;
 use App\Model\Mapper\UserMapperInterface;
 
-class UserEntityManager
+readonly class UserEntityManager
 {
     public function __construct(
-        private readonly ValidationInterface $validation,
-        private readonly UserRepositoryInterface $repository,
-        private readonly UserMapperInterface $userMapper
+        private ValidationInterface $validation,
+        private UserRepositoryInterface $repository,
+        private UserMapperInterface $userMapper
     ) {
     }
 
@@ -24,6 +24,7 @@ class UserEntityManager
     {
         $existingUsers = $this->repository->getUsers();
         if ($this->validation->checkDuplicateMail($existingUsers, $userData->email)) {
+
             $user = $this->userMapper->getUserData($userData);
             $this->updateUser($existingUsers, $user);
         } else {
