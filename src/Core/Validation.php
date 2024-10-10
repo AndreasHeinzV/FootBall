@@ -7,10 +7,15 @@ namespace App\Core;
 use App\Model\DTOs\ErrorsDTO;
 use App\Model\DTOs\UserDTO;
 use App\Model\Mapper\ErrorMapper;
+use App\Model\RepositoryInterface;
+use App\Model\UserEntityManager;
+use App\Model\UserRepository;
 
-class Validation implements ValidationInterface
+readonly class Validation implements ValidationInterface
 {
-
+    public function __construct(private UserRepository $userRepository)
+    {
+    }
 
     public function validateErrors(ErrorsDTO $errorsDTO): bool
     {
@@ -22,16 +27,18 @@ class Validation implements ValidationInterface
         return true;
     }
 
-    public function checkDuplicateMail(array $existingUsers, string $mailToCheck): bool
-    {
-        foreach ($existingUsers as $user) {
-            if (isset($user['email']) && $user['email'] === $mailToCheck) {
-                return true;
-            }
-        }
-        return false;
-    }
+    /*
+        public function checkDuplicateMail(string $mailToCheck): bool
+        {
 
+            foreach ($existingUsers as $user) {
+                if (isset($user['email']) && $user['email'] === $mailToCheck) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    */
     public function userRegisterGetErrors(UserDTO $userDTO): ErrorsDTO
     {
         $errors = [];
@@ -44,23 +51,19 @@ class Validation implements ValidationInterface
         return (new ErrorMapper())->createErrorDTO($errors);
     }
 
-    public function userLoginGetErrors(array $existingUsers, UserDTO $userDTO): ErrorsDTO
+    public function userLoginGetErrors(UserDTO $userDTO): ErrorsDTO
     {
         $errors = [];
         $errors['emailError'] = $this->validateEmail($userDTO->email);
-        $errors['passwordError'] = $this->validatePasswordLogin($existingUsers, $userDTO);
+        $errors['passwordError'] = $this->validatePasswordLogin($userDTO);
 
         return (new ErrorMapper())->createErrorDTO($errors);
     }
 
-    private function validateLogin(array $existingUsers, UserDTO $userDTO): bool
+    private function validateLogin(UserDTO $userDTO): bool
     {
-        foreach ($existingUsers as $user) {
-            if ($user['email'] === $userDTO->email) {
-                return password_verify($userDTO->password, $user['password']);
-            }
-        }
-        return false;
+        $user = $this->userRepository->getUser($userDTO->email);
+        return password_verify($userDTO->password, $user->password);
     }
 
 
@@ -105,13 +108,13 @@ class Validation implements ValidationInterface
         return "";
     }
 
-    private function validatePasswordLogin(array $existingUsers, $userDTO): string
+    private function validatePasswordLogin($userDTO): string
     {
         if (empty($userDTO->password)) {
             return "Password is empty.";
         }
 
-        if (!$this->validateLogin($existingUsers, $userDTO)) {
+        if (!$this->validateLogin($userDTO)) {
             return 'email or password is wrong';
         }
         return "";

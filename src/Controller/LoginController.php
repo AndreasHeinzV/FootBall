@@ -23,7 +23,7 @@ class LoginController implements Controller
     public UserDTO $userDTO;
     public ErrorsDTO $errorsDTO;
 
-    public array $temp;
+
 
     public function __construct(
         public UserRepository $repository,
@@ -47,17 +47,17 @@ class LoginController implements Controller
         if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['loginButton'] === 'login') {
            // $filePath = __DIR__ . '/../../users.json';
 
-            $existingUsers = $this->repository->getUsers();
-            $this->temp['email'] = htmlspecialchars($_POST['email'] ?? '');
-            $this->temp['password'] = htmlspecialchars($_POST['password'] ?? '');
 
-            $this->userDTO = $this->userMapper->createDTO($this->temp);
-            $this->errorsDTO = $this->validator->userLoginGetErrors($existingUsers, $this->userDTO);
+            $temp['email'] = htmlspecialchars($_POST['email'] ?? '');
+            $temp['password'] = htmlspecialchars($_POST['password'] ?? '');
+
+            $this->userDTO = $this->userMapper->createDTO($temp);
+            $this->errorsDTO = $this->validator->userLoginGetErrors($this->userDTO);
             $validation = $this->validator->validateErrors($this->errorsDTO);
 
             if ($validation) {
                 $this->sessionHandler->startSession();
-                $this->userDTO = $this->repository->getUser($existingUsers, $this->userDTO->email);
+                $this->userDTO = $this->repository->getUser($this->userDTO->email);
                 $this->sessionHandler->setUserDTO($this->userDTO);
                $this->redirect->to('index.php');
             }

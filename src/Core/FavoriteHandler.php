@@ -31,12 +31,19 @@ class FavoriteHandler
     {
         $team = $this->footballRepository->getTeam($id);
         if (!empty($team)) {
+            $this->userEntityManager->saveUserFavorites($userDTO, $team);
+        }
+
+        /*
+        $team = $this->footballRepository->getTeam($id);
+        if (!empty($team)) {
             $favoritesList[$userDTO->email] = $this->getUserFavorites($userDTO);
             if (!$this->getFavStatus( $id)) {
                 $favoritesList[$userDTO->email] = $team;
                 $this->userEntityManager->saveUserFavorites($userDTO, $favoritesList[$userDTO->email]);
             }
         }
+        */
     }
 
 
@@ -53,8 +60,13 @@ class FavoriteHandler
 
     public function getUserFavorites(UserDTO $userDTO): array
     {
+        return $this->userRepo->getUserFavorites($userDTO);
+
+        /*
+
         $favoritesList[$userDTO->email] = $this->userRepo->getUserFavorites($userDTO);
         return $favoritesList[$userDTO->email] ?? [];
+        */
     }
 
     public function getFavStatus(string $id): bool

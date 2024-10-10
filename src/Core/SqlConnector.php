@@ -24,7 +24,7 @@ class SqlConnector
     public function __construct()
     {
         if (isset($_ENV['DATABASE'])) {
-            $this->dbName = $_ENV('DATABASE');
+            $this->dbName = $_ENV['DATABASE'];
         }
         $this->dsn = 'mysql:host=' . $this->host . ':' . $this->port . ';dbname=' . $this->dbName;
         $this->pdo = new PDO($this->dsn, $this->user, $this->pass);
@@ -33,25 +33,9 @@ class SqlConnector
     }
 
 
-    public function createUserTable(): void
+    public function getPdo(): PDO
     {
-        $statements =
-            'CREATE TABLE IF NOT EXISTS users(
-    user_id INT AUTO_INCREMENT,
-    user_email VARCHAR(255) NOT NULL,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL,
-    PRIMARY KEY(user_id)
-                  )';
-        $stmtFavorites =
-            'CREATE TABLE IF NOT EXISTS favorites(
-            favorite_id INT AUTO_INCREMENT,
-            user_id INT NULL,
-            PRIMARY KEY(favorite_id),
-            CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) 
-        )';
-        $this->pdo->exec($statements);
-        $this->pdo->exec($stmtFavorites);
+        return $this->pdo;
     }
 
     public function queryInsert(string $query, array $params = []): void
@@ -61,9 +45,10 @@ class SqlConnector
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
+        $stmt->execute();
     }
 
-    public function querySelect(string $query, array $params = []): array
+    public function querySelect(string $query, array $params = []): array|false
     {
         $stmt = $this->pdo->prepare($query);
 

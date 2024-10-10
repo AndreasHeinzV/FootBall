@@ -8,7 +8,7 @@ use App\Model\DTOs\UserDTO;
 interface ValidationInterface
 {
 
-    public function checkDuplicateMail(array $existingUsers, string $mailToCheck): bool;
+  //  public function checkDuplicateMail(array $existingUsers, string $mailToCheck): bool;
 
     public function userRegisterGetErrors(UserDTO $userDTO): ErrorsDTO;
 

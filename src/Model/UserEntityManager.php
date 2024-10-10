@@ -4,43 +4,53 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Core\ValidationInterface;
-use App\Model\DTOs\CompetitionDTO;
+use App\Core\SqlConnector;
 use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapper;
 use App\Model\Mapper\UserMapperInterface;
 
 readonly class UserEntityManager
 {
     public function __construct(
-        private ValidationInterface $validation,
         private UserRepositoryInterface $repository,
-        private UserMapperInterface $userMapper
+        private UserMapperInterface $userMapper,
+        private SqlConnector $sqlConnector
     ) {
     }
 
 
     public function save(UserDTO $userData): void
     {
-        $existingUsers = $this->repository->getUsers();
-        if ($this->validation->checkDuplicateMail($existingUsers, $userData->email)) {
-
-            $user = $this->userMapper->getUserData($userData);
-            $this->updateUser($existingUsers, $user);
+        $userId = $this->sqlConnector->querySelect(
+            'SELECT user_id from users WHERE user_email =:user_email',
+            ['user_email' => $userData->email]
+        );
+        if (!$userId) {
+            $this->sqlConnector->queryInsert(
+                'INSERT INTO users(user_email,password, first_name, last_name) VALUES(:user_email,:password,:first_name,:last_name)',
+                [
+                    'user_email' => $userData->email,
+                    'password' => $userData->password,
+                    'first_name' => $userData->firstName,
+                    'last_name' => $userData->lastName,
+                ]
+            );
         } else {
-            $existingUsers[] = $userData;
-            $this->putUserIntoJson($existingUsers);
+            $this->updateUser($userId['user_id'], $userData);
         }
     }
 
     public function saveUserFavorites(UserDTO $userDTO, array $teamData): void
     {
+/*
         $favorites = $this->repository->getFavorites();
         if (!isset($favorites[$userDTO->email])) {
             $favorites[$userDTO->email] = [];
         }
         $favorites[$userDTO->email][] = $teamData;
         $this->putFavIntoJson($favorites);
+*/
+
+
     }
 
     private function putFavIntoJson(array $favorites): void
@@ -49,27 +59,21 @@ readonly class UserEntityManager
         file_put_contents($path, json_encode($favorites, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 
-    private function updateUser(array $existingUsers, array $user): void
+    private function updateUser(int $userId, userDTO $user): void
     {
-        foreach ($existingUsers as $position => $existingUser) {
-            if ($existingUser['email'] === $user['email']) {
-                $existingUsers[$position]['firstName'] = $user['firstName'];
-                $existingUsers[$position]['lastName'] = $user['lastName'];
-                $existingUsers[$position]['password'] = $user['password'];
-            }
-        }
-        $this->putUserIntoJson($existingUsers);
+        $this->sqlConnector->queryInsert(
+            'UPDATE users SET user_email= :user_email, first_name = :first_name, last_name =:last_name WHERE user_id = :user_id',
+            [
+                'user_email' => $user->email,
+                'first_name' => $user->firstName,
+                'last_name' => $user->lastName,
+                'user_id' => $userId,
+            ]
+        );
     }
 
-    private function putUserIntoJson(array $existingUsers): void
-    {
-        //  print_r($existingUsers);
-        $path = $this->repository->getFilePath();
 
-        file_put_contents($path, json_encode($existingUsers, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-    }
-
-    public function saveFavorites(array $favorites)
+    public function saveFavorites(array $favorites): void
     {
         $this->putFavIntoJson($favorites);
     }

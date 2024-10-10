@@ -25,33 +25,43 @@ class UserRepository implements UserRepositoryInterface
         $this->favFilePath = __DIR__ . '/../../' . $fav;
     }
 
-    public function getUserName(array $existingUsers, string $email): string
+    public function getUserName(string $email): string
     {
-        foreach ($existingUsers as $existingUser) {
-            if ($existingUser['email'] === $email) {
-                return $existingUser['firstName'];
-            }
+        $user = $this->sqlConnector->querySelect(
+            'SELECT first_name FROM users WHERE email = :email',
+            ['email' => $email]
+        );
+
+        if (!$user) {
+            return '';
         }
-        return '';
+
+        return $user["first_name"];
     }
 
-    public function getUser(array $existingUsers, string $email): UserDTO
+    public function getUser(string $email): UserDTO
     {
+        $user = $this->sqlConnector->querySelect(
+            'SELECT user_email, first_name, last_name, password FROM users WHERE user_email = :user_email',
+            ['user_email' => $email]
+        );
         $userMapper = new UserMapper();
-        foreach ($existingUsers as $existingUser) {
-            if ($existingUser['email'] === $email) {
-                return $userMapper->createDTO($existingUser);
-            }
+        if (!$user) {
+            return new UserDTO('', '', '', '');
         }
-        return new UserDTO('', '', '', '');
+
+        return $userMapper->createDTO([
+            'firstName' => $user["first_name"],
+            'lastName' => $user["last_name"],
+            'email' => $user["user_email"],
+            'password' => $user["password"],
+        ]);
     }
 
     public function getUsers(): array
 
     {
-        return $this->sqlConnector->querySelectAll('SELECT * FROM `users`', []);
-
-        //return file_exists($this->filePath) ? json_decode(file_get_contents($this->filePath), true) : [];
+        return $this->sqlConnector->querySelectAll('SELECT * FROM users');
     }
 
 
@@ -59,23 +69,47 @@ class UserRepository implements UserRepositoryInterface
     {
         return $this->filePath;
     }
+
     public function getFavFilePath(): string
     {
         return $this->favFilePath;
     }
+
     public function getUserFavorites(UserDTO $userDTO): array
     {
-       // $favorites = $this->getFavorites();
-        //return $favorites[$userDTO->email] ?? [];
-        return $this->sqlConnector->querySelectAll('SELECT * FROM `favorites` WHERE ', []);
+        $userID = $this->getUserID($userDTO);
+        $favoriteArray =$this->sqlConnector->querySelectAll(
+            'SELECT favorite_position, team_id, team_name, team_crest FROM favorites WHERE user_id = :user_id',
+            ['user_id' => $userID]
+        );
+        $returnArray = [];
+        foreach ($favoriteArray as $favorite) {
+            $returnArray[] = [
+                'favoritePosition' => $favorite["favorite_position"],
+                'teamName' => $favorite['team_name'],
+                'teamID' => $favorite['team_id'],
+                'crest' => $favorite['team_crest']
+            ];
+        }
+        return $returnArray;
     }
 
-    public function getFavorites(): array
+    /*
+        public function getFavorites(): array
+        {
+            /*
+            $favoritesData = file_exists($this->favFilePath) ? file_get_contents($this->favFilePath) : '';
+            return $favoritesData !== '' ? json_decode($favoritesData, true) : [];
+
+            return $this->sqlConnector->querySelectAll('SELECT * FROM `favorites`', []);
+        }
+    */
+    private function getUserID(userDTO $userDTO): int
     {
-        /*
-        $favoritesData = file_exists($this->favFilePath) ? file_get_contents($this->favFilePath) : '';
-        return $favoritesData !== '' ? json_decode($favoritesData, true) : [];
-*/
-        return $this->sqlConnector->querySelectAll('SELECT * FROM `favorites`', []);
+        $userID = $this->sqlConnector->querySelect(
+            'SELECT user_id FROM users WHERE user_id = :user_id',
+            ['user_id' => $userDTO->email]
+        );
+        return $userID['user_id'];
     }
 }

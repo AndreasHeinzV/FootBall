@@ -30,7 +30,8 @@ class DependencyProvider
 
     public function fill(Container $container): void
     {
-        $container->set(Validation::class, new Validation());
+
+
         $container->set(UserMapper::class, new UserMapper());
         $container->set(LeaguesMapper::class, new LeaguesMapper());
         $container->set(CompetitionMapper::class, new CompetitionMapper());
@@ -44,14 +45,21 @@ class DependencyProvider
             $container->get(TeamMapper::class),
             $container->get(PlayerMapper::class)
         ));
+        $container->set(SqlConnector::class, new SqlConnector());
+        $container->set(Fixtures::class, new Fixtures(
+            $container->get(SqlConnector::class)
+        ));
         $container->set(FilesystemLoader::class, new FilesystemLoader(__DIR__ . '/../View'));
 
-        $container->set(UserRepository::class, new UserRepository());
-
-        $container->set(UserEntityManager::class, new UserEntityManager(
-            $container->get(Validation::class),
+        $container->set(UserRepository::class, new UserRepository(
+            $container->get(SqlConnector::class)));
+        $container->set(Validation::class, new Validation(
             $container->get(UserRepository::class),
-            $container->get(UserMapper::class)
+        ));
+        $container->set(UserEntityManager::class, new UserEntityManager(
+            $container->get(UserRepository::class),
+            $container->get(UserMapper::class),
+            $container->get(SqlConnector::class)
 
         ));
 

@@ -93,6 +93,7 @@ class ApiRequester implements ApiRequesterInterface
             $playerArray['name'] = $player['name'];
             $playersArray['squad'][] = $this->teamMapper->createTeamDTO($playerArray);
         }
+
         return $playersArray;
     }
 
