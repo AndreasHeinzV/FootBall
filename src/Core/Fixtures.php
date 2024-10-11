@@ -10,10 +10,10 @@ class Fixtures
 {
     public function __construct(public SqlConnector $sqlConnector)
     {
-
     }
-    public function buildTables(): void{
 
+    public function buildTables(): void
+    {
         $statements =
             'CREATE TABLE IF NOT EXISTS users(
             user_id INT AUTO_INCREMENT,
@@ -39,9 +39,20 @@ class Fixtures
         )';
 
 
-        $pdo =$this->sqlConnector->getPdo();
+        $pdo = $this->sqlConnector->getPdo();
         $pdo->exec($statements);
         $pdo->exec($stmtFavorites);
     }
 
+    public function dropTables(): void
+    {
+        $dropFavorites = 'DROP TABLE IF EXISTS favorites';
+        $dropUsers = 'DROP TABLE IF EXISTS users';
+
+
+        $pdo = $this->sqlConnector->getPdo();
+        $pdo->exec($dropFavorites);
+        $pdo->exec($dropUsers);
+
+    }
 }

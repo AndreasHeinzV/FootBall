@@ -63,10 +63,9 @@ class SqlConnector
     public function querySelectAll(string $query, array $params = []): array
     {
         $stmt = $this->pdo->prepare($query);
-        if (!empty($params)) {
+
             foreach ($params as $key => $value) {
                 $stmt->bindValue(':' . $key, $value);
-            }
         }
 
         $stmt->execute();

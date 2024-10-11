@@ -58,7 +58,6 @@ class DependencyProvider
         ));
         $container->set(UserEntityManager::class, new UserEntityManager(
             $container->get(UserRepository::class),
-            $container->get(UserMapper::class),
             $container->get(SqlConnector::class)
 
         ));

@@ -72,7 +72,7 @@ class UserEntityManagerTest extends TestCase
         self::assertCount(1, $beforeSave);
         $userDTO = $this->userMapper->createDTO($userData);
 
-        $this->entityManager->save($userDTO);
+        $this->entityManager->saveUser($userDTO);
         $actualData = json_decode(file_get_contents($this->path), true, 512, JSON_THROW_ON_ERROR);
 
 
@@ -98,7 +98,7 @@ class UserEntityManagerTest extends TestCase
             'password' => 'ewqwh1262624rh',
         ];
         $userDTO = $this->userMapper->createDTO($userData2);
-        $this->entityManager->save($userDTO);
+        $this->entityManager->saveUser($userDTO);
         $actual2Data = json_decode(file_get_contents($stubRepository->getFilePath()), true);
 
         self::assertCount(2, $actual2Data);

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Model\DTOs\CompetitionDTO;
+use App\Model\DTOs\FavoriteDTO;
 use App\Model\DTOs\TeamDTO;
 use App\Model\DTOs\UserDTO;
 use App\Model\FootballRepositoryInterface;
+use App\Model\Mapper\FavoriteMapper;
 use App\Model\UserEntityManager;
 use App\Model\UserRepository;
 use SessionHandlerInterface;
@@ -23,15 +25,16 @@ class FavoriteHandler
         private readonly SessionHandler $sessionHandler,
         private readonly FootballRepositoryInterface $footballRepository,
         private readonly UserEntityManager $userEntityManager,
-        private readonly UserRepository $userRepo
+        private readonly UserRepository $userRepo,
+        private readonly FavoriteMapper $favoriteMapper
     ) {
     }
 
     public function addUserFavorite(UserDTO $userDTO, string $id): void
     {
         $team = $this->footballRepository->getTeam($id);
-        if (!empty($team)) {
-            $this->userEntityManager->saveUserFavorites($userDTO, $team);
+        if (!empty($team) && !$this->getFavStatus($id)) {
+            $this->userEntityManager->saveUserFavorite($userDTO, $this->favoriteMapper->createFavoriteDTO($team));
         }
 
         /*
@@ -49,6 +52,8 @@ class FavoriteHandler
 
     public function removeUserFavorite(UserDTO $userDTO, string $id): void
     {
+
+        /*
         $this->favoritesList = $this->userRepo->getFavorites();
         foreach ($this->favoritesList[$userDTO->email] as $key => $favorite) {
             if ($favorite['teamID'] === (int)$id) {
@@ -56,6 +61,7 @@ class FavoriteHandler
             }
         }
         $this->userEntityManager->saveFavorites($this->favoritesList);
+        */
     }
 
     public function getUserFavorites(UserDTO $userDTO): array
@@ -72,15 +78,7 @@ class FavoriteHandler
     public function getFavStatus(string $id): bool
     {
         $userDTO = $this->sessionHandler->getUserDTO();
-        $this->favoritesList[$userDTO->email] = $this->userRepo->getUserFavorites($userDTO);
-        if (!empty($this->favoritesList[$userDTO->email])) {
-            foreach ($this->favoritesList[$userDTO->email] as $favorite) {
-                if ($favorite['teamID'] === (int)$id) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return $this->userRepo->checkExistingFavorite($userDTO, $id);
     }
 
 

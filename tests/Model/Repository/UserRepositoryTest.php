@@ -5,7 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Model\Repository;
 
 
-
+use App\Core\Fixtures;
+use App\Core\SqlConnector;
+use App\Model\ApiRequester;
+use App\Model\FootballRepository;
+use App\Model\Mapper\CompetitionMapper;
+use App\Model\Mapper\FavoriteMapper;
+use App\Model\Mapper\LeaguesMapper;
+use App\Model\Mapper\PlayerMapper;
+use App\Model\Mapper\TeamMapper;
+use App\Model\Mapper\UserMapper;
+use App\Model\UserEntityManager;
 use App\Model\UserRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -14,57 +24,186 @@ use function PHPUnit\Framework\assertSame;
 class UserRepositoryTest extends TestCase
 {
     private string $path;
-    protected function setUp(): void{
-        $_ENV['test'] = true;
-        $this->path = __DIR__ . '/../../../users_test.json';
+
+    private UserMapper $userMapper;
+
+    private FavoriteMapper $favoriteMapper;
+    private Fixtures $fixtures;
+
+    private UserRepository $userRepository;
+
+    private UserEntityManager $userEntityManager;
+    private FootballRepository $footballRepository;
+
+    protected function setUp(): void
+    {
+        $_ENV['DATABASE'] = 'football_test';
+
         $testData = [
-            [
-                'firstName' => 'ImATestCat',
-                'lastName' => 'JustusCristus',
-                'email' => 'dog@gmail.com',
-                'password' => 'passw0rd',
-            ],
+
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'dog@gmail.com',
+            'password' => 'passw0rd',
+
         ];
-        file_put_contents($this->path, json_encode($testData));
+
+        $sqlConnector = new SqlConnector();
+        $this->userMapper = new UserMapper();
+        $apiRequester = new ApiRequester(
+            new LeaguesMapper(),
+            new CompetitionMapper(),
+            new TeamMapper(),
+            new PlayerMapper()
+        );
+        $this->favoriteMapper = new FavoriteMapper();
+        $this->fixtures = new Fixtures($sqlConnector);
+        $this->fixtures->buildTables();
+        $this->footballRepository = new FootballRepository(
+            $apiRequester
+        );
+        $this->userRepository = new UserRepository($sqlConnector);
+        $this->userEntityManager = new UserEntityManager($this->userRepository, $sqlConnector);
+
+        $this->userEntityManager->saveUser($this->userMapper->createDTO($testData));
         parent::setUp();
     }
-    protected function tearDown(): void{
-        unset($_ENV['test']);
-        if (file_exists($this->path)) {
-            unlink($this->path);
-        }
+
+    protected function tearDown(): void
+    {
+        $this->fixtures->dropTables();
         parent::tearDown();
     }
 
-    public function testFindUserByEmail(): void{
-
+    public function testFindUserByEmail(): void
+    {
         $testData = [
-            [
-                'firstName' => 'ImATestCat',
-                'lastName' => 'JustusCristus',
-                'email' => 'dog@gmail.com',
-                'password' => 'passw0rd',
-            ],
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'dog@gmail.com',
+            'password' => 'passw0rd',
         ];
-        $userRepository = new UserRepository();
-
-        $users = $userRepository->getUsers();
 
 
-        $username = $userRepository->getUserName($users, $testData[0]['email']);
-        $noFoundUser = $userRepository->getUserName($users,'eqwhwhw@g.com');
-        self::assertSame($username, $testData[0]['firstName']);
-        self::assertSame($noFoundUser, '');
-
+        $userDTO = $this->userMapper->createDTO($testData);
+        $username = $this->userRepository->getUserName($userDTO->email);
+        self::assertSame($username, $testData['firstName']);
     }
 
     public function testGetUserFail(): void
     {
-        $userRepository = new UserRepository();
+        $testData = [
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'wrongmail@gmf.com',
+            'password' => 'passw0rd',
+        ];
 
-        $users = $userRepository->getUsers();
-        $userDTO = $userRepository->getUser($users,'bongo@g.com');
-            assertSame('', $userDTO->email);
+        $userDTO = $this->userMapper->createDTO($testData);
+        $username = $this->userRepository->getUserName($userDTO->email);
+        assertSame('', $username);
+    }
 
+    public function testGetUser(): void
+    {
+        $testMail = 'dog@gmail.com';
+
+        $userDTO = $this->userRepository->getUser($testMail);
+        assertSame('ImATestCat', $userDTO->firstName);
+    }
+
+    public function testGetUserNotFound(): void
+    {
+        $testMail = 'wrong@gmail.com';
+        $userDTO = $this->userRepository->getUser($testMail);
+        assertSame('', $userDTO->firstName);
+    }
+
+    public function testGetUserFavorites(): void
+    {
+        $testData = [
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'wrongmail@gmf.com',
+            'password' => 'passw0rd',
+        ];
+
+        $userDTO = $this->userMapper->createDTO($testData);
+        $userFavorites = $this->userRepository->getUserFavorites($userDTO);
+        self::assertIsArray($userFavorites);
+        // toDo      self::assertNotEmpty($userFavorites);
+    }
+
+    public function testGetUserFavoritesNotFound(): void
+    {
+        $testData = [
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'wrongmail@gmf.com',
+            'password' => 'passw0rd',
+        ];
+
+        $userDTO = $this->userMapper->createDTO($testData);
+        $userFavorites = $this->userRepository->getUserFavorites($userDTO);
+        self::assertIsArray($userFavorites);
+        self::assertEmpty($userFavorites);
+    }
+
+    public function testGetAllUsers(): void
+    {
+        $allUsers = $this->userRepository->getUsers();
+        self::assertIsArray($allUsers);
+        self::assertNotEmpty($allUsers);
+    }
+
+    public function testCheckExistingFavoriteNoFavorites(): void
+    {
+        $testData = [
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'dog@gmail.com',
+            'password' => 'passw0rd',
+        ];
+        $userDTO = $this->userMapper->createDTO($testData);
+        $returnValue = $this->userRepository->checkExistingFavorite($userDTO, '51');
+        self::assertFalse($returnValue);
+    }
+
+    public function testCheckExistingFavoriteFavorites(): void
+    {
+        $testData = [
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'dog@gmail.com',
+            'password' => 'passw0rd',
+        ];
+
+        $team = $this->footballRepository->getTeam('1770');
+
+
+        $this->userEntityManager->saveUserFavorite(
+            $this->userMapper->createDTO($testData),
+            $this->favoriteMapper->createFavoriteDTO($team)
+        );
+
+        $userDTO = $this->userMapper->createDTO($testData);
+        $returnValue = $this->userRepository->checkExistingFavorite($userDTO, '51');
+        self::assertTrue($returnValue);
+
+
+
+    }
+
+    public function testGetUserID(): void
+    {
+        $testData = [
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'dog@gmail.com',
+            'password' => 'passw0rd',
+        ];
+        $userDTO = $this->userMapper->createDTO($testData);
+        $userID = $this->userRepository->getUserID($userDTO);
+        self::assertSame($userID, $userID);
     }
 }

@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Core\SqlConnector;
+use App\Model\DTOs\FavoriteDTO;
 use App\Model\DTOs\UserDTO;
 use App\Model\Mapper\UserMapperInterface;
 
 readonly class UserEntityManager
 {
     public function __construct(
-        private UserRepositoryInterface $repository,
-        private UserMapperInterface $userMapper,
+        private UserRepository $repository,
         private SqlConnector $sqlConnector
     ) {
     }
 
 
-    public function save(UserDTO $userData): void
+    public function saveUser(UserDTO $userData): void
     {
         $userId = $this->sqlConnector->querySelect(
             'SELECT user_id from users WHERE user_email =:user_email',
@@ -39,25 +39,31 @@ readonly class UserEntityManager
         }
     }
 
-    public function saveUserFavorites(UserDTO $userDTO, array $teamData): void
+    public function saveUserFavorite(UserDTO $userDTO, FavoriteDTO $favoriteDTO): void
     {
-/*
-        $favorites = $this->repository->getFavorites();
-        if (!isset($favorites[$userDTO->email])) {
-            $favorites[$userDTO->email] = [];
-        }
-        $favorites[$userDTO->email][] = $teamData;
-        $this->putFavIntoJson($favorites);
-*/
+        $userID = $this->repository->getUserID($userDTO);
+        $this->sqlConnector->queryInsert(
+            'INSERT INTO favorites(user_id,team_id, team_name, team_crest ) VALUES (:user_id,:team_id,:team_name,:team_crest)',
 
-
+            [
+                'user_id' => $userDTO->$userID,
+                'team_id' => $favoriteDTO->teamID,
+                'team_name' => $favoriteDTO->teamName,
+                'team_crest' => $favoriteDTO->crest,
+            ]
+        );
     }
 
-    private function putFavIntoJson(array $favorites): void
-    {
-        $path = $this->repository->getFavFilePath();
-        file_put_contents($path, json_encode($favorites, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-    }
+    /*
+     *
+            $favorites = $this->repository->getFavorites();
+            if (!isset($favorites[$userDTO->email])) {
+                $favorites[$userDTO->email] = [];
+            }
+            $favorites[$userDTO->email][] = $teamData;
+            $this->putFavIntoJson($favorites);
+    */
+
 
     private function updateUser(int $userId, userDTO $user): void
     {
@@ -71,11 +77,4 @@ readonly class UserEntityManager
             ]
         );
     }
-
-
-    public function saveFavorites(array $favorites): void
-    {
-        $this->putFavIntoJson($favorites);
-    }
-
 }

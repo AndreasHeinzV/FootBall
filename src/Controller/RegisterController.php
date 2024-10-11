@@ -65,7 +65,7 @@ class RegisterController implements Controller
                     $this->temp['email'],
                     password_hash($this->temp['password'], PASSWORD_DEFAULT),
                 );
-                $this->userEntityManager->save($this->userDTO);
+                $this->userEntityManager->saveUser($this->userDTO);
                 $this->redirect->to('');
             }
         }
