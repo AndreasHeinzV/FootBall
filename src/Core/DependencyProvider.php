@@ -16,6 +16,7 @@ use App\Controller\TeamController;
 use App\Model\ApiRequester;
 use App\Model\FootballRepository;
 use App\Model\Mapper\CompetitionMapper;
+use App\Model\Mapper\FavoriteMapper;
 use App\Model\Mapper\LeaguesMapper;
 use App\Model\Mapper\PlayerMapper;
 use App\Model\Mapper\TeamMapper;
@@ -38,6 +39,7 @@ class DependencyProvider
         $container->set(TeamMapper::class, new TeamMapper());
         $container->set(PlayerMapper::class, new PlayerMapper());
         $container->set(Redirect::class, new Redirect());
+        $container->set(FavoriteMapper::class, new FavoriteMapper());
         $container->set(NoPageController::class, new NoPageController());
         $container->set(ApiRequester::class, new ApiRequester(
             $container->get(LeaguesMapper::class),
@@ -80,6 +82,7 @@ class DependencyProvider
             $container->get(FootballRepository::class),
             $container->get(UserEntityManager::class),
             $container->get(UserRepository::class),
+            $container->get(FavoriteMapper::class)
         ));
         $container->set(ManageFavorites::class, new ManageFavorites(
             $container->get(SessionHandler::class),

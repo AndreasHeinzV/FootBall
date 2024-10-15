@@ -36,7 +36,6 @@ class FavoriteHandler
         if (!empty($team) && !$this->getFavStatus($id)) {
             $this->userEntityManager->saveUserFavorite($userDTO, $this->favoriteMapper->createFavoriteDTO($team));
         }
-
         /*
         $team = $this->footballRepository->getTeam($id);
         if (!empty($team)) {
@@ -53,26 +52,12 @@ class FavoriteHandler
     public function removeUserFavorite(UserDTO $userDTO, string $id): void
     {
 
-        /*
-        $this->favoritesList = $this->userRepo->getFavorites();
-        foreach ($this->favoritesList[$userDTO->email] as $key => $favorite) {
-            if ($favorite['teamID'] === (int)$id) {
-                unset($this->favoritesList[$userDTO->email][$key]);
-            }
-        }
-        $this->userEntityManager->saveFavorites($this->favoritesList);
-        */
+      $this->userEntityManager->deleteUserFavorite($userDTO, $id);
     }
 
     public function getUserFavorites(UserDTO $userDTO): array
     {
         return $this->userRepo->getUserFavorites($userDTO);
-
-        /*
-
-        $favoritesList[$userDTO->email] = $this->userRepo->getUserFavorites($userDTO);
-        return $favoritesList[$userDTO->email] ?? [];
-        */
     }
 
     public function getFavStatus(string $id): bool
@@ -91,36 +76,68 @@ class FavoriteHandler
         if ($movement === "down") {
             $this->moveFavDown($id);
         }
-        $this->userEntityManager->saveFavorites($this->favoritesList);
     }
 
     private function moveFavUp(string $id): void
     {
-        $this->favoritesList = $this->userRepo->getFavorites();
-        $tempArray = [];
-        $length = count($this->favoritesList[$this->userDTO->email]);
-        foreach ($this->favoritesList[$this->userDTO->email] as $key => $favorite) {
-            if ($favorite['teamID'] === (int)$id) {
-                $tempArray = $favorite;
-                if ((int)$key !== 0 && $length >= 2) {
-                    $this->favoritesList[$this->userDTO->email][$key] = $this->favoritesList[$this->userDTO->email][$key - 1];
-                    $this->favoritesList[$this->userDTO->email][$key - 1] = $tempArray;
+        $userID = $this->userRepo->getUserID($this->userDTO);
+        $minPosition = $this->userRepo->getUserMinFavoritePosition($this->userDTO);
+        $position = $this->userRepo->getUserFavoritePosition($this->userDTO, $id);
+
+        if ($position > $minPosition) {
+            $favoritesArray = $this->userRepo->getUserFavorites($this->userDTO);
+
+
+            foreach ($favoritesArray as $i => $favorite) {
+                if ($favorite['favoritePosition'] === $position) {
+                    $currentIndex = $i;
+                    $prevIndex = $currentIndex - 1;
+
+                    $currentFavoriteTeamID = $favorite['teamID'];
+                    $prevFavTeamIndex = $favoritesArray[$prevIndex];
+                    $prevFavTeamID = $prevFavTeamIndex['teamID'];
+
+                    $this->userEntityManager->updateUserFavoritePosition(
+                        $userID,
+                        $currentFavoriteTeamID,
+                        $prevFavTeamID,
+                        $position,
+                        $prevFavTeamIndex['favoritePosition']
+                    );
+                    break;
                 }
+
             }
         }
     }
 
     private function moveFavDown(string $id): void
     {
-        $this->favoritesList = $this->userRepo->getFavorites();
-        $tempArray = [];
-        $length = count($this->favoritesList[$this->userDTO->email]);
-        foreach ($this->favoritesList[$this->userDTO->email] as $key => $favorite) {
-            if ($favorite['teamID'] === (int)$id) {
-                $tempArray = $favorite;
-                if ((int)$key !== $length && $length >= 2) {
-                    $this->favoritesList[$this->userDTO->email][$key] = $this->favoritesList[$this->userDTO->email][$key + 1];
-                    $this->favoritesList[$this->userDTO->email][$key + 1] = $tempArray;
+        $userID = $this->userRepo->getUserID($this->userDTO);
+        $maxPosition = $this->userRepo->getUserMaxFavoritePosition($this->userDTO);
+        $position = $this->userRepo->getUserFavoritePosition($this->userDTO, $id);
+
+        if ($position < $maxPosition) {
+            $favoritesArray = $this->userRepo->getUserFavorites($this->userDTO);
+
+            foreach ($favoritesArray as $i => $favorite) {
+                if ($favorite['favoritePosition'] === $position) {
+                    $currentIndex = $i;
+                    $nextIndex = $currentIndex + 1;
+                    if (isset($favoritesArray[$nextIndex])) {
+                        $currentFavoriteTeamID = $favorite['teamID'];
+                        $nextFavTeamIndex = $favoritesArray[$nextIndex];
+                        $nextFavTeamID = $nextFavTeamIndex['teamID'];
+
+                        $this->userEntityManager->updateUserFavoritePosition(
+                            $userID,
+                            $currentFavoriteTeamID,
+                            $nextFavTeamID,
+                            $position,
+                            $nextFavTeamIndex['favoritePosition']
+                        );
+                    }
+                    break;
                 }
             }
         }

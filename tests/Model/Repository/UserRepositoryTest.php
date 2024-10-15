@@ -187,7 +187,7 @@ class UserRepositoryTest extends TestCase
         );
 
         $userDTO = $this->userMapper->createDTO($testData);
-        $returnValue = $this->userRepository->checkExistingFavorite($userDTO, '51');
+        $returnValue = $this->userRepository->checkExistingFavorite($userDTO, '1770');
         self::assertTrue($returnValue);
 
 

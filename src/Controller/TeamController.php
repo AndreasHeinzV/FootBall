@@ -25,7 +25,7 @@ readonly class TeamController implements Controller
 
     public function load(ViewInterface $view): void
     {
-//&& $_SERVER['REQUEST_METHOD'] === 'POST'
+
         if (isset($_POST)) {
             $this->manageFavorites->manageFav($_POST);
         }

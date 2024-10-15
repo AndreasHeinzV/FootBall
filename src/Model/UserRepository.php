@@ -56,7 +56,7 @@ class UserRepository implements UserRepositoryInterface
     {
         $userID = $this->getUserID($userDTO);
         $favoriteArray = $this->sqlConnector->querySelectAll(
-            'SELECT favorite_position, team_id, team_name, team_crest FROM favorites WHERE user_id = :user_id',
+            'SELECT favorite_position, team_id, team_name, team_crest FROM favorites WHERE user_id = :user_id ORDER BY favorite_position ASC ',
             ['user_id' => $userID]
         );
         if (!$favoriteArray) {
@@ -92,5 +92,41 @@ class UserRepository implements UserRepositoryInterface
         );
 
         return $userID['user_id'] ?? false;
+    }
+
+    public function getUserFavoritePosition(UserDTO $userDTO, string $id): int|false
+    {
+        $userID = $this->getUserID($userDTO);
+        $favoritePosition = $this->sqlConnector->querySelect(
+            'SELECT favorite_position FROM favorites WHERE user_id = :user_id AND team_id = :team_id',
+            [
+                'user_id' => $userID,
+                'team_id' => (int)$id
+            ]
+        );
+        return $favoritePosition['favorite_position'] ?? false;
+    }
+
+    public function getUserMinFavoritePosition(UserDTO $userDTO): int|false
+    {
+        {
+            $userID = $this->getUserID($userDTO);
+            $minPosition = $this->sqlConnector->querySelect(
+                'SELECT MIN(favorite_position) AS min_position FROM favorites WHERE user_id = :user_id',
+                ['user_id' => $userID]
+            );
+            return $minPosition['min_position'] ?? false;
+        }
+    }
+    public function getUserMaxFavoritePosition(UserDTO $userDTO): int|false
+    {
+        {
+            $userID = $this->getUserID($userDTO);
+            $max = $this->sqlConnector->querySelect(
+                'SELECT MAX(favorite_position) AS max_position FROM favorites WHERE user_id = :user_id',
+                ['user_id' => $userID]
+            );
+            return $max['max_position'] ?? false;
+        }
     }
 }
