@@ -38,7 +38,7 @@ class SessionHandler
         if (isset($_SESSION['userDto'])) {
             $this->emptyUser = $this->mapper->createDTO($_SESSION['userDto']);
         } else {
-            $this->emptyUser = new UserDTO('', '', '', '');
+            $this->emptyUser = new UserDTO('','', '', '', '');
         }
         return $this->emptyUser;
     }

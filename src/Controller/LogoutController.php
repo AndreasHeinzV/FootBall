@@ -9,12 +9,12 @@ use App\Core\SessionHandler;
 use App\Core\ViewInterface;
 
 
-class LogoutController implements Controller
+readonly class LogoutController implements Controller
 {
 
     public function __construct(
-        private readonly SessionHandler $sessionHandler,
-        private readonly RedirectInterface $redirect
+        private SessionHandler $sessionHandler,
+        private RedirectInterface $redirect
     ) {
     }
 

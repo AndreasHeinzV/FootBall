@@ -2,22 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Components\UserFavorite\Communication\Controller;
 
-use App\Components\UserFavorite\Business\UserFavoriteHandler;
-use App\Components\UserFavorite\Business\UserManageFavorites;
+use App\Controller\Controller;
+use App\Core\FavoriteHandler;
+use App\Core\ManageFavorites;
 use App\Core\SessionHandler;
 use App\Core\ViewInterface;
+use App\Model\DTOs\UserDTO;
 
-
-readonly class FavoriteController implements Controller
+readonly class FavoriteController implements FavoriteControllerInterface
 {
 
 
     public function __construct(
         private SessionHandler $sessionHandler,
-        private UserFavoriteHandler $favoriteHandler,
-        private UserManageFavorites $manageFavorites,
+        private FavoriteHandler $favoriteHandler,
+        private ManageFavorites $manageFavorites,
     ) {
     }
 

@@ -7,6 +7,7 @@ namespace App\Model\DTOs;
 readonly class UserDTO
 {
     public function __construct(
+        public ?string $userId,
         public string $firstName,
         public string $lastName,
         public string $email,

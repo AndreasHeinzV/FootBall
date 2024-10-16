@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Core;
+namespace App\Components\UserFavorite\Business;
 
+use App\Components\UserFavorite\Persistence\UserFavoriteEntityManager;
+use App\Components\UserFavorite\Persistence\UserFavoriteRepository;
+use App\Core\SessionHandler;
 use App\Model\DTOs\CompetitionDTO;
 use App\Model\DTOs\FavoriteDTO;
 use App\Model\DTOs\TeamDTO;
@@ -15,17 +18,17 @@ use App\Model\UserRepository;
 use SessionHandlerInterface;
 
 
-class FavoriteHandler
+class UserFavoriteHandler
 {
+    public array $favoritesList = [];
 
-
-    private UserDTO $userDTO;
+    public UserDTO $userDTO;
 
     public function __construct(
         private readonly SessionHandler $sessionHandler,
         private readonly FootballRepositoryInterface $footballRepository,
-        private readonly UserEntityManager $userEntityManager,
-        private readonly UserRepository $userRepo,
+        private readonly UserFavoriteEntityManager $userFavoriteEntityManager,
+        private readonly UserFavoriteRepository $userFavoriteRepository,
         private readonly FavoriteMapper $favoriteMapper
     ) {
     }
@@ -34,7 +37,7 @@ class FavoriteHandler
     {
         $team = $this->footballRepository->getTeam($id);
         if (!empty($team) && !$this->getFavStatus($id)) {
-            $this->userEntityManager->saveUserFavorite($userDTO, $this->favoriteMapper->createFavoriteDTO($team));
+            $this->userFavoriteEntityManager->saveUserFavorite($userDTO, $this->favoriteMapper->createFavoriteDTO($team));
         }
     }
 
@@ -42,18 +45,18 @@ class FavoriteHandler
     public function removeUserFavorite(UserDTO $userDTO, string $id): void
     {
 
-      $this->userEntityManager->deleteUserFavorite($userDTO, $id);
+      $this->userFavoriteEntityManager->deleteUserFavorite($userDTO, $id);
     }
 
     public function getUserFavorites(UserDTO $userDTO): array
     {
-        return $this->userRepo->getUserFavorites($userDTO);
+        return $this->userFavoriteRepository->getUserFavorites($userDTO);
     }
 
     public function getFavStatus(string $id): bool
     {
         $userDTO = $this->sessionHandler->getUserDTO();
-        return $this->userRepo->checkExistingFavorite($userDTO, $id);
+        return $this->userFavoriteRepository->checkExistingFavorite($userDTO, $id);
     }
 
 
@@ -61,21 +64,21 @@ class FavoriteHandler
     {
         $this->userDTO = $this->sessionHandler->getUserDTO();
         if ($movement === "up") {
-            $this->moveFavUp($id);
+            $this->moveFavUp($this->userDTO, $id);
         }
         if ($movement === "down") {
-            $this->moveFavDown($id);
+            $this->moveFavDown($this->userDTO, $id);
         }
     }
 
-    private function moveFavUp(string $id): void
+    private function moveFavUp(UserDTO $userDTO, string $id): void
     {
-        $userID = $this->userRepo->getUserID($this->userDTO);
-        $minPosition = $this->userRepo->getUserMinFavoritePosition($this->userDTO);
-        $position = $this->userRepo->getUserFavoritePosition($this->userDTO, $id);
+
+        $minPosition = $this->userFavoriteRepository->getUserMinFavoritePosition($this->userDTO);
+        $position = $this->userFavoriteRepository->getUserFavoritePosition($this->userDTO, $id);
 
         if ($position > $minPosition) {
-            $favoritesArray = $this->userRepo->getUserFavorites($this->userDTO);
+            $favoritesArray = $this->userFavoriteRepository->getUserFavorites($this->userDTO);
 
 
             foreach ($favoritesArray as $i => $favorite) {
@@ -87,8 +90,8 @@ class FavoriteHandler
                     $prevFavTeamIndex = $favoritesArray[$prevIndex];
                     $prevFavTeamID = $prevFavTeamIndex['teamID'];
 
-                    $this->userEntityManager->updateUserFavoritePosition(
-                        $userID,
+                    $this->userFavoriteEntityManager->updateUserFavoritePosition(
+                        (int)$userDTO->userId,
                         $currentFavoriteTeamID,
                         $prevFavTeamID,
                         $position,
@@ -101,14 +104,14 @@ class FavoriteHandler
         }
     }
 
-    private function moveFavDown(string $id): void
+    private function moveFavDown(UserDTO $userDTO, string $id): void
     {
-        $userID = $this->userRepo->getUserID($this->userDTO);
-        $maxPosition = $this->userRepo->getUserMaxFavoritePosition($this->userDTO);
-        $position = $this->userRepo->getUserFavoritePosition($this->userDTO, $id);
+
+        $maxPosition = $this->userFavoriteRepository->getUserMaxFavoritePosition($this->userDTO);
+        $position = $this->userFavoriteRepository->getUserFavoritePosition($this->userDTO, $id);
 
         if ($position < $maxPosition) {
-            $favoritesArray = $this->userRepo->getUserFavorites($this->userDTO);
+            $favoritesArray = $this->userFavoriteRepository->getUserFavorites($this->userDTO);
 
             foreach ($favoritesArray as $i => $favorite) {
                 if ($favorite['favoritePosition'] === $position) {
@@ -119,8 +122,8 @@ class FavoriteHandler
                         $nextFavTeamIndex = $favoritesArray[$nextIndex];
                         $nextFavTeamID = $nextFavTeamIndex['teamID'];
 
-                        $this->userEntityManager->updateUserFavoritePosition(
-                            $userID,
+                        $this->userFavoriteEntityManager->updateUserFavoritePosition(
+                            (int)$userDTO->userId,
                             $currentFavoriteTeamID,
                             $nextFavTeamID,
                             $position,

@@ -36,7 +36,7 @@ class LoginController implements Controller
 
     public function load(ViewInterface $view): void
     {
-        $this->userDTO = new UserDTO('', '', '', '');
+        $this->userDTO = new UserDTO('','', '', '', '');
         $this->errorsDTO = new ErrorsDTO('', '', '', '');
         $this->handlePost();
         $this->setupView($view);

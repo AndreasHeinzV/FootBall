@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Components\UserFavorite\Business\UserFavoriteHandler;
+use App\Components\UserFavorite\Business\UserManageFavorites;
 use App\Core\FavoriteHandler;
 use App\Core\ManageFavorites;
 use App\Core\Redirect;
@@ -18,8 +20,8 @@ readonly class TeamController implements Controller
 
     public function __construct(
         private FootballRepository $repository,
-        private FavoriteHandler $favoriteHandler,
-        private ManageFavorites $manageFavorites,
+        private UserFavoriteHandler $favoriteHandler,
+        private UserManageFavorites $manageFavorites,
     ) {
     }
 

@@ -2,62 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Components\UserFavorite\Persistence;
 
 use App\Core\SqlConnector;
 use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapper;
 
-class UserRepository implements UserRepositoryInterface
+class UserFavoriteRepository
 {
+
     public function __construct(public SqlConnector $sqlConnector)
     {
     }
 
-    public function getUserName(string $email): string
-    {
-        $user = $this->sqlConnector->querySelect(
-            'SELECT first_name FROM users WHERE user_email = :user_email',
-            ['user_email' => $email]
-        );
-
-        if (!$user) {
-            return '';
-        }
-
-        return $user["first_name"];
-    }
-
-    public function getUser(string $email): UserDTO
-    {
-        $user = $this->sqlConnector->querySelect(
-            'SELECT user_email, first_name, last_name, password FROM users WHERE user_email = :user_email',
-            ['user_email' => $email]
-        );
-        $userMapper = new UserMapper();
-        if (!$user) {
-            return new UserDTO(null,'', '', '', '');
-        }
-
-        return $userMapper->createDTO([
-            'firstName' => $user["first_name"],
-            'lastName' => $user["last_name"],
-            'email' => $user["user_email"],
-            'password' => $user["password"],
-        ]);
-    }
-
-    public function getUsers(): array
-    {
-        return $this->sqlConnector->querySelectAll('SELECT * FROM users');
-    }
-
     public function getUserFavorites(UserDTO $userDTO): array
     {
-        $userID = $this->getUserID($userDTO);
+
         $favoriteArray = $this->sqlConnector->querySelectAll(
             'SELECT favorite_position, team_id, team_name, team_crest FROM favorites WHERE user_id = :user_id ORDER BY favorite_position ASC ',
-            ['user_id' => $userID]
+            ['user_id' => $userDTO->userId]
         );
         if (!$favoriteArray) {
             return [];
@@ -84,23 +46,13 @@ class UserRepository implements UserRepositoryInterface
         return $returnValue !== false;
     }
 
-    public function getUserID(userDTO $userDTO): int|false
-    {
-        $userID = $this->sqlConnector->querySelect(
-            'SELECT user_id FROM users WHERE user_email = :user_email',
-            ['user_email' => $userDTO->email]
-        );
-
-        return $userID['user_id'] ?? false;
-    }
-
     public function getUserFavoritePosition(UserDTO $userDTO, string $id): int|false
     {
-        $userID = $this->getUserID($userDTO);
+
         $favoritePosition = $this->sqlConnector->querySelect(
             'SELECT favorite_position FROM favorites WHERE user_id = :user_id AND team_id = :team_id',
             [
-                'user_id' => $userID,
+                'user_id' => $userDTO->userId,
                 'team_id' => (int)$id
             ]
         );
@@ -110,10 +62,10 @@ class UserRepository implements UserRepositoryInterface
     public function getUserMinFavoritePosition(UserDTO $userDTO): int|false
     {
         {
-            $userID = $this->getUserID($userDTO);
+
             $minPosition = $this->sqlConnector->querySelect(
                 'SELECT MIN(favorite_position) AS min_position FROM favorites WHERE user_id = :user_id',
-                ['user_id' => $userID]
+                ['user_id' => $userDTO->userId]
             );
             return $minPosition['min_position'] ?? false;
         }
@@ -121,10 +73,10 @@ class UserRepository implements UserRepositoryInterface
     public function getUserMaxFavoritePosition(UserDTO $userDTO): int|false
     {
         {
-            $userID = $this->getUserID($userDTO);
+
             $max = $this->sqlConnector->querySelect(
                 'SELECT MAX(favorite_position) AS max_position FROM favorites WHERE user_id = :user_id',
-                ['user_id' => $userID]
+                ['user_id' => $userDTO->userId]
             );
             return $max['max_position'] ?? false;
         }

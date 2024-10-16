@@ -10,11 +10,11 @@ use App\Core\ViewInterface;
 use App\Model\FootballRepository;
 use App\Model\FootballRepositoryInterface;
 
-class LeaguesController implements Controller
+readonly class LeaguesController implements Controller
 {
 
 
-    public function __construct(private readonly FootballRepositoryInterface $repository)
+    public function __construct(private FootballRepositoryInterface $repository)
     {
     }
 

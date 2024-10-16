@@ -2,51 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Components\UserFavorite\Persistence;
 
 use App\Core\SqlConnector;
 use App\Model\DTOs\FavoriteDTO;
 use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapperInterface;
 
-readonly class UserEntityManager
+readonly class UserFavoriteEntityManager
 {
     public function __construct(
-        private UserRepository $repository,
         private SqlConnector $sqlConnector
     ) {
     }
 
-
-    public function saveUser(UserDTO $userDTO): void
-    {
-        $userId = $this->sqlConnector->querySelect(
-            'SELECT user_id from users WHERE user_email =:user_email',
-            ['user_email' => $userDTO->email]
-        );
-        if (!$userId) {
-            $this->sqlConnector->queryInsert(
-                'INSERT INTO users(user_email,password, first_name, last_name) VALUES(:user_email,:password,:first_name,:last_name)',
-                [
-                    'user_email' => $userDTO->email,
-                    'password' => $userDTO->password,
-                    'first_name' => $userDTO->firstName,
-                    'last_name' => $userDTO->lastName,
-                ]
-            );
-        } else {
-            $this->updateUser($userId['user_id'], $userDTO);
-        }
-    }
-
     public function saveUserFavorite(UserDTO $userDTO, FavoriteDTO $favoriteDTO): void
     {
-        $userID = $this->repository->getUserID($userDTO);
         $this->sqlConnector->queryInsert(
             'INSERT INTO favorites(user_id,team_id, team_name, team_crest ) VALUES (:user_id,:team_id,:team_name,:team_crest)',
-
             [
-                'user_id' => $userID,
+                'user_id' => $userDTO,
                 'team_id' => $favoriteDTO->teamID,
                 'team_name' => $favoriteDTO->teamName,
                 'team_crest' => $favoriteDTO->crest,
@@ -61,7 +35,6 @@ readonly class UserEntityManager
         int $currentPosition,
         int $previousPosition
     ): void {
-
         $this->sqlConnector->queryManipulate(
             'UPDATE favorites SET favorite_position = -1 WHERE user_id = :user_id AND team_id = :team_id',
             [
@@ -87,31 +60,16 @@ readonly class UserEntityManager
                 'team_id' => $currentTeamID,
             ]
         );
-
-
     }
-    public function deleteUserFavorite (UserDTO $userDTO, string $id): void
-    {
-        $userID = $this->repository->getUserID($userDTO);
 
+    public function deleteUserFavorite(UserDTO $userDTO, string $id): void
+    {
         $this->sqlConnector->queryManipulate(
             '
        DELETE FROM favorites where team_id = :team_id and user_id = :user_id',
             [
                 'team_id' => (int)$id,
-                'user_id' => $userID,
-            ]
-        );
-    }
-    private function updateUser(int $userId, userDTO $user): void
-    {
-        $this->sqlConnector->queryInsert(
-            'UPDATE users SET user_email= :user_email, first_name = :first_name, last_name =:last_name WHERE user_id = :user_id',
-            [
-                'user_email' => $user->email,
-                'first_name' => $user->firstName,
-                'last_name' => $user->lastName,
-                'user_id' => $userId,
+                'user_id' => $userDTO,
             ]
         );
     }

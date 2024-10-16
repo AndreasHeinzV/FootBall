@@ -27,18 +27,6 @@ readonly class Validation implements ValidationInterface
         return true;
     }
 
-    /*
-        public function checkDuplicateMail(string $mailToCheck): bool
-        {
-
-            foreach ($existingUsers as $user) {
-                if (isset($user['email']) && $user['email'] === $mailToCheck) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    */
     public function userRegisterGetErrors(UserDTO $userDTO): ErrorsDTO
     {
         $errors = [];
