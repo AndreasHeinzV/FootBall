@@ -1,0 +1,365 @@
+{
+  "area": {
+    "id": 2032,
+    "name": "Brazil",
+    "code": "BRA",
+    "flag": "https://crests.football-data.org/764.svg"
+  },
+  "id": 3984,
+  "name": "Fortaleza EC",
+  "shortName": "Fortaleza",
+  "tla": "FEC",
+  "crest": "https://crests.football-data.org/3984.png",
+  "address": "Avenida Senador Fernandes Távora 200, Pici Fortaleza, CE 60510-290",
+  "website": "http://www.fortalezaec.net",
+  "founded": 1918,
+  "clubColors": "Red / Blue / White",
+  "venue": "Estádio Castelão",
+  "runningCompetitions": [
+    {
+      "id": 2013,
+      "name": "Campeonato Brasileiro Série A",
+      "code": "BSA",
+      "type": "LEAGUE",
+      "emblem": "https://crests.football-data.org/bsa.png"
+    },
+    {
+      "id": 2081,
+      "name": "Copa Sudamericana",
+      "code": "CS",
+      "type": "CUP",
+      "emblem": null
+    }
+  ],
+  "coach": {
+    "id": 178952,
+    "firstName": "Juan",
+    "lastName": "Vojvoda",
+    "name": "Juan Vojvoda",
+    "dateOfBirth": "1975-05-13",
+    "nationality": "Argentina",
+    "contract": {
+      "start": "2021-05",
+      "until": "2024-12"
+    }
+  },
+  "squad": [
+    {
+      "id": 1631,
+      "name": "João Ricardo",
+      "position": "Goalkeeper",
+      "dateOfBirth": "1988-09-06",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 1662,
+      "name": "Santos",
+      "position": "Goalkeeper",
+      "dateOfBirth": "1990-03-17",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 12532,
+      "name": "Mauricio Kozlinski",
+      "position": "Goalkeeper",
+      "dateOfBirth": "1991-06-18",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 157261,
+      "name": "Magrão",
+      "position": "Goalkeeper",
+      "dateOfBirth": "2000-05-15",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264057,
+      "name": "Murilo",
+      "position": "Goalkeeper",
+      "dateOfBirth": "2004-02-11",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 1272,
+      "name": "Bruno Pacheco",
+      "position": "Defence",
+      "dateOfBirth": "1991-12-08",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 1465,
+      "name": "Yago Pikachu",
+      "position": "Defence",
+      "dateOfBirth": "1992-06-05",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 1706,
+      "name": "Felipe Jonatan",
+      "position": "Defence",
+      "dateOfBirth": "1998-02-15",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 12670,
+      "name": "Tinga",
+      "position": "Defence",
+      "dateOfBirth": "1993-09-01",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 19918,
+      "name": "Erandir",
+      "position": "Defence",
+      "dateOfBirth": "1982-08-05",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 23615,
+      "name": "Benjamín Kuščević",
+      "position": "Defence",
+      "dateOfBirth": "1996-05-02",
+      "nationality": "Chile"
+    },
+    {
+      "id": 30263,
+      "name": "Titi",
+      "position": "Defence",
+      "dateOfBirth": "1988-03-12",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 46373,
+      "name": "Tomás Cardona",
+      "position": "Defence",
+      "dateOfBirth": "1995-10-10",
+      "nationality": "Argentina"
+    },
+    {
+      "id": 46530,
+      "name": "Emanuel Brítez",
+      "position": "Defence",
+      "dateOfBirth": "1992-03-26",
+      "nationality": "Argentina"
+    },
+    {
+      "id": 151462,
+      "name": "Jhonatan Paulo da Silva",
+      "position": "Defence",
+      "dateOfBirth": "1999-07-13",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 169088,
+      "name": "Eros Mancuso",
+      "position": "Defence",
+      "dateOfBirth": "1999-04-17",
+      "nationality": "Argentina"
+    },
+    {
+      "id": 264053,
+      "name": "Gustavo da Silva",
+      "position": "Defence",
+      "dateOfBirth": "2004-08-18",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264055,
+      "name": "Samuel",
+      "position": "Defence",
+      "dateOfBirth": "2005-04-05",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264056,
+      "name": "Arthur Barbosa",
+      "position": "Defence",
+      "dateOfBirth": "2006-01-30",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 1680,
+      "name": "Matheus Rossetto",
+      "position": "Midfield",
+      "dateOfBirth": "1996-06-03",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 15452,
+      "name": "Lucas Sasha",
+      "position": "Midfield",
+      "dateOfBirth": "1990-03-01",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 21600,
+      "name": "Marinho",
+      "position": "Midfield",
+      "dateOfBirth": "1990-05-29",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 45802,
+      "name": "Leandro Martínez",
+      "position": "Midfield",
+      "dateOfBirth": "1994-06-04",
+      "nationality": "Argentina"
+    },
+    {
+      "id": 46461,
+      "name": "Tomás Pochettino",
+      "position": "Midfield",
+      "dateOfBirth": "1996-02-01",
+      "nationality": "Argentina"
+    },
+    {
+      "id": 116226,
+      "name": "Imanol Machuca",
+      "position": "Midfield",
+      "dateOfBirth": "2000-01-15",
+      "nationality": "Argentina"
+    },
+    {
+      "id": 124717,
+      "name": "Pedro Augusto",
+      "position": "Midfield",
+      "dateOfBirth": "1997-03-03",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 145985,
+      "name": "Hércules",
+      "position": "Midfield",
+      "dateOfBirth": "2000-10-20",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 146350,
+      "name": "Calebe",
+      "position": "Midfield",
+      "dateOfBirth": "2000-04-30",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 168918,
+      "name": "Kervin Andrade",
+      "position": "Midfield",
+      "dateOfBirth": "2005-04-13",
+      "nationality": "Venezuela"
+    },
+    {
+      "id": 168986,
+      "name": "Jose Welison",
+      "position": "Midfield",
+      "dateOfBirth": "1995-03-11",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 192618,
+      "name": "Kauan",
+      "position": "Midfield",
+      "dateOfBirth": "2005-04-16",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 260719,
+      "name": "Fabricio Dias",
+      "position": "Midfield",
+      "dateOfBirth": "2004-08-26",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264050,
+      "name": "Michel Cavalcante",
+      "position": "Midfield",
+      "dateOfBirth": "2006-02-23",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264052,
+      "name": "Gabriel Cunha",
+      "position": "Midfield",
+      "dateOfBirth": "2005-09-21",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 12837,
+      "name": "Renato Kayzer",
+      "position": "Offence",
+      "dateOfBirth": "1996-02-17",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 39599,
+      "name": "Juan Lucero",
+      "position": "Offence",
+      "dateOfBirth": "1991-11-30",
+      "nationality": "Argentina"
+    },
+    {
+      "id": 115959,
+      "name": "Moises",
+      "position": "Offence",
+      "dateOfBirth": "1996-09-02",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 152030,
+      "name": "Iarley Barros",
+      "position": "Offence",
+      "dateOfBirth": "2003-04-15",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 169022,
+      "name": "Breno Lopes",
+      "position": "Offence",
+      "dateOfBirth": "1996-01-24",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 203350,
+      "name": "Alexsandro Amorim",
+      "position": "Offence",
+      "dateOfBirth": "2005-05-18",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 249277,
+      "name": "Guilherme",
+      "position": "Offence",
+      "dateOfBirth": "2005-06-15",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 249646,
+      "name": "Rinaldo",
+      "position": "Offence",
+      "dateOfBirth": "1975-08-24",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264049,
+      "name": "Kaiky",
+      "position": "Offence",
+      "dateOfBirth": "2004-03-06",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264051,
+      "name": "Kauê",
+      "position": "Offence",
+      "dateOfBirth": "2004-02-20",
+      "nationality": "Brazil"
+    },
+    {
+      "id": 264054,
+      "name": "Landerson",
+      "position": "Offence",
+      "dateOfBirth": "2006-12-12",
+      "nationality": "Brazil"
+    }
+  ],
+  "staff": [],
+  "lastUpdated": "2022-04-06T13:16:50Z"
+}

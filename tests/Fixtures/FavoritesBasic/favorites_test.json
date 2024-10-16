@@ -1,0 +1,73 @@
+{
+  "ilovecats@gmail.com": {
+    "1": {
+      "teamName": "Botafogo FR",
+      "teamID": 1770,
+      "crest": "https:\/\/crests.football-data.org\/1770.png",
+      "squad": [
+        {
+          "playerID": 1299,
+          "link": "\/index.php?page=player&id=1299",
+          "name": "John"
+        },
+        {
+          "playerID": 13152,
+          "link": "\/index.php?page=player&id=13152",
+          "name": "Raul"
+        },
+        {
+          "playerID": 113680,
+          "link": "\/index.php?page=player&id=113680",
+          "name": "Igo"
+        },
+        {
+          "playerID": 169622,
+          "link": "\/index.php?page=player&id=169622",
+          "name": "Roberto Fern\u00e1ndez"
+        },
+        {
+          "playerID": 1239,
+          "link": "\/index.php?page=player&id=1239",
+          "name": "Vitinho"
+        }
+      ]
+    },
+    "2": {
+      "teamName": "FC Bayern M\u00fcnchen",
+      "teamID": 5,
+      "crest": "https:\/\/crests.football-data.org\/5.png",
+      "squad": [
+        {
+          "playerID": 341,
+          "link": "\/index.php?page=player&id=341",
+          "name": "Manuel Neuer"
+        },
+        {
+          "playerID": 342,
+          "link": "\/index.php?page=player&id=342",
+          "name": "Sven Ulreich"
+        },
+        {
+          "playerID": 113105,
+          "link": "\/index.php?page=player&id=113105",
+          "name": "Daniel Peretz"
+        },
+        {
+          "playerID": 212846,
+          "link": "\/index.php?page=player&id=212846",
+          "name": "Max Schmitt"
+        },
+        {
+          "playerID": 370,
+          "link": "\/index.php?page=player&id=370",
+          "name": "Thomas M\u00fcller"
+        },
+        {
+          "playerID": 176991,
+          "link": "\/index.php?page=player&id=176991",
+          "name": "Nestor Irankunda"
+        }
+      ]
+    }
+  }
+}

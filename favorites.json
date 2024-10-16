@@ -1,0 +1,288 @@
+{
+    "ilovecats@gmail.com": [
+        {
+            "teamName": "FC Bayern M\u00fcnchen",
+            "teamID": 5,
+            "crest": "https:\/\/crests.football-data.org\/5.png",
+            "squad": [
+                {
+                    "playerID": 341,
+                    "link": "\/index.php?page=player&id=341",
+                    "name": "Manuel Neuer"
+                },
+                {
+                    "playerID": 342,
+                    "link": "\/index.php?page=player&id=342",
+                    "name": "Sven Ulreich"
+                },
+                {
+                    "playerID": 113105,
+                    "link": "\/index.php?page=player&id=113105",
+                    "name": "Daniel Peretz"
+                },
+                {
+                    "playerID": 212846,
+                    "link": "\/index.php?page=player&id=212846",
+                    "name": "Max Schmitt"
+                },
+                {
+                    "playerID": 370,
+                    "link": "\/index.php?page=player&id=370",
+                    "name": "Thomas M\u00fcller"
+                },
+                {
+                    "playerID": 176991,
+                    "link": "\/index.php?page=player&id=176991",
+                    "name": "Nestor Irankunda"
+                },
+                {
+                    "playerID": 212013,
+                    "link": "\/index.php?page=player&id=212013",
+                    "name": "Tarek Buchmann"
+                },
+                {
+                    "playerID": 202665,
+                    "link": "\/index.php?page=player&id=202665",
+                    "name": "Aleksandar Pavlovi\u0107"
+                },
+                {
+                    "playerID": 202588,
+                    "link": "\/index.php?page=player&id=202588",
+                    "name": "Noel Aseko Nkili"
+                },
+                {
+                    "playerID": 176899,
+                    "link": "\/index.php?page=player&id=176899",
+                    "name": "Arijon Ibrahimovic"
+                },
+                {
+                    "playerID": 171977,
+                    "link": "\/index.php?page=player&id=171977",
+                    "name": "Mathys Tel"
+                },
+                {
+                    "playerID": 168299,
+                    "link": "\/index.php?page=player&id=168299",
+                    "name": "Min-Jae Kim"
+                },
+                {
+                    "playerID": 144393,
+                    "link": "\/index.php?page=player&id=144393",
+                    "name": "Jamal Musiala"
+                },
+                {
+                    "playerID": 122188,
+                    "link": "\/index.php?page=player&id=122188",
+                    "name": "Josip Stani\u0161i\u0107"
+                },
+                {
+                    "playerID": 114915,
+                    "link": "\/index.php?page=player&id=114915",
+                    "name": "Sacha Boey"
+                },
+                {
+                    "playerID": 113765,
+                    "link": "\/index.php?page=player&id=113765",
+                    "name": "Michael Olise"
+                },
+                {
+                    "playerID": 48657,
+                    "link": "\/index.php?page=player&id=48657",
+                    "name": "Hiroki Ito"
+                },
+                {
+                    "playerID": 21288,
+                    "link": "\/index.php?page=player&id=21288",
+                    "name": "Alphonso Davies"
+                },
+                {
+                    "playerID": 15884,
+                    "link": "\/index.php?page=player&id=15884",
+                    "name": "Jo\u00e3o Palhinha"
+                },
+                {
+                    "playerID": 9549,
+                    "link": "\/index.php?page=player&id=9549",
+                    "name": "Konrad Laimer"
+                },
+                {
+                    "playerID": 9541,
+                    "link": "\/index.php?page=player&id=9541",
+                    "name": "Dayot Upamecano"
+                },
+                {
+                    "playerID": 8004,
+                    "link": "\/index.php?page=player&id=8004",
+                    "name": "Harry Kane"
+                },
+                {
+                    "playerID": 3314,
+                    "link": "\/index.php?page=player&id=3314",
+                    "name": "Eric Dier"
+                },
+                {
+                    "playerID": 3246,
+                    "link": "\/index.php?page=player&id=3246",
+                    "name": "Rapha\u00ebl Guerreiro"
+                },
+                {
+                    "playerID": 3184,
+                    "link": "\/index.php?page=player&id=3184",
+                    "name": "Leroy San\u00e9"
+                },
+                {
+                    "playerID": 3181,
+                    "link": "\/index.php?page=player&id=3181",
+                    "name": "Leon Goretzka"
+                },
+                {
+                    "playerID": 360,
+                    "link": "\/index.php?page=player&id=360",
+                    "name": "Kingsley Coman"
+                },
+                {
+                    "playerID": 359,
+                    "link": "\/index.php?page=player&id=359",
+                    "name": "Joshua Kimmich"
+                },
+                {
+                    "playerID": 311,
+                    "link": "\/index.php?page=player&id=311",
+                    "name": "Serge Gnabry"
+                }
+            ]
+        },
+        {
+            "teamName": "Borussia Dortmund",
+            "teamID": 4,
+            "crest": "https:\/\/crests.football-data.org\/4.png",
+            "squad": [
+                {
+                    "playerID": 334,
+                    "link": "\/index.php?page=player&id=334",
+                    "name": "Gregor Kobel"
+                },
+                {
+                    "playerID": 9389,
+                    "link": "\/index.php?page=player&id=9389",
+                    "name": "Alexander Meyer"
+                },
+                {
+                    "playerID": 151077,
+                    "link": "\/index.php?page=player&id=151077",
+                    "name": "Marcel Lotka"
+                },
+                {
+                    "playerID": 261058,
+                    "link": "\/index.php?page=player&id=261058",
+                    "name": "Filippo Man\u00e9"
+                },
+                {
+                    "playerID": 263672,
+                    "link": "\/index.php?page=player&id=263672",
+                    "name": "Almugera Kabar"
+                },
+                {
+                    "playerID": 133548,
+                    "link": "\/index.php?page=player&id=133548",
+                    "name": "Ayman Azhil"
+                },
+                {
+                    "playerID": 246628,
+                    "link": "\/index.php?page=player&id=246628",
+                    "name": "Kjell W\u00e4tjen"
+                },
+                {
+                    "playerID": 182280,
+                    "link": "\/index.php?page=player&id=182280",
+                    "name": "Julien Duranville"
+                },
+                {
+                    "playerID": 179460,
+                    "link": "\/index.php?page=player&id=179460",
+                    "name": "Jamie Bynoe-Gittens"
+                },
+                {
+                    "playerID": 144283,
+                    "link": "\/index.php?page=player&id=144283",
+                    "name": "Yan Couto"
+                },
+                {
+                    "playerID": 136733,
+                    "link": "\/index.php?page=player&id=136733",
+                    "name": "Gio Reyna"
+                },
+                {
+                    "playerID": 133903,
+                    "link": "\/index.php?page=player&id=133903",
+                    "name": "Maximilian Beier"
+                },
+                {
+                    "playerID": 101074,
+                    "link": "\/index.php?page=player&id=101074",
+                    "name": "Felix Kalu Nmecha"
+                },
+                {
+                    "playerID": 82515,
+                    "link": "\/index.php?page=player&id=82515",
+                    "name": "Karim Adeyemi"
+                },
+                {
+                    "playerID": 75539,
+                    "link": "\/index.php?page=player&id=75539",
+                    "name": "Nico Schlotterbeck"
+                },
+                {
+                    "playerID": 44030,
+                    "link": "\/index.php?page=player&id=44030",
+                    "name": "Julian Ryerson"
+                },
+                {
+                    "playerID": 9551,
+                    "link": "\/index.php?page=player&id=9551",
+                    "name": "Marcel Sabitzer"
+                },
+                {
+                    "playerID": 8805,
+                    "link": "\/index.php?page=player&id=8805",
+                    "name": "Ramy Bensebaini"
+                },
+                {
+                    "playerID": 8273,
+                    "link": "\/index.php?page=player&id=8273",
+                    "name": "Pascal Gro\u00df"
+                },
+                {
+                    "playerID": 7457,
+                    "link": "\/index.php?page=player&id=7457",
+                    "name": "Donyell Malen"
+                },
+                {
+                    "playerID": 3183,
+                    "link": "\/index.php?page=player&id=3183",
+                    "name": "Emre Can"
+                },
+                {
+                    "playerID": 379,
+                    "link": "\/index.php?page=player&id=379",
+                    "name": "Waldemar Anton"
+                },
+                {
+                    "playerID": 351,
+                    "link": "\/index.php?page=player&id=351",
+                    "name": "Niklas S\u00fcle"
+                },
+                {
+                    "playerID": 211,
+                    "link": "\/index.php?page=player&id=211",
+                    "name": "Sehrou Guirassy"
+                },
+                {
+                    "playerID": 148,
+                    "link": "\/index.php?page=player&id=148",
+                    "name": "Julian Brandt"
+                }
+            ]
+        }
+    ]
+}

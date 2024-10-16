@@ -1,0 +1,50 @@
+{
+  "id": 348,
+  "name": "Rafinha",
+  "firstName": "",
+  "lastName": "Rafinha",
+  "dateOfBirth": "1985-09-07",
+  "nationality": "Brazil",
+  "section": "Defence",
+  "position": "Defence",
+  "shirtNumber": 13,
+  "lastUpdated": "2023-07-30T23:15:45Z",
+  "currentTeam": {
+    "area": {
+      "id": 2032,
+      "name": "Brazil",
+      "code": "BRA",
+      "flag": "https://crests.football-data.org/764.svg"
+    },
+    "id": 1776,
+    "name": "São Paulo FC",
+    "shortName": "São Paulo",
+    "tla": "PAU",
+    "crest": "https://crests.football-data.org/1776.png",
+    "address": "null São Paulo, SP null",
+    "website": "http://www.saopaulofc.net",
+    "founded": 1930,
+    "clubColors": "White / Red / Black",
+    "venue": "Estádio do Morumbi",
+    "runningCompetitions": [
+      {
+        "id": 2152,
+        "name": "Copa Libertadores",
+        "code": "CLI",
+        "type": "CUP",
+        "emblem": "https://crests.football-data.org/CLI.svg"
+      },
+      {
+        "id": 2013,
+        "name": "Campeonato Brasileiro Série A",
+        "code": "BSA",
+        "type": "LEAGUE",
+        "emblem": "https://crests.football-data.org/bsa.png"
+      }
+    ],
+    "contract": {
+      "start": "2024-07",
+      "until": "2024-12"
+    }
+  }
+}
