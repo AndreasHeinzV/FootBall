@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapper;
+use App\Components\User\Persistence\DTOs\UserDTO;
+use App\Components\User\Persistence\Mapper\UserMapperInterface;
 
-class SessionHandler
+readonly class SessionHandler implements SessionHandlerInterface
 {
 
-    public UserDTO $emptyUser;
+    public UserDTO $userDTO;
 
-    public function __construct(private readonly UserMapper $mapper)
+    public function __construct(private UserMapperInterface $userMapper)
     {
     }
 
 
-    public function startSession(): void
+    public function startSession(UserDTO $userDTO): void
     {
         $_SESSION['status'] = true;
+        $_SESSION['userDto'] = $this->userMapper->UserDTOToArray($userDTO);
+
     }
 
     public function stopSession(): void
@@ -27,20 +29,15 @@ class SessionHandler
         $_SESSION['status'] = false;
     }
 
-    public function setUserDTO(UserDTO $userDTO): void
-    {
-        $_SESSION['userDto'] = $this->mapper->getUserData($userDTO);
-    }
-
 
     public function getUserDTO(): UserDTO
     {
         if (isset($_SESSION['userDto'])) {
-            $this->emptyUser = $this->mapper->createDTO($_SESSION['userDto']);
+            $this->userDTO = $this->userMapper->createDTO($_SESSION['userDto']);
         } else {
-            $this->emptyUser = new UserDTO('','', '', '', '');
+            $this->userDTO = new UserDTO(null,'', '', '', '');
         }
-        return $this->emptyUser;
+        return $this->userDTO;
     }
 
     public function getStatus(): bool

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Components\Database\Business\DatabaseBusinessFacade;
+use App\Components\Database\Business\Model\Fixtures;
 use App\Core\Container;
 use App\Core\ControllerProvider;
 use App\Core\DependencyProvider;
-use App\Core\Fixtures;
 use App\Core\View;
 
 session_start();
@@ -20,8 +21,8 @@ $container = new Container();
 
 $dependencyProvider = new DependencyProvider();
 $dependencyProvider->fill($container);
-$build = $container->get(Fixtures::class);
-$build->buildTables();
+$build = $container->get(DatabaseBusinessFacade::class);
+$build->createUserTables();
 $view = $container->get(View::class);
 
 $controllerProvider = new ControllerProvider($container);

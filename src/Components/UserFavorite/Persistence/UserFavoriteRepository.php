@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Components\UserFavorite\Persistence;
 
-use App\Core\SqlConnector;
-use App\Model\DTOs\UserDTO;
+use App\Components\Database\Persistence\SqlConnectorInterface;
+use App\Components\User\Persistence\DTOs\UserDTO;
 
-class UserFavoriteRepository
+class UserFavoriteRepository implements UserFavoriteRepositoryInterface
 {
 
-    public function __construct(public SqlConnector $sqlConnector)
+    public function __construct(public SqlConnectorInterface $sqlConnector)
     {
     }
 
@@ -52,7 +52,7 @@ class UserFavoriteRepository
         $favoritePosition = $this->sqlConnector->querySelect(
             'SELECT favorite_position FROM favorites WHERE user_id = :user_id AND team_id = :team_id',
             [
-                'user_id' => $userDTO->userId,
+                'user_id' => (int)$userDTO->userId,
                 'team_id' => (int)$id
             ]
         );

@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Tests\Model\Repository;
 
 
-use App\Core\Fixtures;
-use App\Core\SqlConnector;
-use App\Model\ApiRequester;
-use App\Model\FootballRepository;
-use App\Model\Mapper\CompetitionMapper;
-use App\Model\Mapper\FavoriteMapper;
-use App\Model\Mapper\LeaguesMapper;
-use App\Model\Mapper\PlayerMapper;
-use App\Model\Mapper\TeamMapper;
-use App\Model\Mapper\UserMapper;
-use App\Model\UserEntityManager;
-use App\Model\UserRepository;
+use App\Components\Api\Business\Model\ApiRequester;
+use App\Components\Database\Business\Model\Fixtures;
+use App\Components\Database\Persistence\SqlConnector;
+use App\Components\Football\Business\Model\FootballBusinessFacade;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\User\Persistence\UserEntityManager;
+use App\Components\User\Persistence\UserRepository;
+use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapper;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertSame;
@@ -33,7 +33,7 @@ class UserRepositoryTest extends TestCase
     private UserRepository $userRepository;
 
     private UserEntityManager $userEntityManager;
-    private FootballRepository $footballRepository;
+    private FootballBusinessFacade $footballRepository;
 
     protected function setUp(): void
     {
@@ -59,7 +59,7 @@ class UserRepositoryTest extends TestCase
         $this->favoriteMapper = new FavoriteMapper();
         $this->fixtures = new Fixtures($sqlConnector);
         $this->fixtures->buildTables();
-        $this->footballRepository = new FootballRepository(
+        $this->footballRepository = new FootballBusinessFacade(
             $apiRequester
         );
         $this->userRepository = new UserRepository($sqlConnector);

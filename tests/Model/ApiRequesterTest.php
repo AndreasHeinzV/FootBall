@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Model;
 
-use App\Model\ApiRequester;
-use App\Model\Mapper\CompetitionMapper;
-use App\Model\Mapper\LeaguesMapper;
-use App\Model\Mapper\PlayerMapper;
-use App\Model\Mapper\TeamMapper;
+use App\Components\Api\Business\Model\ApiRequester;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
 use PHPUnit\Framework\TestCase;
 
 class ApiRequesterTest extends TestCase

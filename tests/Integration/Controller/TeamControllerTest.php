@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
-use App\Controller\TeamController;
+use App\Components\Football\Communication\Controller\TeamController;
 use App\Core\ManageFavorites;
 use App\Core\ViewInterface;
 use App\Tests\Fixtures\Container;

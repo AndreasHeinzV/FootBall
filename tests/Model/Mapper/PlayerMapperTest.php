@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Model\Mapper;
 
-use App\Model\DTOs\PlayerDTO;
-use App\Model\Mapper\PlayerMapper;
+use App\Components\Football\DTOs\PlayerDTO;
+use App\Components\Football\Mapper\PlayerMapper;
 use PHPUnit\Framework\TestCase;
-
-use function PHPUnit\Framework\assertSame;
 
 class PlayerMapperTest extends TestCase
 {

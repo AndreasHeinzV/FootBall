@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
-use App\Controller\HomeController;
-use App\Controller\LoginController;
+use App\Components\Football\Communication\Controller\HomeController;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\User\Persistence\UserRepository;
+use App\Components\UserLogin\Communication\Controller\LoginController;
+use App\Components\Validation\Validation;
 use App\Core\SessionHandler;
-use App\Core\Validation;
-use App\Model\Mapper\UserMapper;
-use App\Model\UserRepository;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\TextUI\XmlConfiguration\Validator;
 
 class HomeControllerTest extends TestCase
 {

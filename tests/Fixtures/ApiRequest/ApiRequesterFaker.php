@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Fixtures\ApiRequest;
 
-use App\Model\ApiRequesterInterface;
-use App\Model\DTOs\PlayerDTO;
-use App\Model\Mapper\CompetitionMapper;
-use App\Model\Mapper\LeaguesMapperInterface;
-use App\Model\Mapper\PlayerMapper;
-use App\Model\Mapper\TeamMapper;
+use App\Components\Api\Business\Model\ApiRequesterInterface;
+use App\Components\Football\DTOs\PlayerDTO;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapperInterface;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
 
 readonly class ApiRequesterFaker implements ApiRequesterInterface
 {

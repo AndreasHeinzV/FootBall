@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Model\Mapper;
 
-use App\Model\DTOs\ErrorsDTO;
-use App\Model\Mapper\ErrorMapper;
+use App\Components\User\Persistence\DTOs\ErrorsDTO;
+use App\Components\User\Persistence\Mapper\ErrorMapper;
 use PHPUnit\Framework\TestCase;
 
 class ErrorMapperTest extends TestCase
@@ -16,7 +16,7 @@ class ErrorMapperTest extends TestCase
         $mapper = new ErrorMapper();
 
         $errorDTO = new ErrorsDTO('noName', '', '', '');
-        $errorsArray = $mapper->getErrorsData($errorDTO);
+        $errorsArray = $mapper->ErrorDTOToArray($errorDTO);
         self::assertArrayHasKey('firstNameEmptyError', $errorsArray);
         self::assertSame('noName', $errorsArray['firstNameEmptyError']);
     }

@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Core;
 
-use App\Controller\PlayerController;
+use App\Components\Football\Communication\Controller\PlayerController;
 use App\Core\Container;
 use App\Core\DependencyProvider;
-
 use PHPUnit\Framework\TestCase;
 
 class DependencyProviderTest extends TestCase

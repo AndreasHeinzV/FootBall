@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Core;
 
+use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Core\SessionHandler;
-use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapper;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertSame;

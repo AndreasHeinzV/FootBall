@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Model\Mapper;
 
 
-use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapper;
+use App\Components\User\Persistence\DTOs\UserDTO;
+use App\Components\User\Persistence\Mapper\UserMapper;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertInstanceOf;
@@ -45,10 +45,10 @@ class userMapperTest extends TestCase
 
     public function testGetArrayFromDTO(): void
     {
-        /**@var \App\Model\DTOs\UserDTO $user */
+        /**@var \App\Components\User\Persistence\DTOs\UserDTO $user */
 
         $userDTO = $this->userMapper->createDTO($this->testData);
-        $userData = $this->userMapper->getUserData($userDTO);
+        $userData = $this->userMapper->UserDTOToArray($userDTO);
 
         self::assertArrayHasKey('firstName', $userData);
         assertSame($this->testData['firstName'], $userData['firstName']);

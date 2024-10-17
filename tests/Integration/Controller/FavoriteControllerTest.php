@@ -4,27 +4,20 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
+use App\Components\Api\Business\Model\ApiRequester;
+use App\Components\Football\Business\Model\FootballBusinessFacade;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\User\Persistence\UserEntityManager;
+use App\Components\User\Persistence\UserRepository;
+use App\Components\Validation\Validation;
 use App\Controller\FavoriteController;
-use App\Controller\HomeController;
-use App\Controller\LoginController;
-use App\Controller\TeamController;
 use App\Core\FavoriteHandler;
 use App\Core\ManageFavorites;
 use App\Core\SessionHandler;
-use App\Core\Validation;
-use App\Core\ViewInterface;
-use App\Model\ApiRequester;
-use App\Model\DTOs\UserDTO;
-use App\Model\FootballRepository;
-use App\Model\Mapper\CompetitionMapper;
-use App\Model\Mapper\LeaguesMapper;
-use App\Model\Mapper\PlayerMapper;
-use App\Model\Mapper\TeamMapper;
-use App\Model\Mapper\UserMapper;
-use App\Model\UserEntityManager;
-use App\Model\UserRepository;
-use App\Tests\Fixtures\Container;
-use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
 
@@ -41,7 +34,7 @@ class FavoriteControllerTest extends TestCase
 
     private ApiRequester $apiRequester;
 
-    private FootballRepository $repo;
+    private FootballBusinessFacade $repo;
     private UserEntityManager $userEntityManager;
 
 
@@ -63,7 +56,7 @@ class FavoriteControllerTest extends TestCase
             new PlayerMapper()
         );
 
-        $this->repo = new FootballRepository($this->apiRequester);
+        $this->repo = new FootballBusinessFacade($this->apiRequester);
         $this->userEntityManager = new UserEntityManager($this->validation, $this->userRepository, $this->userMapper);
         parent::setUp();
     }

@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Model\Repository;
 
-use App\Model\ApiRequester;
-use App\Model\DTOs\TeamDTO;
-use App\Model\FootballRepository;
-use App\Model\Mapper\CompetitionMapper;
-use App\Model\Mapper\LeaguesMapper;
-use App\Model\Mapper\PlayerMapper;
-use App\Model\Mapper\TeamMapper;
+use App\Components\Football\Business\Model\FootballBusinessFacade;
+use App\Components\Football\DTOs\TeamDTO;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
 use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
-
 use PHPUnit\Framework\TestCase;
 
 class FootballRepositoryTest extends TestCase
@@ -20,7 +18,7 @@ class FootballRepositoryTest extends TestCase
 
     private ApiRequesterFaker $apiRequester;
 
-    private FootballRepository $footballRepository;
+    private FootballBusinessFacade $footballRepository;
     public TeamMapper $teamMapper;
 
     public TeamDTO $teamDTO;
@@ -37,7 +35,7 @@ class FootballRepositoryTest extends TestCase
         );
 
 
-        $this->footballRepository = new FootballRepository(
+        $this->footballRepository = new FootballBusinessFacade(
             $this->apiRequester,
 
         );

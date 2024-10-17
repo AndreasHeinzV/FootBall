@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Components\UserFavorite\Communication\Controller;
 
-use App\Controller\Controller;
-use App\Core\FavoriteHandler;
-use App\Core\ManageFavorites;
+
+use App\Components\UserFavorite\Business\UserFavoriteBusinessFacadeInterface;
 use App\Core\SessionHandler;
 use App\Core\ViewInterface;
-use App\Model\DTOs\UserDTO;
+
 
 readonly class FavoriteController implements FavoriteControllerInterface
 {
@@ -17,8 +16,7 @@ readonly class FavoriteController implements FavoriteControllerInterface
 
     public function __construct(
         private SessionHandler $sessionHandler,
-        private FavoriteHandler $favoriteHandler,
-        private ManageFavorites $manageFavorites,
+        private UserFavoriteBusinessFacadeInterface $userFavoriteBusinessFacade,
     ) {
     }
 
@@ -27,10 +25,10 @@ readonly class FavoriteController implements FavoriteControllerInterface
     {
         $user = $this->sessionHandler->getUserDTO();
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST)) {
-            $this->manageFavorites->manageFav($_POST);
+            $this->userFavoriteBusinessFacade->manageFavoriteInput($_POST);
         }
         $view->setTemplate('favorites.twig');
-        $view->addParameter('favorites', $this->favoriteHandler->getUserFavorites($user) ?? []);
+        $view->addParameter('favorites', $this->userFavoriteBusinessFacade->getUserFavorites($user) ?? []);
     }
 
 

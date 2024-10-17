@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Model\Mapper;
 
-use App\Model\DTOs\TeamDTO;
-use App\Model\Mapper\TeamMapper;
+use App\Components\Football\DTOs\TeamDTO;
+use App\Components\Football\Mapper\TeamMapper;
 use PHPUnit\Framework\TestCase;
 
 class TeamMapperTest extends TestCase

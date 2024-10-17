@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Tests\Core;
 
-use App\Controller\HomeController;
-use App\Controller\LogoutController;
-use App\Controller\NoPageController;
+use App\Components\Football\Business\Model\FootballBusinessFacade;
+use App\Components\Football\Communication\Controller\HomeController;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
+use App\Components\Pages\Business\Communication\Controller\NoPageController;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\UserLogin\Communication\Controller\LogoutController;
 use App\Core\Container;
 use App\Core\ControllerProvider;
 use App\Core\Redirect;
 use App\Core\SessionHandler;
 use App\Core\View;
-use App\Model\FootballRepository;
-use App\Model\Mapper\CompetitionMapper;
-use App\Model\Mapper\LeaguesMapper;
-use App\Model\Mapper\PlayerMapper;
-use App\Model\Mapper\TeamMapper;
-use App\Model\Mapper\UserMapper;
 use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\RedirectSpy;
 use PHPUnit\Framework\TestCase;
@@ -94,12 +94,12 @@ class ControllerProviderTest extends TestCase
             $container->get(TeamMapper::class),
             $container->get(PlayerMapper::class)
         ));
-        $container->set(FootballRepository::class, new FootballRepository(
+        $container->set(FootballBusinessFacade::class, new FootballBusinessFacade(
             $container->get(ApiRequesterFaker::class)
         ));
 
         $container->set(HomeController::class, new HomeController(
-            $container->get(FootballRepository::class),
+            $container->get(FootballBusinessFacade::class),
         ));
 
         $controllerProvider = new ControllerProvider($container);

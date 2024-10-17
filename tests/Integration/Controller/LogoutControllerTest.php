@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
-use App\Controller\LogoutController;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\UserLogin\Communication\Controller\LogoutController;
 use App\Core\SessionHandler;
-use App\Model\Mapper\UserMapper;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;

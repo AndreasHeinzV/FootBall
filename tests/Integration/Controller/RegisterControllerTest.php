@@ -4,20 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
-use App\Controller\RegisterController;
-use App\Core\Validation;
-use App\Model\DTOs\ErrorsDTO;
-use App\Model\Mapper\ErrorMapper;
-use App\Model\Mapper\UserMapper;
-use App\Model\UserEntityManager;
-use App\Model\UserRepository;
+use App\Components\User\Persistence\Mapper\ErrorMapper;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\User\Persistence\UserEntityManager;
+use App\Components\User\Persistence\UserRepository;
+use App\Components\UserRegister\Communication\Controller\RegisterController;
+use App\Components\Validation\Validation;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
-
-use PHPUnit\TextUI\XmlConfiguration\Validator;
-
-use function PHPUnit\Framework\assertTrue;
 
 class RegisterControllerTest extends TestCase
 {

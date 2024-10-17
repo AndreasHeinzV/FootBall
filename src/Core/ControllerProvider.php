@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Controller\FavoriteController;
-use App\Controller\HomeController;
-use App\Controller\LeaguesController;
-use App\Controller\LoginController;
-use App\Controller\LogoutController;
-use App\Controller\NoPageController;
-use App\Controller\PlayerController;
-use App\Controller\RegisterController;
-use App\Controller\TeamController;
+
+use App\Components\Football\Communication\Controller\HomeController;
+use App\Components\Football\Communication\Controller\LeaguesController;
+use App\Components\Football\Communication\Controller\PlayerController;
+use App\Components\Football\Communication\Controller\TeamController;
+use App\Components\Pages\Business\Communication\Controller\NoPageController;
+use App\Components\UserFavorite\Communication\Controller\FavoriteController;
+use App\Components\UserLogin\Communication\Controller\LoginController;
+use App\Components\UserLogin\Communication\Controller\LogoutController;
+use App\Components\UserRegister\Communication\Controller\RegisterController;
 
 class ControllerProvider
 {

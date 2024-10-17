@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Model\EntityManager;
 
-use App\Core\Validation;
-use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapper;
-use App\Model\UserEntityManager;
-use App\Model\UserRepository;
-use App\Tests\Fixtures\Container;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\User\Persistence\UserEntityManager;
+use App\Components\User\Persistence\UserRepository;
+use App\Components\Validation\Validation;
 use PHPUnit\Framework\TestCase;
 
 class UserEntityManagerTest extends TestCase

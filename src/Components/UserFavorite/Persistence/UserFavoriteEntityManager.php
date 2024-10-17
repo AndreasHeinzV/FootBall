@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Components\UserFavorite\Persistence;
 
-use App\Core\SqlConnector;
-use App\Model\DTOs\FavoriteDTO;
-use App\Model\DTOs\UserDTO;
+use App\Components\Database\Persistence\SqlConnectorInterface;
+use App\Components\User\Persistence\DTOs\UserDTO;
+use App\Components\UserFavorite\Persistence\DTO\FavoriteDTO;
 
-readonly class UserFavoriteEntityManager
+readonly class UserFavoriteEntityManager implements UserFavoriteEntityManagerInterface
 {
     public function __construct(
-        private SqlConnector $sqlConnector
+        private SqlConnectorInterface $sqlConnector
     ) {
     }
 
@@ -20,7 +20,7 @@ readonly class UserFavoriteEntityManager
         $this->sqlConnector->queryInsert(
             'INSERT INTO favorites(user_id,team_id, team_name, team_crest ) VALUES (:user_id,:team_id,:team_name,:team_crest)',
             [
-                'user_id' => $userDTO,
+                'user_id' => $userDTO->userId,
                 'team_id' => $favoriteDTO->teamID,
                 'team_name' => $favoriteDTO->teamName,
                 'team_crest' => $favoriteDTO->crest,
@@ -69,7 +69,7 @@ readonly class UserFavoriteEntityManager
        DELETE FROM favorites where team_id = :team_id and user_id = :user_id',
             [
                 'team_id' => (int)$id,
-                'user_id' => $userDTO,
+                'user_id' => $userDTO->userId,
             ]
         );
     }

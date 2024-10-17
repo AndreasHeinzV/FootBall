@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Model\Mapper;
 
-use App\Model\DTOs\CompetitionDTO;
-use App\Model\Mapper\CompetitionMapper;
+use App\Components\Football\DTOs\CompetitionDTO;
+use App\Components\Football\Mapper\CompetitionMapper;
 use PHPUnit\Framework\TestCase;
 
 class CompetitionMapperTest extends TestCase

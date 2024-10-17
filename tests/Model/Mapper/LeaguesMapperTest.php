@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Model\Mapper;
 
-use App\Model\DTOs\LeaguesDTO;
-use App\Model\Mapper\LeaguesMapper;
-
+use App\Components\Football\DTOs\LeaguesDTO;
+use App\Components\Football\Mapper\LeaguesMapper;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertSame;

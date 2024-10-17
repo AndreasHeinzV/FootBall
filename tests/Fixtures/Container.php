@@ -4,27 +4,24 @@ declare(strict_types=1);
 
 namespace App\Tests\Fixtures;
 
-use App\Controller\LogoutController;
+use App\Components\Football\Business\Model\FootballBusinessFacade;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\User\Persistence\UserEntityManager;
+use App\Components\User\Persistence\UserRepository;
+use App\Components\Validation\Validation;
 use App\Core\FavoriteHandler;
-use App\Core\Redirect;
 use App\Core\SessionHandler;
-use App\Core\Validation;
-use App\Model\FootballRepository;
-use App\Model\Mapper\CompetitionMapper;
-use App\Model\Mapper\LeaguesMapper;
-use App\Model\Mapper\PlayerMapper;
-use App\Model\Mapper\TeamMapper;
-use App\Model\Mapper\UserMapper;
-use App\Model\UserEntityManager;
-use App\Model\UserRepository;
 use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
-use SebastianBergmann\CodeUnit\Mapper;
 
 class Container
 {
-    public static function getRepository(): FootballRepository
+    public static function getRepository(): FootballBusinessFacade
     {
-        return new FootballRepository(
+        return new FootballBusinessFacade(
             new ApiRequesterFaker(
                 new LeaguesMapper(),
                 new CompetitionMapper(),

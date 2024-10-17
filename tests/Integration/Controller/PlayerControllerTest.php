@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
-use App\Controller\PlayerController;
+use App\Components\Football\Communication\Controller\PlayerController;
 use App\Core\ViewInterface;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\ViewFaker;

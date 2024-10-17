@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Core;
 
-use App\Core\Validation;
-use App\Model\DTOs\ErrorsDTO;
-use App\Model\DTOs\UserDTO;
-use App\Model\Mapper\UserMapper;
+use App\Components\User\Persistence\DTOs\ErrorsDTO;
+use App\Components\User\Persistence\DTOs\UserDTO;
+use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Components\Validation\Validation;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
@@ -94,14 +94,14 @@ class ValidationTest extends TestCase
     public function testCheckForNoErrors(): void
     {
         $errorDTO = new ErrorsDTO('', '', '', '', '', '');
-        $errorStatus = $this->validation->validateErrors($errorDTO);
+        $errorStatus = $this->validation->validateNoErrors($errorDTO);
         assertTrue($errorStatus);
     }
 
     public function testIfErrorsHasValues(): void
     {
         $errorDTO = new ErrorsDTO('First name is empty.', '', '', '', '', '');
-        $errorStatus = $this->validation->validateErrors($errorDTO);
+        $errorStatus = $this->validation->validateNoErrors($errorDTO);
         assertFalse($errorStatus);
     }
     /*
