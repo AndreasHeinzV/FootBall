@@ -12,9 +12,10 @@ class View implements ViewInterface
     protected string $template = 'home.twig';
 
     public string $test;
+
     public function __construct(
         private readonly Environment $twig,
-        public SessionHandler $sessionHandler,
+        public SessionHandlerInterface $sessionHandler,
     ) {
     }
 
@@ -35,8 +36,10 @@ class View implements ViewInterface
     public function display(): void
     {
         $this->addParameter('status', $this->sessionHandler->getStatus());
-        $this->addParameter('userDto', $this->sessionHandler->getUserDTO());
-        if (isset($_ENV['test'])){
+        if ($this->sessionHandler->getStatus()) {
+            $this->addParameter('userDto', $this->sessionHandler->getUserDTO());
+        }
+        if (isset($_ENV['test'])) {
             $this->test = $this->twig->render($this->template, $this->parameters);
         }
 

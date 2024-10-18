@@ -5,7 +5,7 @@
 {% endblock %}
 <form action="/?page=register" method="POST">
     <label for="fName">First name:</label>
-    <input type="text" id="fName" name="fName" value="{{ errors ? userDto.firstName|default('') }}">
+    <input type="text" id="fName" name="fName" value="{{userRegisterDto.firstName}}">
 
     {% if errors.firstNameEmptyError %}
         <div class="error">{{ errors.firstNameEmptyError }}</div>
@@ -14,7 +14,7 @@
     <br><br>
 
     <label for="lName">Last name:</label>
-    <input type="text" id="lName" name="lName" value="{{ errors? userDto.lastName|default('') }}">
+    <input type="text" id="lName" name="lName" value="{{ userRegisterDto.lastName}}">
 
     {% if errors.lastNameEmptyError %}
         <div class="error">{{ errors.lastNameEmptyError }}</div>
@@ -23,7 +23,7 @@
     <br><br>
 
     <label for="password">Password:</label>
-    <input type="text" id="password" name="password" value="{{ errors ? userDto.password|default('') }}">
+    <input type="text" id="password" name="password" value="{{ userRegisterDto.password }}">
 
     {% if errors.passwordError %}
         <div class="error">{{ errors.passwordError }}</div>
@@ -31,14 +31,11 @@
 
     <br><br>
 
-
-
     <label for="email">Email:</label>
-    <input type="text" id="email" name="email" value="{{ userDto.email }}">
+    <input type="text" id="email" name="email" value="{{ userRegisterDto.email }}">
     {% if errors.emailError %}
         <div class="error">{{ errors.emailError }}</div>
     {% endif %}
-
     <br><br>
 
     <input type="submit" value="push" name="registerMe" id="push">

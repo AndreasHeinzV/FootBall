@@ -7,8 +7,8 @@ namespace App\Tests\Integration\Controller;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserRepository;
+use App\Components\UserLogin\Business\Model\UserLoginValidation;
 use App\Components\UserLogin\Communication\Controller\LoginController;
-use App\Components\Validation\Validation;
 use App\Core\SessionHandler;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 class LoginControllerTest extends TestCase
 {
 
-    public Validation $validation;
+    public UserLoginValidation $validation;
     public ViewFaker $viewFaker;
     public UserRepository $userRepository;
 
@@ -33,7 +33,7 @@ class LoginControllerTest extends TestCase
         $_ENV['test'] = 1;
         $this->viewFaker = new ViewFaker();
         $this->userRepository = new UserRepository();
-        $this->validation = new Validation();
+        $this->validation = new UserLoginValidation();
         $this->userMapper = new UserMapper();
         $this->errorMapper = new ErrorMapper();
         $this->redirectSpy = new RedirectSpy();
@@ -95,7 +95,7 @@ class LoginControllerTest extends TestCase
         $parameters = $this->viewFaker->getParameters();
 
         $template = $this->viewFaker->getTemplate();
-        $errors = $this->errorMapper->createErrorDTO($parameters['errors']);
+        $errors = $this->errorMapper->arrayToDto($parameters['errors']);
         $userDto = $this->userMapper->createDTO($parameters['userDto']);
 
 
@@ -126,7 +126,7 @@ class LoginControllerTest extends TestCase
         $loginController->load($this->viewFaker);
         $parameters = $this->viewFaker->getParameters();
         $template = $this->viewFaker->getTemplate();
-        $errors = $this->errorMapper->createErrorDTO($parameters['errors']);
+        $errors = $this->errorMapper->arrayToDto($parameters['errors']);
         $userDto = $this->userMapper->createDTO($parameters['userDto']);
 
 
@@ -158,7 +158,7 @@ class LoginControllerTest extends TestCase
         $parameters = $this->viewFaker->getParameters();
 
         $template = $this->viewFaker->getTemplate();
-        $errors = $this->errorMapper->createErrorDTO($parameters['errors']);
+        $errors = $this->errorMapper->arrayToDto($parameters['errors']);
         $userDto = $this->userMapper->createDTO($parameters['userDto']);
 
 

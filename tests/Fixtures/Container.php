@@ -12,7 +12,7 @@ use App\Components\Football\Mapper\TeamMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
-use App\Components\Validation\Validation;
+use App\Components\UserLogin\Business\Model\UserLoginValidation;
 use App\Core\FavoriteHandler;
 use App\Core\SessionHandler;
 use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
@@ -36,7 +36,7 @@ class Container
     public static function getEntityManager(): UserEntityManager
     {
         return new UserEntityManager(
-            new Validation(),
+            new UserLoginValidation(),
             new UserRepository(),
             new UserMapper(),
         );

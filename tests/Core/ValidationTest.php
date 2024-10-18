@@ -7,7 +7,7 @@ namespace App\Tests\Core;
 use App\Components\User\Persistence\DTOs\ErrorsDTO;
 use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\User\Persistence\Mapper\UserMapper;
-use App\Components\Validation\Validation;
+use App\Components\UserLogin\Business\Model\UserLoginValidation;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
@@ -19,13 +19,13 @@ class ValidationTest extends TestCase
 
     private array $testDataValue;
 
-    public Validation $validation;
+    public UserLoginValidation $validation;
     public UserDTO $userDTO;
     public UserMapper $userMapper;
 
     protected function setUp(): void
     {
-        $this->validation = new Validation();
+        $this->validation = new UserLoginValidation();
         $this->testData = [
             'firstName' => 'ImATestCat',
             'lastName' => 'JustusCristus',
@@ -50,7 +50,7 @@ class ValidationTest extends TestCase
         one uppercase letter, one number, and one special character like ?!*$#@%^&.";
 
 
-        $errorDTO = $this->validation->userRegisterGetErrors($this->userDTO);
+        $errorDTO = $this->validation->userRegisterGetErrorsDTO($this->userDTO);
 
         // self::assertInstanceOf(ErrorsDTO::class, $errorDTO);
 
@@ -66,7 +66,7 @@ class ValidationTest extends TestCase
         one uppercase letter, one number, and one special character like ?!*$#@%^&.";
 
         $userDTO = new UserDTO('', '', '', '');
-        $errorDTO = $this->validation->userRegisterGetErrors($userDTO);
+        $errorDTO = $this->validation->userRegisterGetErrorsDTO($userDTO);
 
 
 
@@ -87,7 +87,7 @@ class ValidationTest extends TestCase
             'password' => 'passw0rd',
         ];
         $userDTO = $this->userMapper->createDTO($testData);
-        $errorDTO = $this->validation->userRegisterGetErrors($userDTO);
+        $errorDTO = $this->validation->userRegisterGetErrorsDTO($userDTO);
         self::assertSame($errorMessage, $errorDTO->emailError);
     }
 
@@ -114,7 +114,7 @@ class ValidationTest extends TestCase
             'password' => '',
         ];
         $userDTO = $this->userMapper->createDTO($testData);
-        $validation = new Validation();
+        $validation = new UserLoginValidation();
         $validation->userLoginGetErrors(,$userDTO);
     }
     */

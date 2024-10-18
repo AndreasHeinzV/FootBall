@@ -13,7 +13,7 @@ use App\Components\Football\Mapper\TeamMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
-use App\Components\Validation\Validation;
+use App\Components\UserLogin\Business\Model\UserLoginValidation;
 use App\Controller\FavoriteController;
 use App\Core\FavoriteHandler;
 use App\Core\ManageFavorites;
@@ -28,7 +28,7 @@ class FavoriteControllerTest extends TestCase
     private SessionHandler $sessionHandler;
     private UserMapper $userMapper;
     private UserRepository $userRepository;
-    private Validation $validation;
+    private UserLoginValidation $validation;
 
     private ViewFaker $view;
 
@@ -46,7 +46,7 @@ class FavoriteControllerTest extends TestCase
         $_ENV['test'] = 1;
         $this->userMapper = new UserMapper();
         $this->userRepository = new UserRepository();
-        $this->validation = new Validation();
+        $this->validation = new UserLoginValidation();
         $this->sessionHandler = new SessionHandler($this->userMapper);
         $this->view = new ViewFaker();
         $this->apiRequester = new ApiRequester(

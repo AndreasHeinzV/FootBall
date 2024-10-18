@@ -7,8 +7,8 @@ namespace App\Tests\Integration\Controller;
 use App\Components\Football\Communication\Controller\HomeController;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserRepository;
+use App\Components\UserLogin\Business\Model\UserLoginValidation;
 use App\Components\UserLogin\Communication\Controller\LoginController;
-use App\Components\Validation\Validation;
 use App\Core\SessionHandler;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\RedirectSpy;
@@ -70,7 +70,7 @@ class HomeControllerTest extends TestCase
         $view = new ViewFaker();
         $userRepository = new UserRepository();
         $userMapper = new UserMapper();
-        $validation = new Validation();
+        $validation = new UserLoginValidation();
         $redirectSpy = new RedirectSpy();
         $sessionHandler = new SessionHandler($userMapper);
         $_SERVER['REQUEST_METHOD'] = 'POST';

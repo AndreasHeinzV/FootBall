@@ -8,13 +8,13 @@ use App\Components\User\Persistence\DTOs\ErrorsDTO;
 
 class ErrorMapper implements ErrorMapperInterface
 {
-    public function createErrorDTO(array $errors): ErrorsDTO
+    public function arrayToDto(array $errors): ErrorsDTO
     {
         return new ErrorsDTO(
-            $errors['firstNameEmptyError'] ?? '',
-            $errors['lastNameEmptyError'] ?? '',
-            $errors['emailError'] ?? '',
-            $errors['passwordError'] ?? ''
+            $errors['firstNameEmptyError']?? null,
+            $errors['lastNameEmptyError'] ?? null,
+            $errors['emailError'],
+            $errors['passwordError']
         );
     }
 

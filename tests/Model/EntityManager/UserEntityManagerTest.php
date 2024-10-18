@@ -7,14 +7,14 @@ namespace App\Tests\Model\EntityManager;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
-use App\Components\Validation\Validation;
+use App\Components\UserLogin\Business\Model\UserLoginValidation;
 use PHPUnit\Framework\TestCase;
 
 class UserEntityManagerTest extends TestCase
 {
     private string $path;
 
-    private Validation $validation;
+    private UserLoginValidation $validation;
     private UserEntityManager $entityManager;
     public UserMapper $userMapper;
 
@@ -24,7 +24,7 @@ class UserEntityManagerTest extends TestCase
     {
         $_ENV['test'] = 1;
         $this->path = __DIR__ . '/../../../users_test.json';
-        $this->validation = new Validation();
+        $this->validation = new UserLoginValidation();
         $this->userMapper = new UserMapper();
         $testData = [
             [
@@ -36,7 +36,7 @@ class UserEntityManagerTest extends TestCase
         ];
         file_put_contents($this->path, json_encode($testData));
         $this->entityManager = new UserEntityManager(
-            new Validation(),
+            new UserLoginValidation(),
             new UserRepository(),
             $this->userMapper
         );

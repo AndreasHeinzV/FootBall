@@ -8,8 +8,8 @@ use App\Components\User\Persistence\Mapper\ErrorMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
+use App\Components\UserLogin\Business\Model\UserLoginValidation;
 use App\Components\UserRegister\Communication\Controller\RegisterController;
-use App\Components\Validation\Validation;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +19,7 @@ class RegisterControllerTest extends TestCase
     public ViewFaker $viewFaker;
     public UserMapper $userMapper;
 
-    public Validation $validation;
+    public UserLoginValidation $validation;
 
     public ErrorMapper $errorMapper;
     public RedirectSpy $redirectSpy;
@@ -30,7 +30,7 @@ class RegisterControllerTest extends TestCase
         parent::setUp();
         $this->viewFaker = new ViewFaker();
         $this->userMapper = new UserMapper();
-        $this->validation = new Validation();
+        $this->validation = new UserLoginValidation();
         $this->errorMapper = new ErrorMapper();
         $this->redirectSpy = new RedirectSpy();
     }
@@ -57,7 +57,7 @@ class RegisterControllerTest extends TestCase
         $parameters = $this->viewFaker->getParameters();
 
         $errorData = $parameters['errors'];
-        $errorDTO = $this->errorMapper->createErrorDTO($errorData);
+        $errorDTO = $this->errorMapper->arrayToDto($errorData);
 
 
         self::assertNotEmpty($this->viewFaker->getTemplate());
@@ -86,7 +86,7 @@ class RegisterControllerTest extends TestCase
         $parameters = $this->viewFaker->getParameters();
 
         $errorData = $parameters['errors'];
-        $errorDTO = $this->errorMapper->createErrorDTO($errorData);
+        $errorDTO = $this->errorMapper->arrayToDto($errorData);
 
 
         self::assertNotEmpty($this->viewFaker->getTemplate());
