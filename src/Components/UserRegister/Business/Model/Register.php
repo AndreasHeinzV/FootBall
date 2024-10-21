@@ -8,12 +8,14 @@ use App\Components\User\Business\UserBusinessFacadeInterface;
 use App\Components\User\Persistence\DTOs\ErrorsDTO;
 use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\UserRegister\Persistence\DTO\UserRegisterDto;
+use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
 
 readonly class Register implements RegisterInterface
 {
     public function __construct(
         private UserRegisterValidationInterface $userRegisterValidation,
         private UserBusinessFacadeInterface $userBusinessFacade,
+        private RegisterMapper $registerMapper,
     ) {
     }
 
@@ -23,21 +25,9 @@ readonly class Register implements RegisterInterface
 
         if ($this->userRegisterValidation->validateNoErrors($errorsDTO)) {
             $userRegisterDto->password = password_hash($userRegisterDto->password, PASSWORD_DEFAULT);
-            $this->userBusinessFacade->registerUser($this->mapToUserDTO($userRegisterDto));
+            $this->userBusinessFacade->registerUser($this->registerMapper->mapRegisterDtoToUserDTO($userRegisterDto));
             return null;
         }
         return $errorsDTO;
-    }
-
-//todo maybe change
-    public function mapToUserDTO(UserRegisterDto $userRegisterDto): UserDTO
-    {
-        return new UserDTO(
-            null,
-            $userRegisterDto->firstName,
-            $userRegisterDto->lastName,
-            $userRegisterDto->email,
-            $userRegisterDto->password
-        );
     }
 }

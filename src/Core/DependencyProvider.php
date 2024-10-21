@@ -32,13 +32,21 @@ use App\Components\UserFavorite\Persistence\UserFavoriteEntityManager;
 use App\Components\UserFavorite\Persistence\UserFavoriteRepository;
 use App\Components\UserLogin\Business\Model\Login;
 use App\Components\UserLogin\Business\Model\UserLoginValidation;
+use App\Components\UserLogin\Business\Model\ValidationTypesLogin\EmailLoginValidation;
+use App\Components\UserLogin\Business\Model\ValidationTypesLogin\PasswordLoginValidation;
+use App\Components\UserLogin\Business\Model\ValidationTypesLogin\UserAuthentication;
 use App\Components\UserLogin\Business\UserLoginBusinessFacade;
 use App\Components\UserLogin\Communication\Controller\LoginController;
 use App\Components\UserLogin\Communication\Controller\LogoutController;
 use App\Components\UserRegister\Business\Model\Register;
 use App\Components\UserRegister\Business\Model\UserRegisterValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\EmailValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\FirstNameValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\LastNameValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\PasswordValidation;
 use App\Components\UserRegister\Business\UserRegisterBusinessFacade;
 use App\Components\UserRegister\Communication\Controller\RegisterController;
+use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -56,14 +64,20 @@ class DependencyProvider
         $container->set(PlayerMapper::class, new PlayerMapper());
         $container->set(Redirect::class, new Redirect());
         $container->set(FavoriteMapper::class, new FavoriteMapper());
+        $container->set(RegisterMapper::class, new RegisterMapper());
         $container->set(NoPageController::class, new NoPageController());
         $container->set(ErrorMapper::class, new ErrorMapper());
+        $container->set(FirstNameValidation::class, new FirstNameValidation());
+        $container->set(LastNameValidation::class, new LastNameValidation());
+        $container->set(EmailValidation::class, new EmailValidation());
+        $container->set(PasswordValidation::class, new PasswordValidation());
         $container->set(ApiRequester::class, new ApiRequester(
             $container->get(LeaguesMapper::class),
             $container->get(CompetitionMapper::class),
             $container->get(TeamMapper::class),
             $container->get(PlayerMapper::class)
         ));
+
         $container->set(SqlConnector::class, new SqlConnector());
         $container->set(Fixtures::class, new Fixtures(
             $container->get(SqlConnector::class)
@@ -87,9 +101,17 @@ class DependencyProvider
             $container->get(UserRepository::class),
             $container->get(UserEntityManager::class)
         ));
-        $container->set(UserLoginValidation::class, new UserLoginValidation(
+        $container->set(UserAuthentication::class, new UserAuthentication(
             $container->get(UserBusinessFacade::class),
-            $container->get(ErrorMapper::class)
+        ));
+        $container->set(EmailLoginValidation::class, new EmailLoginValidation());
+        $container->set(PasswordLoginValidation::class, new PasswordLoginValidation(
+            $container->get(UserAuthentication::class),
+        ));
+        $container->set(UserLoginValidation::class, new UserLoginValidation(
+            $container->get(ErrorMapper::class),
+            $container->get(EmailLoginValidation::class),
+            $container->get(PasswordLoginValidation::class)
         ));
 
         $container->set(UserFavoriteEntityManager::class, new UserFavoriteEntityManager(
@@ -119,11 +141,16 @@ class DependencyProvider
         ));
         $container->set(UserRegisterValidation::class, new UserRegisterValidation(
             $container->get(ErrorMapper::class),
+            $container->get(FirstNameValidation::class),
+            $container->get(LastNameValidation::class),
+            $container->get(EmailValidation::class),
+            $container->get(PasswordValidation::class),
         ));
 
         $container->set(Register::class, new Register(
             $container->get(UserRegisterValidation::class),
             $container->get(UserBusinessFacade::class),
+            $container->get((RegisterMapper::class))
         ));
         $container->set(UserRegisterBusinessFacade::class, new UserRegisterBusinessFacade(
             $container->get(UserBusinessFacade::class),

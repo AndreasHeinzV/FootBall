@@ -7,12 +7,12 @@ namespace App\Core;
 use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\User\Persistence\Mapper\UserMapperInterface;
 
-readonly class SessionHandler implements SessionHandlerInterface
+ class SessionHandler implements SessionHandlerInterface
 {
 
     public UserDTO $userDTO;
 
-    public function __construct(private UserMapperInterface $userMapper)
+    public function __construct(private readonly UserMapperInterface $userMapper)
     {
     }
 

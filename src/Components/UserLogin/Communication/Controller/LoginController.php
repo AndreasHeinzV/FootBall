@@ -34,7 +34,6 @@ readonly class LoginController implements UserLoginControllerInterface
             $userLoginDto = new UserLoginDto();
             $userLoginDto->email = htmlspecialchars($_POST['email'] ?? '');
             $userLoginDto->password = htmlspecialchars($_POST['password'] ?? '');
-
             $errorsDTO = $this->userLoginBusinessFacade->loginUser($userLoginDto);
 
             if (!$errorsDTO instanceof ErrorsDTO) {

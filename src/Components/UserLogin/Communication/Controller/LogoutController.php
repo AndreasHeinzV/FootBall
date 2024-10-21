@@ -21,11 +21,6 @@ readonly class LogoutController implements UserLoginControllerInterface
 
     public function load(ViewInterface $view): void
     {
-        $this->handleLogout();
-    }
-
-    private function handleLogout(): void
-    {
         if (!(session_status() === PHP_SESSION_NONE)) {
             session_destroy();
             $this->sessionHandler->stopSession();

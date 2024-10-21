@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Database\Business\Model;
+namespace App\Tests\Fixtures;
+
 
 use App\Components\Database\Persistence\SqlConnector;
-use App\Tests\Fixtures\DataLoader;
+use App\Components\User\Persistence\DTOs\UserDTO;
+use http\Client\Curl\User;
 
-class Fixtures implements FixturesInterface
+class DatabaseBuilder
 {
     public function __construct(public SqlConnector $sqlConnector)
     {
@@ -43,6 +45,7 @@ class Fixtures implements FixturesInterface
         $pdo = $this->sqlConnector->getPdo();
         $pdo->exec($statements);
         $pdo->exec($stmtFavorites);
+
     }
 
     public function dropTables(): void
@@ -54,5 +57,16 @@ class Fixtures implements FixturesInterface
         $pdo = $this->sqlConnector->getPdo();
         $pdo->exec($dropFavorites);
         $pdo->exec($dropUsers);
+    }
+
+    public function loadData(UserDTO $userDTO): void
+    {
+        if (isset($_ENV['DATABASE']) && $_ENV['DATABASE'] === 'football_test') {
+            try {
+                $dataLoader = new DataLoader();
+                $dataLoader->loadTestDataIntoDatabase($userDTO);
+            } catch (\Exception $exception) {
+            }
+        }
     }
 }

@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace App\Components\UserFavorite\Business\Model;
 
-use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Business\Model\FootballBusinessFacadeInterface;
-use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapper;
 use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapperInterface;
-use App\Components\UserFavorite\Persistence\UserFavoriteEntityManager;
 use App\Components\UserFavorite\Persistence\UserFavoriteEntityManagerInterface;
-use App\Components\UserFavorite\Persistence\UserFavoriteRepository;
 use App\Components\UserFavorite\Persistence\UserFavoriteRepositoryInterface;
 use App\Core\SessionHandler;
 
@@ -29,7 +25,6 @@ readonly class Favorite implements FavoriteInterface
 
     public function manageFav(array $input): void
     {
-
         foreach ($input as $keyValue => $value) {
             switch (true) {
                 case ($keyValue === 'add'):
@@ -56,7 +51,7 @@ readonly class Favorite implements FavoriteInterface
         $this->userFavoriteEntityManager->deleteUserFavorite($userDTO, $teamId);
     }
 
-    public function handleAdd( string $teamId): void
+    public function handleAdd(string $teamId): void
     {
         $userDTO = $this->sessionHandler->getUserDTO();
         $team = $this->footballBusinessFacade->getTeam($teamId);

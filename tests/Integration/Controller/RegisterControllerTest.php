@@ -4,14 +4,27 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
+use App\Components\Database\Business\DatabaseBusinessFacade;
+use App\Components\Database\Business\Model\Fixtures;
+use App\Components\Database\Persistence\SqlConnector;
+use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
 use App\Components\UserLogin\Business\Model\UserLoginValidation;
+use App\Components\UserRegister\Business\Model\Register;
+use App\Components\UserRegister\Business\Model\UserRegisterValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\EmailValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\FirstNameValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\LastNameValidation;
+use App\Components\UserRegister\Business\Model\ValidationTypesRegister\PasswordValidation;
+use App\Components\UserRegister\Business\UserRegisterBusinessFacade;
 use App\Components\UserRegister\Communication\Controller\RegisterController;
+use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
+use Couchbase\User;
 use PHPUnit\Framework\TestCase;
 
 class RegisterControllerTest extends TestCase
@@ -21,19 +34,56 @@ class RegisterControllerTest extends TestCase
 
     public UserLoginValidation $validation;
 
-    public ErrorMapper $errorMapper;
+
     public RedirectSpy $redirectSpy;
 
+    private RegisterController $registerController;
     protected function setUp(): void
     {
         $_ENV['test'] = 1;
+        $_ENV['DATABASE'] = 'football_test';
         parent::setUp();
         $this->viewFaker = new ViewFaker();
         $this->userMapper = new UserMapper();
-        $this->validation = new UserLoginValidation();
-        $this->errorMapper = new ErrorMapper();
+        $errorMapper = new ErrorMapper();
         $this->redirectSpy = new RedirectSpy();
+
+        $sqlConnector = new SqlConnector();
+        $databaseBusinessFacade = new DatabaseBusinessFacade(
+            new Fixtures($sqlConnector)
+        );
+        $databaseBusinessFacade->createUserTables();
+        $userBusinessFacade = new UserBusinessFacade(
+            new UserRepository($sqlConnector),
+            new UserEntityManager($sqlConnector)
+        );
+
+        $userRegisterValidation = new UserRegisterValidation(
+            $errorMapper,
+            new FirstNameValidation(),
+            new LastNameValidation(),
+            new EmailValidation(),
+            new PasswordValidation(),
+        );
+
+        $registerMapper = new RegisterMapper();
+        $register = new Register(
+            $userRegisterValidation,
+            $userBusinessFacade,
+            $registerMapper
+        );
+        $userRegisterBusinessFacade = new UserRegisterBusinessFacade(
+            $userBusinessFacade,
+            $register
+        );
+        $this->registerController = new RegisterController($userRegisterBusinessFacade, $this->redirectSpy);
     }
+
+    protected function tearDown(): void{
+        unset($_SERVER['REQUEST_METHOD'], $_ENV, $_POST);
+        parent::tearDown();
+    }
+
 
     public function testRegisterUserWrongValues(): void
     {
@@ -45,23 +95,13 @@ class RegisterControllerTest extends TestCase
         $_POST['email'] = 'gewg@g.com';
         $_POST['password'] = 'wgw';
 
-        $userEntityManager = new UserEntityManager($this->validation, new UserRepository(), $this->userMapper,);
-        $userRegisterController = new RegisterController(
-            $userEntityManager,
-            $this->validation,
-            $this->userMapper,
-            $this->redirectSpy
-        );
-
-        $userRegisterController->load($this->viewFaker);
+        $this->registerController->load($this->viewFaker);
         $parameters = $this->viewFaker->getParameters();
 
         $errorData = $parameters['errors'];
-        $errorDTO = $this->errorMapper->arrayToDto($errorData);
-
 
         self::assertNotEmpty($this->viewFaker->getTemplate());
-        self::assertSame('', $errorDTO->emailError);
+        self::assertNull($errorData['firstNameEmptyError']);
     }
 
     public function testRegisterUserRightValues(): void
@@ -74,22 +114,10 @@ class RegisterControllerTest extends TestCase
         $_POST['email'] = 'catsAreCute@cat.com';
         $_POST['password'] = 'CatIsCute1!';
 
-        $userEntityManager = new UserEntityManager($this->validation, new UserRepository(), $this->userMapper,);
-        $userRegisterController = new RegisterController(
-            $userEntityManager,
-            $this->validation,
-            $this->userMapper,
-            $this->redirectSpy
-        );
+       $this->registerController->load($this->viewFaker);
 
-        $userRegisterController->load($this->viewFaker);
         $parameters = $this->viewFaker->getParameters();
-
-        $errorData = $parameters['errors'];
-        $errorDTO = $this->errorMapper->arrayToDto($errorData);
-
-
         self::assertNotEmpty($this->viewFaker->getTemplate());
-        self::assertSame('', $errorDTO->emailError);
+        self::assertNull($parameters['errors']);
     }
 }

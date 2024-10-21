@@ -40,16 +40,14 @@ class ApiRequester implements ApiRequesterInterface
             $response = curl_exec($curl);
 
             if ($response === false) {
-                $error = curl_error($curl);
+            //    $error = curl_error($curl);
                 curl_close($curl);
-                error_log("Request Failed No ID found: " . $error);
                 return [];
             }
             $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
 
             if ($httpStatus !== 200) {
-              error_log("Request Failed HTTP Status: " . $httpStatus);
                 return [];
             }
             return json_decode($response, true);

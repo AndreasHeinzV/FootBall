@@ -10,13 +10,16 @@ use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
 use App\Components\User\Persistence\Mapper\ErrorMapperInterface;
 use App\Components\User\Persistence\Mapper\UserMapperInterface;
+use App\Components\UserLogin\Business\Model\ValidationTypesLogin\EmailLoginValidation;
+use App\Components\UserLogin\Business\Model\ValidationTypesLogin\PasswordLoginValidation;
 use App\Components\UserLogin\Persistence\DTO\UserLoginDto;
 
 readonly class UserLoginValidation implements UserLoginValidationInterface
 {
     public function __construct(
-        private UserBusinessFacadeInterface $userBusinessFacade,
         private ErrorMapperInterface $errorMapper,
+        private EmailLoginValidation $emailLoginValidation,
+        private PasswordLoginValidation $passwordLoginValidation,
     ) {
     }
 
@@ -30,41 +33,11 @@ readonly class UserLoginValidation implements UserLoginValidationInterface
         return true;
     }
 
-
     public function userLoginGetErrorsDTO(UserLoginDto $userLoginDto): ErrorsDTO
     {
-        $errors['emailError'] = $this->validateEmail($userLoginDto->email);
-        $errors['passwordError'] = $this->validatePasswordLogin($userLoginDto);
+        $errors['emailError'] = $this->emailLoginValidation->validateInput($userLoginDto);
+        $errors['passwordError'] = $this->passwordLoginValidation->validateInput($userLoginDto);
         return $this->errorMapper->arrayToDto($errors);
     }
 
-    private function validateEmail(string $email): ?string
-    {
-        if (empty($email)) {
-            return "Email is empty.";
-        }
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return "Invalid email address.";
-        }
-        return null;
-    }
-
-    private function validatePasswordLogin($userLoginDto): ?string
-    {
-        if (empty($userLoginDto->password)) {
-            return "Password is empty.";
-        }
-
-        if (!$this->validateLogin($userLoginDto)) {
-            return 'email or password is wrong';
-        }
-        return null;
-    }
-
-    private function validateLogin(UserLoginDto $userLoginDto): bool
-    {
-        $userDTOFromDB = $this->userBusinessFacade->getUserByMail($userLoginDto->email);
-        return password_verify($userLoginDto->password, $userDTOFromDB->password);
-    }
 }

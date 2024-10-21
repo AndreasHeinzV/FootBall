@@ -4,7 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
+use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\Model\ApiRequester;
+use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Communication\Controller\PlayerController;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
+use App\Core\Redirect;
 use App\Core\ViewInterface;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\ViewFaker;
@@ -19,7 +27,15 @@ class PlayerControllerTest extends TestCase
     protected function setUp(): void
     {
         $this->view = new ViewFaker();
-        $this->playerController = new PlayerController(Container::getRepository());
+        $apiRequester = new ApiRequester(
+            new LeaguesMapper(),
+            new CompetitionMapper(),
+            new TeamMapper(),
+            new PlayerMapper()
+        );
+        $apiRequesterFacade = new ApiRequestFacade($apiRequester);
+        $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
+        $this->playerController = new PlayerController($footballBusinessFacade, new Redirect());
         parent::setUp();
     }
 
@@ -62,7 +78,8 @@ class PlayerControllerTest extends TestCase
         self::assertEmpty($parameters);
     }
 
-    public function testInvalidGet(): void{
+    public function testInvalidGet(): void
+    {
         $_GET['id'] = '3259069483648';
 
         $this->playerController->load($this->view);

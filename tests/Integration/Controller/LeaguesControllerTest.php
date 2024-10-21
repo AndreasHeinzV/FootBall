@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
+use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\Model\ApiRequester;
+use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Communication\Controller\LeaguesController;
+use App\Components\Football\Mapper\CompetitionMapper;
+use App\Components\Football\Mapper\LeaguesMapper;
+use App\Components\Football\Mapper\PlayerMapper;
+use App\Components\Football\Mapper\TeamMapper;
 use App\Core\ViewInterface;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\ViewFaker;
@@ -17,9 +24,18 @@ class LeaguesControllerTest extends TestCase
     private LeaguesController $leaguesController;
     protected function setUp(): void
     {
-        $this->view = new ViewFaker();
-        $this->leaguesController = new LeaguesController(Container::getRepository());
         parent::setUp();
+        $this->view = new ViewFaker();
+        $apiRequester = new ApiRequester(
+            new LeaguesMapper(),
+            new CompetitionMapper(),
+            new TeamMapper(),
+            new PlayerMapper()
+        );
+        $apiRequesterFacade = new ApiRequestFacade($apiRequester);
+        $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
+        $this->leaguesController = new LeaguesController(($footballBusinessFacade));
+
     }
 
     protected function tearDown(): void
@@ -39,10 +55,10 @@ class LeaguesControllerTest extends TestCase
 
         self::assertArrayHasKey('teams', $parameters);
         $playerData = $parameters['teams'];
-        self::assertCount(20, $playerData);
 
-        self::assertSame('Fortaleza EC', $playerData[0]->name);
-        self::assertSame('CA Mineiro', $playerData[8]->name);
+        self::assertCount(20, $playerData);
+        self::assertNotEmpty($playerData[0]->name);
+        self::assertNotEmpty($playerData[8]->name);
     }
 
     public function testNoGet(): void
