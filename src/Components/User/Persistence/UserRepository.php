@@ -13,22 +13,6 @@ class UserRepository implements UserRepositoryInterface
     public function __construct(public SqlConnectorInterface $sqlConnector)
     {
     }
-/*
-    public function getUserName(string $email): string
-    {
-        $user = $this->sqlConnector->querySelect(
-            'SELECT first_name FROM users WHERE user_email = :user_email',
-            ['user_email' => $email]
-        );
-
-        if (!$user) {
-            return '';
-        }
-
-        return $user["first_name"];
-    }
-
-*/
     public function getUser(string $email): UserDTO
     {
         $user = $this->sqlConnector->querySelect(
@@ -54,7 +38,7 @@ class UserRepository implements UserRepositoryInterface
         return $this->sqlConnector->querySelectAll('SELECT * FROM users');
     }
 
-    public function getUserID(UserDTO $userDTO): int|false
+    public function getUserIdByMail(UserDTO $userDTO): int|false
     {
         $userID = $this->sqlConnector->querySelect(
             'SELECT user_id FROM users WHERE user_email = :user_email',

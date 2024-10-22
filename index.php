@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Components\Database\Business\DatabaseBusinessFacade;
-use App\Components\Database\Business\Model\Fixtures;
 use App\Core\Container;
 use App\Core\ControllerProvider;
 use App\Core\DependencyProvider;

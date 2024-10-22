@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\Football\Communication\Controller;
 
-use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Business\Model\FootballBusinessFacadeInterface;
-use App\Components\UserFavorite\Business\UserFavoriteBusinessFacade;
 use App\Components\UserFavorite\Business\UserFavoriteBusinessFacadeInterface;
 use App\Core\Redirect;
 use App\Core\ViewInterface;

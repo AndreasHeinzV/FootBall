@@ -8,7 +8,7 @@ interface UserBusinessFacadeInterface
 {
     public function getUserByMail(string $email): UserDTO;
 
-    public function getUserById(UserDTO $userDTO): int;
+    public function getUserIdByMail(UserDTO $userDTO): int|false;
 
     public function getUsers(): array;
 

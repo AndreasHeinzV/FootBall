@@ -23,6 +23,7 @@ use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapper;
 use App\Components\UserFavorite\Persistence\UserFavoriteEntityManager;
 use App\Components\UserFavorite\Persistence\UserFavoriteRepository;
 use App\Core\SessionHandler;
+use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\DataLoader;
 use App\Tests\Fixtures\ViewFaker;
@@ -32,14 +33,9 @@ class FavoriteControllerTest extends TestCase
 {
 
     //toDo write case list empty, multiple users in favorites_json
-    private SessionHandler $sessionHandler;
-
     private ViewFaker $view;
 
     private FavoriteController $favoriteController;
-
-
-    private UserFavoriteBusinessFacade $userFavoriteBusinessFacade;
 
     private DatabaseBuilder $databaseBuilder;
 
@@ -50,10 +46,10 @@ class FavoriteControllerTest extends TestCase
 
         $_ENV['test'] = 1;
         $_ENV['DATABASE'] = 'football_test';
-        $this->userMapper = new UserMapper();
-        $this->sessionHandler = new SessionHandler($this->userMapper);
+        $userMapper = new UserMapper();
+        $sessionHandler = new SessionHandler($userMapper);
         $this->view = new ViewFaker();
-        $apiRequester = new ApiRequester(
+        $apiRequester = new ApiRequesterFaker(
             new LeaguesMapper(),
             new CompetitionMapper(),
             new TeamMapper(),
@@ -66,7 +62,7 @@ class FavoriteControllerTest extends TestCase
             'email' => 'dog@gmail.com',
             'password' => password_hash('passw0rd', PASSWORD_DEFAULT),
         ];
-        $userDTO = $this->userMapper->createDTO($testData);
+        $userDTO = $userMapper->createDTO($testData);
 
         $sqlConnector = new SqlConnector();
         $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
@@ -78,14 +74,14 @@ class FavoriteControllerTest extends TestCase
         $favoriteRepository = new UserFavoriteRepository($sqlConnector);
 
         $favorite = new Favorite(
-            $this->sessionHandler,
+            $sessionHandler,
             $footballBusinessFacade,
             new UserFavoriteEntityManager($sqlConnector),
             $favoriteRepository,
             $favoriteMapper
         );
-        $this->userFavoriteBusinessFacade = new userFavoriteBusinessFacade($favorite, $favoriteRepository);
-        $this->favoriteController = new FavoriteController($this->sessionHandler, $this->userFavoriteBusinessFacade);
+        $userFavoriteBusinessFacade = new userFavoriteBusinessFacade($favorite, $favoriteRepository);
+        $this->favoriteController = new FavoriteController($sessionHandler, $userFavoriteBusinessFacade);
 
 
         $userEntityManager = new UserEntityManager($sqlConnector);
@@ -109,8 +105,8 @@ class FavoriteControllerTest extends TestCase
         $_ENV['test'] = 1;
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['add'] = "328";
-        //  $_POST['favorite'] = 'add';
+        $_POST['add'] = "3984";
+
 
         $_SESSION['status'] = true;
         $_SESSION['userDto'] = [
@@ -132,17 +128,48 @@ class FavoriteControllerTest extends TestCase
 
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
+        self::assertCount(4, $favorites);
         self::assertSame("FC Bayern München", $favorites[0]['teamName'], "Base value");
-        // self::assertNotEmpty($favorites[2]['teamName']);
-        //  self::assertSame($favorites[3]['teamName'], 'Burnley FC', "expected 2nd Team");
+        self::assertSame('Fortaleza EC', $favorites[3]['teamName'], "expected team name");
     }
+
+    public function testAddFalse(): void
+    {
+        $_ENV['test'] = 1;
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['add'] = "4";
+
+
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'userId' => 1,
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "dog@gmail.com",
+            'password' => "passw0rd",
+        ];
+
+
+        $this->favoriteController->load($this->view);
+        $parameters = $this->view->getParameters();
+        $template = $this->view->getTemplate();
+
+
+        $favorites = $parameters['favorites'];
+
+        self::assertSame('favorites.twig', $template);
+        self::assertNotEmpty($parameters);
+        self::assertCount(3, $favorites);
+
+    }
+
 
     public function testTryAddForDuplicate(): void
     {
         $_ENV['test'] = 1;
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['add'] = "5";
-        //  $_POST['favorite'] = 'add';
 
         $_SESSION['status'] = true;
         $_SESSION['userDto'] = [
@@ -152,9 +179,6 @@ class FavoriteControllerTest extends TestCase
             'email' => "dog@gmail.com",
             'password' => "passw0rd",
         ];
-
-        // $this->userFavoriteBusinessFacade->manageFavoriteInput(['add' => '5']);
-
 
         $this->favoriteController->load($this->view);
         $parameters = $this->view->getParameters();
@@ -166,7 +190,7 @@ class FavoriteControllerTest extends TestCase
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
         self::assertSame("FC Bayern München", $favorites[0]['teamName'], "Base value");
-        //   self::assertCount(2, $favorites);
+        self::assertCount(3, $favorites);
     }
 
     public function testDelete(): void
@@ -205,8 +229,6 @@ class FavoriteControllerTest extends TestCase
             'email' => "dog@gmail.com",
             'password' => "passw0rd",
         ];
-        $this->userFavoriteBusinessFacade->manageFavoriteInput(['add' => '5']);
-        $this->userFavoriteBusinessFacade->manageFavoriteInput(['add' => '4']);
 
         $this->favoriteController->load($this->view);
         $parameters = $this->view->getParameters();
@@ -214,9 +236,9 @@ class FavoriteControllerTest extends TestCase
 
         $favorites = $parameters['favorites'];
 
-        self::assertSame('FC Bayern München', $favorites[1]['teamName']);
-        self::assertCount(2, $favorites);
-        self::assertSame('Borussia Dortmund', $favorites[0]['teamName']);
+        self::assertSame('FC Bayern München', $favorites[0]['teamName']);
+        self::assertCount(3, $favorites);
+        self::assertSame('Borussia Dortmund', $favorites[1]['teamName']);
     }
 
     public function testMoveDown(): void
@@ -232,9 +254,6 @@ class FavoriteControllerTest extends TestCase
             'email' => "dog@gmail.com",
             'password' => "passw0rd",
         ];
-        $this->userFavoriteBusinessFacade->manageFavoriteInput(['add' => '5']);
-        $this->userFavoriteBusinessFacade->manageFavoriteInput(['add' => '1770']);
-        $this->userFavoriteBusinessFacade->manageFavoriteInput(['add' => '4']);
 
         $this->favoriteController->load($this->view);
         $parameters = $this->view->getParameters();
@@ -243,33 +262,6 @@ class FavoriteControllerTest extends TestCase
         self::assertSame('Borussia Dortmund', $favorites[1]['teamName']);
         self::assertCount(3, $favorites);
         self::assertSame('FC Bayern München', $favorites[0]['teamName']);
-    }
-
-    public function testAddThree(): void
-    {
-        $_ENV['test'] = 1;
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['down'] = "1770";
-        $_SESSION['status'] = true;
-        $_SESSION['userDto'] = [
-            'userId' => 1,
-            'firstName' => "testName",
-            'lastName' => "dog",
-            'email' => "dog@gmail.com",
-            'password' => "passw0rd",
-        ];
-
-        $userDTO = $this->userMapper->createDTO($_SESSION['userDto']);
-
-        $userFavorites = $this->userFavoriteBusinessFacade->getUserFavorites($userDTO);
-        $dataLoader = new DataLoader();
-        $dataLoader->loadTestDataIntoDatabase($userDTO);
-
-
-        $this->favoriteController->load($this->view);
-        $parameters = $this->view->getParameters();
-        $favorites = $parameters['favorites'];
-
-        self::assertSame('FC Bayern München', $favorites[0]['teamName']);
+        self::assertSame('Botafogo FR', $favorites[2]['teamName']);
     }
 }

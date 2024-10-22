@@ -27,7 +27,7 @@ class ViewTest extends TestCase
         $sessionHandlerStub = $this->createStub(SessionHandler::class);
         $sessionHandlerStub->method('getStatus')->willReturn(true);
 
-        $userDTO = new UserDTO('Justus', '', '', '');
+        $userDTO = new UserDTO(-1,'Justus', '', '', '');
         $sessionHandlerStub->method('getUserDTO')->willReturn($userDTO);
         $view = new View($twig, $sessionHandlerStub);
         $view->setTemplate('testPage.twig');

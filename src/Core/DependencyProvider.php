@@ -191,7 +191,8 @@ class DependencyProvider
         ));
 
         $container->set(PlayerController::class, new PlayerController(
-            $container->get(FootballBusinessFacade::class)
+            $container->get(FootballBusinessFacade::class),
+            $container->get(Redirect::class)
         ));
 
         $container->set(TeamController::class, new TeamController(

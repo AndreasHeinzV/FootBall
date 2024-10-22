@@ -14,6 +14,7 @@ use App\Components\Football\Mapper\PlayerMapper;
 use App\Components\Football\Mapper\TeamMapper;
 use App\Components\UserFavorite\Business\UserFavoriteBusinessFacade;
 use App\Core\ViewInterface;
+use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +28,7 @@ class TeamControllerTest extends TestCase
     protected function setUp(): void
     {
 
-        $apiRequester = new ApiRequester(
+        $apiRequester = new ApiRequesterFaker(
             new LeaguesMapper(),
             new CompetitionMapper(),
             new TeamMapper(),
@@ -84,11 +85,9 @@ class TeamControllerTest extends TestCase
 
         $this->teamController->load($this->view);
         $parameters = $this->view->getParameters();
-            $page = $_GET['page'];
 
         self::assertNotContains('players', $parameters);
-//        self::assertSame([], $parameters['players']);
-        //dump($page);
+
 
     }
 }

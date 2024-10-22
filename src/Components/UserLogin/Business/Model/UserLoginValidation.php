@@ -35,9 +35,10 @@ readonly class UserLoginValidation implements UserLoginValidationInterface
 
     public function userLoginGetErrorsDTO(UserLoginDto $userLoginDto): ErrorsDTO
     {
-        $errors['emailError'] = $this->emailLoginValidation->validateInput($userLoginDto);
-        $errors['passwordError'] = $this->passwordLoginValidation->validateInput($userLoginDto);
-        return $this->errorMapper->arrayToDto($errors);
+        $errorsDTO = $this->errorMapper->emptyErrorDto();
+        $errorsDTO->emailError = $this->emailLoginValidation->validateInput($userLoginDto);
+        $errorsDTO->passwordError = $this->passwordLoginValidation->validateInput($userLoginDto);
+        return $errorsDTO;
     }
 
 }

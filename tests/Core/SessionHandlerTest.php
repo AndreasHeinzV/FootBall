@@ -50,11 +50,11 @@ class SessionHandlerTest extends TestCase
 
     public function testSessionHandler(): void
     {
-        session_start();
+
         $sessionHandler = new SessionHandler($this->userMapper);
-        $sessionHandler->setUserDTO($this->userMapper->createDTO($this->testData));
+        $sessionHandler->startSession($this->userMapper->createDTO($this->testData));
         $userDTO = $sessionHandler->getUserDTO();
 
-        assertSame($this->testData['firstName'], $userDTO->firstName);
+        assertSame('ImATestCat', $userDTO->firstName);
     }
 }

@@ -13,6 +13,7 @@ use App\Components\Football\Mapper\LeaguesMapper;
 use App\Components\Football\Mapper\PlayerMapper;
 use App\Components\Football\Mapper\TeamMapper;
 use App\Core\ViewInterface;
+use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\Container;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,7 @@ class LeaguesControllerTest extends TestCase
     {
         parent::setUp();
         $this->view = new ViewFaker();
-        $apiRequester = new ApiRequester(
+        $apiRequester = new ApiRequesterFaker(
             new LeaguesMapper(),
             new CompetitionMapper(),
             new TeamMapper(),

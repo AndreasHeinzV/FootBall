@@ -24,29 +24,27 @@ use App\Components\UserRegister\Communication\Controller\RegisterController;
 use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
-use Couchbase\User;
 use PHPUnit\Framework\TestCase;
 
 class RegisterControllerTest extends TestCase
 {
-    public ViewFaker $viewFaker;
-    public UserMapper $userMapper;
+    private ViewFaker $viewFaker;
 
-    public UserLoginValidation $validation;
+    private UserLoginValidation $validation;
 
-
-    public RedirectSpy $redirectSpy;
+    private RedirectSpy $redirectSpy;
 
     private RegisterController $registerController;
+
     protected function setUp(): void
     {
         $_ENV['test'] = 1;
         $_ENV['DATABASE'] = 'football_test';
         parent::setUp();
         $this->viewFaker = new ViewFaker();
-        $this->userMapper = new UserMapper();
+
         $errorMapper = new ErrorMapper();
-        $this->redirectSpy = new RedirectSpy();
+        $redirectSpy = new RedirectSpy();
 
         $sqlConnector = new SqlConnector();
         $databaseBusinessFacade = new DatabaseBusinessFacade(
@@ -76,10 +74,11 @@ class RegisterControllerTest extends TestCase
             $userBusinessFacade,
             $register
         );
-        $this->registerController = new RegisterController($userRegisterBusinessFacade, $this->redirectSpy);
+        $this->registerController = new RegisterController($userRegisterBusinessFacade, $redirectSpy);
     }
 
-    protected function tearDown(): void{
+    protected function tearDown(): void
+    {
         unset($_SERVER['REQUEST_METHOD'], $_ENV, $_POST);
         parent::tearDown();
     }
@@ -114,7 +113,7 @@ class RegisterControllerTest extends TestCase
         $_POST['email'] = 'catsAreCute@cat.com';
         $_POST['password'] = 'CatIsCute1!';
 
-       $this->registerController->load($this->viewFaker);
+        $this->registerController->load($this->viewFaker);
 
         $parameters = $this->viewFaker->getParameters();
         self::assertNotEmpty($this->viewFaker->getTemplate());

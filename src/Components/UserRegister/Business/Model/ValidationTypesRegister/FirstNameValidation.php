@@ -10,7 +10,7 @@ class FirstNameValidation implements ValidationInterface
     public function validateInput(string $input): ?string
     {
         if (empty($input)) {
-            return "First name is empty.";
+            return "Firstname is empty.";
         }
         return null;
     }

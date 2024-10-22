@@ -23,9 +23,9 @@ readonly class UserBusinessFacade implements UserBusinessFacadeInterface
         return $this->userRepository->getUser($email);
     }
 
-    public function getUserById(UserDTO $userDTO): int
+    public function getUserIdByMail(UserDTO $userDTO): int|false
     {
-        return $this->userRepository->getUserID($userDTO);
+        return $this->userRepository->getUserIdByMail($userDTO);
     }
 
     public function getUsers(): array

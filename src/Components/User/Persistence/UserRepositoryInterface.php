@@ -10,5 +10,5 @@ interface UserRepositoryInterface
 
     public function getUser(string $email);
 
-    public function getUserID(UserDTO $userDTO);
+    public function getUserIdByMail(UserDTO $userDTO);
 }

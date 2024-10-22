@@ -6,3 +6,10 @@ services:
       MYSQL_DATABASE: football
     ports:
       - '3336:3306'
+
+  mailcatcher:
+    image: 'schickling/mailcatcher'
+    container_name: cms_mailcatcher
+    ports:
+      - '1080:1080'
+      - '1025:1025'

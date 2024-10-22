@@ -8,4 +8,6 @@ interface ErrorMapperInterface
 {
     public function arrayToDto(array $errors): ErrorsDTO;
     public function ErrorDTOToArray(ErrorsDTO $errorsDTO): array;
+
+    public function emptyErrorDto():ErrorsDTO;
 }
