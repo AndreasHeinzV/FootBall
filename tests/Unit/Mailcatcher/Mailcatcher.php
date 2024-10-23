@@ -14,19 +14,19 @@ class Mailcatcher extends TestCase
 
         $mail = new PHPMailer();
         $mail->isSMTP();
-        $mail->Host = 'localhost'; // Use the service name as the hostname
-        $mail->Port = 1025; // Default Mailcatcher SMTP port
+        $mail->Host = 'localhost';
+        $mail->Port = 1025;
         $mail->SMTPAuth = false;
         $mail->SMTPSecure = false;
 
-        $mail->setFrom('from@example.com', 'Mailer');
+        $mail->setFrom('FootballApi@service.com', 'EmailDispatcher');
         $mail->addAddress('recipient@example.com');
         $mail->Subject = 'Test Mail';
         $mail->Body    = 'This is a test mail sent to Mailcatcher.';
 
         if(!$mail->send()) {
             echo 'Message could not be sent.';
-            echo 'Mailer Error: ' . $mail->ErrorInfo;
+            echo 'EmailDispatcher Error: ' . $mail->ErrorInfo;
         } else {
             echo 'Message has been sent';
         }

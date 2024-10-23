@@ -13,4 +13,5 @@ interface UserBusinessFacadeInterface
     public function getUsers(): array;
 
     public function registerUser(UserDTO $userDTO): void;
+
 }

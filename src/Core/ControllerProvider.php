@@ -10,6 +10,7 @@ use App\Components\Football\Communication\Controller\LeaguesController;
 use App\Components\Football\Communication\Controller\PlayerController;
 use App\Components\Football\Communication\Controller\TeamController;
 use App\Components\Pages\Business\Communication\Controller\NoPageController;
+use App\Components\PasswordReset\Communication\Controller\PasswordResetController;
 use App\Components\UserFavorite\Communication\Controller\FavoriteController;
 use App\Components\UserLogin\Communication\Controller\LoginController;
 use App\Components\UserLogin\Communication\Controller\LogoutController;
@@ -35,6 +36,7 @@ class ControllerProvider
             'login' => LoginController::class,
             'logout' => LogoutController::class,
             'favorites' => FavoriteController::class,
+            'resetPassword' => PasswordResetController::class,
             '404' => NoPageController::class,
         ];
     }

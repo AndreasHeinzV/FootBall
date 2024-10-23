@@ -94,7 +94,6 @@ class PasswordValidationTest extends TestCase
         $status =  $this->validation->validateInput($userLoginDto);
         self::assertIsString($status);
         self::assertSame('Password is empty.', $status);
-        phpinfo();
     }
 
 }

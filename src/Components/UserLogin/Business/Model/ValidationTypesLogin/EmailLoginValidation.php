@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Components\UserLogin\Business\Model\ValidationTypesLogin;
 
 use App\Components\UserLogin\Persistence\DTO\UserLoginDto;
-use App\Components\UserRegister\Business\Model\ValidationTypesRegister\ValidationInterface;
 
 class EmailLoginValidation implements LoginValidationInterface
 {
