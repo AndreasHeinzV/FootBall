@@ -35,8 +35,12 @@ readonly class UserBusinessFacade implements UserBusinessFacadeInterface
 
     public function registerUser(UserDTO $userDTO): void
     {
-         $this->userEntityManager->saveUser($userDTO);
+        $this->userEntityManager->saveUser($userDTO);
     }
 
+    public function updateUserPassword(UserDTO $userDTO): void
+    {
+        $this->userEntityManager->updateUserPassword($userDTO);
+    }
 
 }

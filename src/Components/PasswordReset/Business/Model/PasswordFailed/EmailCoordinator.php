@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Components\PasswordReset\Business\Model\PasswordFailed;
 
-use App\Components\PasswordReset\Business\Model\TimeManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
 use App\Components\PasswordReset\Persistence\DTOs\MailDTO;
 use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
-use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
 use App\Components\User\Business\UserBusinessFacadeInterface;
 
 
@@ -45,10 +44,6 @@ readonly class EmailCoordinator
 
         $this->userPasswordResetEntityManager->savePasswordResetAction($userDTO, $mailDTO);
 
-        $status = $this->emailDispatcher->sendMail($mailDTO);
-        if ($status) {
-            return true;
-        }
-        return false;
+        return $this->emailDispatcher->sendMail($mailDTO);
     }
 }

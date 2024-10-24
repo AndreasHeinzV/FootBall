@@ -6,9 +6,7 @@ namespace App\Components\PasswordReset\Persistence\DTOs;
 
 class ResetDTO
 {
-    public ?string $email;
     public ?string $FirstPassword = null;
-    public ?string $LastPassword = null;
+    public ?string $SecondPassword = null;
 
-    public ?int $timestamp = null;
 }

@@ -41,7 +41,6 @@ class Fixtures implements FixturesInterface
         $stmtResetPasswords =
             'CREATE TABLE IF NOT EXISTS reset_passwords(
         user_id INT NOT NULL,
-        user_email VARCHAR(255) NOT NULL,
         action_id VARCHAR(255) NOT NULL,
         timestamp INT NOT NULL,
         PRIMARY KEY(action_id),

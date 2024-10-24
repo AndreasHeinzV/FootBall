@@ -44,7 +44,6 @@ class DatabaseBuilder
         $stmtResetPasswords =
             'CREATE TABLE IF NOT EXISTS reset_passwords(
         user_id INT NOT NULL,
-        user_email VARCHAR(255) NOT NULL,
         action_id VARCHAR(255) NOT NULL,
         timestamp INT NOT NULL,
         PRIMARY KEY(action_id),
@@ -60,8 +59,9 @@ class DatabaseBuilder
     public function dropTables(): void
     {
         $dropFavorites = 'DROP TABLE IF EXISTS favorites';
-        $dropUsers = 'DROP TABLE IF EXISTS users';
         $dropResetPasswords = 'DROP TABLE IF EXISTS reset_passwords';
+        $dropUsers = 'DROP TABLE IF EXISTS users';
+
 
         $pdo = $this->sqlConnector->getPdo();
         $pdo->exec($dropFavorites);

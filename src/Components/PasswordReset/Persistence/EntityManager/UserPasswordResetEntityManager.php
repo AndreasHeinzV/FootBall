@@ -18,13 +18,20 @@ readonly class UserPasswordResetEntityManager
     public function savePasswordResetAction(UserDTO $userDTO, MailDTO $mailDTO): void
     {
         $this->sqlConnector->queryInsert(
-            'INSERT INTO reset_passwords(user_id,action_id, user_email, timestamp) Values(:user_id,:action_id,:user_email,:timestamp)'
-            ,[
+            'INSERT INTO reset_passwords(user_id, action_id, timestamp) Values(:user_id,:action_id,:timestamp)'
+            , [
                 'user_id' => $userDTO->userId,
                 'action_id' => $mailDTO->actionId,
-                'user_email' => $userDTO->email,
                 'timestamp' => $mailDTO->timestamp,
             ]
+        );
+    }
+
+    public function deletePasswordResetAction(string $actionId): void
+    {
+        $this->sqlConnector->queryManipulate(
+            'DELETE FROM reset_passwords WHERE action_id = :action_id',
+            ['action_id' => $actionId]
         );
     }
 }

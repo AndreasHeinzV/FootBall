@@ -14,4 +14,5 @@ interface UserBusinessFacadeInterface
 
     public function registerUser(UserDTO $userDTO): void;
 
+    public function updateUserPassword(UserDTO $userDTO): void;
 }

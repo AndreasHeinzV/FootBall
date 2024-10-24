@@ -36,6 +36,14 @@ readonly class UserEntityManager implements UserEntityManagerInterface
         }
     }
 
+    public function updateUserPassword(UserDTO $userDTO): void
+    {
+        $this->sqlConnector->queryInsert(
+            'UPDATE users SET password= :password WHERE user_email =:user_email',
+            ['user_email' => $userDTO->email, 'password' => password_hash($userDTO->password, PASSWORD_DEFAULT)]
+        );
+    }
+
 
     private function updateUser(int $userId, userDTO $user): void
     {
@@ -49,4 +57,5 @@ readonly class UserEntityManager implements UserEntityManagerInterface
             ]
         );
     }
+
 }

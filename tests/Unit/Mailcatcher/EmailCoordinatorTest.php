@@ -10,7 +10,7 @@ use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailCoordinator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailDispatcher;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidation;
-use App\Components\PasswordReset\Business\Model\TimeManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
 use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
 use App\Components\User\Business\UserBusinessFacadeInterface;
 use App\Components\User\Persistence\DTOs\UserDTO;

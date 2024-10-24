@@ -10,11 +10,19 @@ use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailCoordinator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailDispatcher;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidation;
+use App\Components\PasswordReset\Business\Model\PasswordReset\AccessManager;
 use App\Components\PasswordReset\Business\Model\PasswordReset\ResetCoordinator;
-use App\Components\PasswordReset\Business\Model\TimeManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\ResetErrorDtoProvider;
+use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\ValidateResetErrors;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateDuplicatePassword;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateFirstPassword;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateSecondPassword;
 use App\Components\PasswordReset\Business\PasswordResetBusinessFacade;
 use App\Components\PasswordReset\Communication\Controller\PasswordFailedController;
 use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
+use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
+use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
@@ -79,9 +87,30 @@ class PasswordFailedControllerTest extends TestCase
             $userBusinessFacade
         );
         $redirect = new Redirect();
+        $userPasswordResetRepository = new UserPasswordResetRepository($sqlConnector);
 
-        $resetCoordinator = new ResetCoordinator();
-        $passwordFailedBusinessFacade = new PasswordResetBusinessFacade($emailCoordinator, $resetCoordinator);
+
+        $validateFirstPassword = new ValidateFirstPassword();
+        $validateSecondPassword = new ValidateSecondPassword();
+        $validateDuplicatePassword = new ValidateDuplicatePassword();
+
+        $validateResetErrors = new ValidateResetErrors(
+            $validateFirstPassword,
+            $validateSecondPassword,
+            $validateDuplicatePassword
+        );
+        $resetErrorDtoProvider = new ResetErrorDtoProvider($validateResetErrors);
+        $resetCoordinator = new ResetCoordinator(
+            $resetErrorDtoProvider,
+            $userPasswordResetRepository,
+            $userPasswordResetEntityManager,
+            $userBusinessFacade,
+            $userMapper
+        );
+
+        $actionMapper = new ActionMapper();
+        $accessManager = new AccessManager($userPasswordResetRepository, $actionMapper, $timeManager);
+        $passwordFailedBusinessFacade = new PasswordResetBusinessFacade($emailCoordinator, $resetCoordinator, $accessManager);
         $this->controller = new PasswordFailedController($passwordFailedBusinessFacade, $redirect);
     }
 

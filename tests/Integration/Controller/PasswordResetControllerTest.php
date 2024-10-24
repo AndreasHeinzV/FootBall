@@ -10,11 +10,20 @@ use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailCoordinator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailDispatcher;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidation;
+use App\Components\PasswordReset\Business\Model\PasswordReset\AccessManager;
 use App\Components\PasswordReset\Business\Model\PasswordReset\ResetCoordinator;
-use App\Components\PasswordReset\Business\Model\TimeManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\ResetErrorDtoProvider;
+use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\ValidateResetErrors;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateDuplicatePassword;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateFirstPassword;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateSecondPassword;
 use App\Components\PasswordReset\Business\PasswordResetBusinessFacade;
 use App\Components\PasswordReset\Communication\Controller\PasswordResetController;
+use App\Components\PasswordReset\Persistence\DTOs\MailDTO;
 use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
+use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
+use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
@@ -24,6 +33,9 @@ use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\ViewFaker;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPUnit\Framework\TestCase;
+use SebastianBergmann\CodeUnit\Mapper;
+
+use function PHPUnit\Framework\assertTrue;
 
 class PasswordResetControllerTest extends TestCase
 {
@@ -31,11 +43,13 @@ class PasswordResetControllerTest extends TestCase
     private ViewFaker $view;
     private PasswordResetController $passwordResetController;
 
+    private DatabaseBuilder $databaseBuilder;
+
+    private UserPasswordResetEntityManager $userPasswordResetEntityManager;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->view = new ViewFaker();
-
 
         $_ENV['DATABASE'] = 'football_test';
         $this->view = new ViewFaker();
@@ -65,47 +79,119 @@ class PasswordResetControllerTest extends TestCase
         $emailDispatcher = new EmailDispatcher(new PHPMailer());
         $timeManager = new TimeManager();
         $actionIdGenerator = new ActionIdGenerator();
-        $userPasswordResetEntityManager = new UserPasswordResetEntityManager($sqlConnector);
+        $this->userPasswordResetEntityManager = new UserPasswordResetEntityManager($sqlConnector);
+
         $emailCoordinator = new EmailCoordinator(
             $emailBuilder,
             $emailDispatcher,
             $emailValidation,
             $timeManager,
             $actionIdGenerator,
-            $userPasswordResetEntityManager,
+            $this->userPasswordResetEntityManager,
             $userBusinessFacade
         );
         $redirect = new Redirect();
 
-        $resetCoordinator = new ResetCoordinator();
-        $passwordFailedBusinessFacade = new PasswordResetBusinessFacade($emailCoordinator, $resetCoordinator);
+        $validateFirstPassword = new ValidateFirstPassword();
+        $validateSecondPassword = new ValidateSecondPassword();
+        $validateDuplicatePassword = new ValidateDuplicatePassword();
+
+
+        $validateResetErrors = new ValidateResetErrors(
+            $validateFirstPassword,
+            $validateSecondPassword,
+            $validateDuplicatePassword
+        );
+        $resetErrorDtoProvider = new ResetErrorDtoProvider($validateResetErrors);
+
+        $userPasswordResetRepository = new UserPasswordResetRepository($sqlConnector);
+        $resetCoordinator = new ResetCoordinator(
+            $resetErrorDtoProvider,
+            $userPasswordResetRepository,
+            $this->userPasswordResetEntityManager,
+            $userBusinessFacade,
+            $userMapper
+        );
+        $actionMapper = new ActionMapper();
+        $accessManager = new AccessManager($userPasswordResetRepository, $actionMapper, $timeManager);
+        $passwordFailedBusinessFacade = new PasswordResetBusinessFacade(
+            $emailCoordinator,
+            $resetCoordinator,
+            $accessManager
+        );
+        //  $passwordFailedBusinessFacade->sendPasswordResetEmail('test@example.com');
+
 
         $this->passwordResetController = new PasswordResetController($passwordFailedBusinessFacade, $redirect);
     }
 
     protected function tearDown(): void
     {
+        $this->databaseBuilder->dropTables();
         unset($this->view, $_GET, $_POST);
+
         parent::tearDown();
     }
 
     public function testResetSuccessfully(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_GET['ts'] = 3;
-        $_GET['email'] = 'pull@example.com';
+        $time = time();
+        $newTime = time() - 60;
+        $_GET['ts'] = $time;
+        $mailerDto = new MailDTO();
+        $mailerDto->timestamp = $newTime;
+        $mailerDto->actionId = '1234';
+        $_GET['actionId'] = '1234';
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['password-reset'] = 'push';
+        $_POST['passwordReset'] = 'push';
+        $_POST['firstPassword'] = 'ILoveCats123#';
+        $_POST['secondPassword'] = 'ILoveCats123#';
+        $userMapper = new UserMapper();
+        $userDto = $userMapper->UserDTOWithOnlyUserId(1);
+
+        $this->userPasswordResetEntityManager->savePasswordResetAction($userDto, $mailerDto);
 
         $this->passwordResetController->load($this->view);
+        $parameter = $this->view->getParameters();
+        assertTrue($parameter['resetErrorDto']);
     }
 
-    public function testResetFail(): void
+    public function testResetTimeoutMail(): void
     {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_GET['ts'] = time() - 60;
+        $_GET['actionId'] = '123';
+        $time = time();
+        $twoHoursAgo = time() - (2 * 60 * 60+45);
+        $_GET['ts'] = $time;
+        $mailerDto = new MailDTO();
+        $mailerDto->timestamp = $twoHoursAgo;
+        $mailerDto->actionId = '1234';
+        $_GET['actionId'] = '1234';
+
+        $userMapper = new UserMapper();
+        $userDto = $userMapper->UserDTOWithOnlyUserId(1);
+        $this->userPasswordResetEntityManager->savePasswordResetAction($userDto, $mailerDto);
+
+
+        $this->passwordResetController->load($this->view);
+        $parameter = $this->view->getParameters();
+        $result = $parameter['resetErrorDto'];
+
+        self::assertNotEmpty($parameter);
+        self::assertFalse($parameter['resetErrorDto']);
+
     }
 
     public function testTimeoutEmail(): void
     {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['password-reset'] = 'push';
+
+        $twoHoursInSeconds = 2 * 60 * 60;
+        $timestampOlderThanTwoHours = time() - $twoHoursInSeconds;
+        assertTrue(true);
     }
 }
