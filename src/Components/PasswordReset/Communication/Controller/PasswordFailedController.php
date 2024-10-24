@@ -8,7 +8,7 @@ use App\Components\PasswordReset\Business\PasswordResetBusinessFacadeInterface;
 use App\Core\RedirectInterface;
 use App\Core\ViewInterface;
 
-class PasswordFailedController
+readonly class PasswordFailedController
 {
 
     public function __construct(
@@ -23,7 +23,7 @@ class PasswordFailedController
         if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['password-reset'] === 'push') {
             $status = $this->passwordResetBusinessFacade->sendPasswordResetEmail($_POST['email']);
         }
-        $view->addParameter('status', $status);
+        $view->addParameter('passwordStatus', $status);
         $view->setTemplate('password-failed.twig');
 
         if ($status) {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\PasswordReset\Business\Model\PasswordFailed;
 
-class EmailValidation
+class EmailValidationPasswordFailed
 {
 
     public function validate(string $email): bool

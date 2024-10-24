@@ -10,6 +10,11 @@
     <a href="/index.php/?page=login">
         <button type="submit" name="page" value="login">Login</button>
     </a>
+    <a href="index.php/?page=password-reset">
+        <button type="submit" name="page" value="password-reset">Reset Password</button>
+    </a>
+
+
 {% else %}
     <a href="index.php/?page=logout">
         <button type="submit" name="page" value="logout">Logout</button>
@@ -18,6 +23,7 @@
     <a href="index.php/?page=favorites">
         <button type="submit" name="page" value="favorites">Favorites</button>
     </a>
+
 
     <h1> Welcome: {{ userDto.firstName }}</h1>
 

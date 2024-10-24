@@ -9,7 +9,7 @@ use App\Components\PasswordReset\Business\Model\PasswordFailed\ActionIdGenerator
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailCoordinator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailDispatcher;
-use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidation;
+use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidationPasswordFailed;
 use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
 use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
 use App\Components\User\Business\UserBusinessFacadeInterface;
@@ -50,7 +50,7 @@ class EmailCoordinatorTest extends TestCase
         $userBusinessFacadeMockFail->method('getUserByMail')->willReturn($userDTOStub2);
 
 
-        $emailValidation = new EmailValidation();
+        $emailValidation = new EmailValidationPasswordFailed();
         $emailBuilder = new EmailBuilder();
         $emailDispatcher = new EmailDispatcher(new PHPMailer());
         $timeManager = new TimeManager();

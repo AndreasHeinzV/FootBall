@@ -19,6 +19,24 @@ use App\Components\Football\Mapper\LeaguesMapper;
 use App\Components\Football\Mapper\PlayerMapper;
 use App\Components\Football\Mapper\TeamMapper;
 use App\Components\Pages\Business\Communication\Controller\NoPageController;
+use App\Components\PasswordReset\Business\Model\PasswordFailed\ActionIdGenerator;
+use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
+use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailCoordinator;
+use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailDispatcher;
+use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidationPasswordFailed;
+use App\Components\PasswordReset\Business\Model\PasswordReset\AccessManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\ResetCoordinator;
+use App\Components\PasswordReset\Business\Model\PasswordReset\ResetErrorDtoProvider;
+use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
+use App\Components\PasswordReset\Business\Model\PasswordReset\ValidateResetErrors;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateDuplicatePassword;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateFirstPassword;
+use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateSecondPassword;
+use App\Components\PasswordReset\Business\PasswordResetBusinessFacade;
+use App\Components\PasswordReset\Communication\Controller\PasswordFailedController;
+use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
+use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
+use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
@@ -47,6 +65,7 @@ use App\Components\UserRegister\Business\Model\ValidationTypesRegister\PasswordV
 use App\Components\UserRegister\Business\UserRegisterBusinessFacade;
 use App\Components\UserRegister\Communication\Controller\RegisterController;
 use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
+use PHPMailer\PHPMailer\PHPMailer;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -180,6 +199,65 @@ class DependencyProvider
             $container->get(Environment::class),
             $container->get(SessionHandler::class),
         ));
+        $container->set(UserPasswordResetRepository::class, new UserPasswordResetRepository(
+           $container->get(SqlConnector::class)
+        ));
+
+        $container->set(ActionMapper::class, new ActionMapper());
+        $container->set(TimeManager::class, new TimeManager());
+
+        $container->set(AccessManager::class, new AccessManager(
+            $container->get(UserPasswordResetRepository::class),
+            $container->get(ActionMapper::class),
+            $container->get(TimeManager::class)
+        ));
+        $container->set(PHPMailer::class, new PHPMailer());
+
+        $container->set(EmailBuilder::class, new EmailBuilder());
+        $container->set(EmailDispatcher::class , new EmailDispatcher(
+            $container->get(PHPMailer::class),
+        ));
+        $container->set(EmailValidationPasswordFailed::class, new EmailValidationPasswordFailed());
+        $container->set(ActionIdGenerator::class, new ActionIdGenerator());
+
+        $container->set(UserPasswordResetEntityManager::class, new UserPasswordResetEntityManager(
+            $container->get(SqlConnector::class),
+        ));
+        $container->set(ValidateFirstPassword::class, new ValidateFirstPassword());
+        $container->set(ValidateSecondPassword::class, new ValidateSecondPassword());
+        $container->set(ValidateDuplicatePassword::class, new ValidateDuplicatePassword());
+
+        $container->set(ValidateResetErrors::class, new ValidateResetErrors(
+            $container->get(ValidateFirstPassword::class),
+            $container->get(ValidateSecondPassword::class),
+            $container->get(ValidateDuplicatePassword::class),
+        ));
+        $container->set(ResetErrorDtoProvider::class, new ResetErrorDtoProvider(
+            $container->get(ValidateResetErrors::class),
+        ));
+
+        $container->set(EmailCoordinator::class, new EmailCoordinator(
+            $container->get(EmailBuilder::class),
+            $container->get(EmailDispatcher::class),
+            $container->get(EmailValidationPasswordFailed::class),
+            $container->get(TimeManager::class),
+            $container->get(ActionIdGenerator::class),
+            $container->get(UserPasswordResetEntityManager::class),
+            $container->get(UserBusinessFacade::class),
+        ));
+        $container->set(ResetCoordinator::class, new ResetCoordinator(
+            $container->get(ResetErrorDtoProvider::class),
+            $container->get(UserPasswordResetRepository::class),
+            $container->get(UserPasswordResetEntityManager::class),
+            $container->get(UserBusinessFacade::class),
+            $container->get(UserMapper::class),
+        ));
+
+        $container->set(PasswordResetBusinessFacade::class, new PasswordResetBusinessFacade(
+            $container->get(EmailCoordinator::class),
+            $container->get(ResetCoordinator::class),
+            $container->get(AccessManager::class)
+        ));
         $container->set(LoginController::class, new LoginController(
             $container->get(UserLoginBusinessFacade::class),
             $container->get(Redirect::class)
@@ -207,6 +285,10 @@ class DependencyProvider
 
         $container->set(HomeController::class, new HomeController(
             $container->get(FootballBusinessFacade::class),
+        ));
+        $container->set(PasswordFailedController::class, new PasswordFailedController(
+            $container->get(PasswordResetBusinessFacade::class),
+            $container->get(Redirect::class),
         ));
     }
 

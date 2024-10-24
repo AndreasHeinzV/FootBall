@@ -9,7 +9,7 @@ use App\Components\PasswordReset\Business\Model\PasswordFailed\ActionIdGenerator
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailCoordinator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailDispatcher;
-use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidation;
+use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailValidationPasswordFailed;
 use App\Components\PasswordReset\Business\Model\PasswordReset\AccessManager;
 use App\Components\PasswordReset\Business\Model\PasswordReset\ResetCoordinator;
 use App\Components\PasswordReset\Business\Model\PasswordReset\ResetErrorDtoProvider;
@@ -74,7 +74,7 @@ class PasswordResetControllerTest extends TestCase
         $userEntityManager->saveUser($userDTO);
 
 
-        $emailValidation = new EmailValidation();
+        $emailValidation = new EmailValidationPasswordFailed();
         $emailBuilder = new EmailBuilder();
         $emailDispatcher = new EmailDispatcher(new PHPMailer());
         $timeManager = new TimeManager();

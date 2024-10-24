@@ -16,7 +16,7 @@ readonly class EmailCoordinator
     public function __construct(
         private EmailBuilder $emailBuilder,
         private EmailDispatcherInterface $emailDispatcher,
-        private EmailValidation $emailValidation,
+        private EmailValidationPasswordFailed $emailValidation,
         private TimeManager $timeManager,
         private ActionIdGenerator $actionIdGenerator,
         private UserPasswordResetEntityManager $userPasswordResetEntityManager,
