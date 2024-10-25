@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Validation\Login;
+namespace App\Tests\Components\UserLogin\Business\Validation;
 
 use App\Components\UserLogin\Business\Model\ValidationTypesLogin\EmailLoginValidation;
 use App\Components\UserLogin\Persistence\DTO\UserLoginDto;

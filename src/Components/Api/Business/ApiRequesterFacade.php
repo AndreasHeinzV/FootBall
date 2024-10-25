@@ -7,7 +7,7 @@ namespace App\Components\Api\Business;
 use App\Components\Api\Business\Model\ApiRequesterInterface;
 use App\Components\Football\DTOs\PlayerDTO;
 
-readonly class ApiRequestFacade implements ApiRequestFacadeInterface
+readonly class ApiRequesterFacade implements ApiRequestFacadeInterface
 {
 
     public function __construct(private ApiRequesterInterface $apiRequester)

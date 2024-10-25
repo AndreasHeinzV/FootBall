@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Mailcatcher;
+namespace App\Tests\Components\PasswordReset\Business\Mailcatcher;
 
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailDispatcher;
 use App\Components\PasswordReset\Persistence\DTOs\MailDTO;

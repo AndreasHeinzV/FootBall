@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Validation\Login;
+namespace App\Tests\Components\UserLogin\Business\Validation;
 
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\DTOs\ErrorsDTO;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
-use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
 use App\Components\UserLogin\Business\Model\UserLoginValidation;

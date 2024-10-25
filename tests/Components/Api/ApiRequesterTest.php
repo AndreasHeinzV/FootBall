@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Model;
+namespace App\Tests\Components\Api;
 
 use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Football\Mapper\CompetitionMapper;

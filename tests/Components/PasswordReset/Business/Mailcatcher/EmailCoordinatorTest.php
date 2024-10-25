@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Mailcatcher;
+namespace App\Tests\Components\PasswordReset\Business\Mailcatcher;
 
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\ActionIdGenerator;

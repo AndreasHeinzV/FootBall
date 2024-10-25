@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Facade;
 
-use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -65,7 +65,7 @@ class UserFavoriteBusinessFacadeTest extends TestCase
         $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
         $this->databaseBuilder->buildTables();
 
-        $apiRequesterFacade = new ApiRequestFacade($apiRequester);
+        $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
         $favoriteMapper = new FavoriteMapper();
         $favoriteRepository = new UserFavoriteRepository($sqlConnector);

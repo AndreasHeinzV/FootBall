@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Facade;
 
-use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\DTOs\PlayerDTO;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -32,7 +32,7 @@ class FootballBusinessFacadeTest extends TestCase
             new TeamMapper(),
             new PlayerMapper()
         );
-        $apiRequesterFacade = new ApiRequestFacade($apiRequester);
+        $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $this->footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
     }
 

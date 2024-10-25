@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Validation\ResetUserPassword;
+namespace App\Tests\Components\PasswordReset\Business\Validation\ResetUserPassword;
 
 use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateFirstPassword;
 use App\Components\PasswordReset\Persistence\DTOs\ResetDTO;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
-use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
@@ -68,7 +68,7 @@ class FavoriteControllerTest extends TestCase
         $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
         $this->databaseBuilder->buildTables();
 
-        $apiRequesterFacade = new ApiRequestFacade($apiRequester);
+        $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
         $favoriteMapper = new FavoriteMapper();
         $favoriteRepository = new UserFavoriteRepository($sqlConnector);

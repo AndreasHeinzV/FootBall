@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Core;
 
-use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Communication\Controller\HomeController;
@@ -96,11 +96,11 @@ class ControllerProviderTest extends TestCase
             $container->get(TeamMapper::class),
             $container->get(PlayerMapper::class)
         ));
-        $container->set(ApiRequestFacade::class, new ApiRequestFacade(
+        $container->set(ApiRequesterFacade::class, new ApiRequesterFacade(
             $container->get(ApiRequesterFaker::class),
         ));
         $container->set(FootballBusinessFacade::class, new FootballBusinessFacade(
-            $container->get(ApiRequestFacade::class)
+            $container->get(ApiRequesterFacade::class)
         ));
 
         $container->set(HomeController::class, new HomeController(

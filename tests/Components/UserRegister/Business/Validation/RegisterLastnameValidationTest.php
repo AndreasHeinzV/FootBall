@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Validation\Register;
+namespace App\Tests\Components\UserRegister\Business\Validation;
 
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\LastNameValidation;
 use PHPUnit\Framework\TestCase;

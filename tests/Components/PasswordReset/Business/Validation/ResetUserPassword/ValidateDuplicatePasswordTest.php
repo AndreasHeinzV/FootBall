@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Validation\ResetUserPassword;
+namespace App\Tests\Components\PasswordReset\Business\Validation\ResetUserPassword;
 
 use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateDuplicatePassword;
 use App\Components\PasswordReset\Persistence\DTOs\ResetDTO;
 use App\Components\PasswordReset\Persistence\DTOs\ResetErrorDTO;
 use PHPUnit\Framework\TestCase;
-
-use function PHPUnit\Framework\assertNull;
 
 class ValidateDuplicatePasswordTest extends TestCase
 {

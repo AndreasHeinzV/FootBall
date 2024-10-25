@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
-use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Communication\Controller\LeaguesController;
@@ -33,7 +33,7 @@ class LeaguesControllerTest extends TestCase
             new TeamMapper(),
             new PlayerMapper()
         );
-        $apiRequesterFacade = new ApiRequestFacade($apiRequester);
+        $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
         $this->leaguesController = new LeaguesController(($footballBusinessFacade));
 

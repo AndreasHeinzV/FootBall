@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Components\Api\Business\ApiRequestFacade;
+use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
@@ -137,7 +137,7 @@ class DependencyProvider
         $container->set(UserFavoriteEntityManager::class, new UserFavoriteEntityManager(
             $container->get(SqlConnector::class),
         ));
-        $container->set(ApiRequestFacade::class, new ApiRequestFacade(
+        $container->set(ApiRequesterFacade::class, new ApiRequesterFacade(
             $container->get(ApiRequester::class),
         ));
 
@@ -145,7 +145,7 @@ class DependencyProvider
             $container->get(UserMapper::class)
         ));
         $container->set(FootballBusinessFacade::class, new FootballBusinessFacade(
-            $container->get(ApiRequestFacade::class),
+            $container->get(ApiRequesterFacade::class),
         ));
         $container->set(Favorite::class, new Favorite(
             $container->get(SessionHandler::class),
