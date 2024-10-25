@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Validation\Register;
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\FirstNameValidation;
 use PHPUnit\Framework\TestCase;
 
-class RegisterFirstnameValidation extends TestCase
+class RegisterFirstnameValidationTest extends TestCase
 {
 
     private FirstNameValidation $validation;

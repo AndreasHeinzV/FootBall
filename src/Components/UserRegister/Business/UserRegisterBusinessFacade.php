@@ -16,16 +16,16 @@ readonly class UserRegisterBusinessFacade implements UserRegisterBusinessFacadeI
 {
 
     public function __construct(
-        private UserBusinessFacadeInterface $userBusinessFacade,
+       // private UserBusinessFacadeInterface $userBusinessFacade,
         private RegisterInterface $register
     ) {
     }
-
+/*
     public function registerUser(UserDTO $userDTO): void
     {
         $this->userBusinessFacade->registerUser($userDTO);
     }
-
+*/
     public function registerUserNew(UserRegisterDto $userRegisterDto): ?ErrorsDTO
     {
         return $this->register->execute($userRegisterDto);

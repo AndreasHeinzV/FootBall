@@ -34,6 +34,7 @@ use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\Validat
 use App\Components\PasswordReset\Business\Model\PasswordReset\Validation\ValidateSecondPassword;
 use App\Components\PasswordReset\Business\PasswordResetBusinessFacade;
 use App\Components\PasswordReset\Communication\Controller\PasswordFailedController;
+use App\Components\PasswordReset\Communication\Controller\PasswordResetController;
 use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
 use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
 use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
@@ -172,7 +173,7 @@ class DependencyProvider
             $container->get((RegisterMapper::class))
         ));
         $container->set(UserRegisterBusinessFacade::class, new UserRegisterBusinessFacade(
-            $container->get(UserBusinessFacade::class),
+           // $container->get(UserBusinessFacade::class),
             $container->get(Register::class),
         ));
         $container->set(LogoutController::class, new LogoutController(
@@ -287,6 +288,10 @@ class DependencyProvider
             $container->get(FootballBusinessFacade::class),
         ));
         $container->set(PasswordFailedController::class, new PasswordFailedController(
+            $container->get(PasswordResetBusinessFacade::class),
+            $container->get(Redirect::class),
+        ));
+        $container->set(PasswordResetController::class, new PasswordResetController(
             $container->get(PasswordResetBusinessFacade::class),
             $container->get(Redirect::class),
         ));

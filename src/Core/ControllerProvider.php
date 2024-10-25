@@ -37,7 +37,8 @@ class ControllerProvider
             'login' => LoginController::class,
             'logout' => LogoutController::class,
             'favorites' => FavoriteController::class,
-            'password-reset' => PasswordFailedController::class,
+            'password-failed' => PasswordFailedController::class,
+            'password-reset' => PasswordResetController::class,
             '404' => NoPageController::class,
         ];
     }

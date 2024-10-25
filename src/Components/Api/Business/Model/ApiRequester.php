@@ -68,9 +68,7 @@ class ApiRequester implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/teams/' . $id;
         $team = $this->parRequest($uri);
         $playersArray = [];
-        if (empty($team)) {
-            return [];
-        }
+
 
         $playersArray['teamName'] = $team['name'];
         $playersArray['teamID'] = $team['id'];
@@ -92,9 +90,6 @@ class ApiRequester implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/competitions/' . $code . '/standings';
         $standings = $this->parRequest($uri);
 
-        if (empty($standings)) {
-            return [];
-        }
 
         $teamID = $standings['standings'][0]['table'];
         foreach ($teamID as $table) {
@@ -120,9 +115,7 @@ class ApiRequester implements ApiRequesterInterface
         $uri = 'https://api.football-data.org/v4/competitions/';
         $matches = $this->parRequest($uri);
         $leaguesArray = [];
-        if (empty($matches)) {
-            return [];
-        }
+
 
         foreach ($matches['competitions'] as $competition) {
             $leagueArray = [];

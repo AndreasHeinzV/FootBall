@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Validation\Register;
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\EmailValidation;
 use PHPUnit\Framework\TestCase;
 
-class RegisterEmailValidation extends TestCase
+class RegisterEmailValidationTest extends TestCase
 {
 
     private EmailValidation $validation;

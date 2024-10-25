@@ -6,12 +6,12 @@ namespace App\Components\PasswordReset\Business\Model\PasswordReset;
 
 use App\Components\PasswordReset\Persistence\DTOs\ActionDTO;
 use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
-use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
+use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepositoryInterface;
 
 readonly class AccessManager
 {
     public function __construct(
-        private UserPasswordResetRepository $repository,
+        private UserPasswordResetRepositoryInterface $repository,
         private ActionMapper $actionMapper,
         private TimeManager $timeManager,
     ) {

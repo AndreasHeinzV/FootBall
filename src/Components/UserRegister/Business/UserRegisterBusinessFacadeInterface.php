@@ -8,6 +8,6 @@ use App\Components\UserRegister\Persistence\DTO\UserRegisterDto;
 
 interface UserRegisterBusinessFacadeInterface
 {
-    public function registerUser(UserDTO $userDTO): void;
+   // public function registerUser(UserDTO $userDTO): void;
     public function registerUserNew(UserRegisterDto $userRegisterDto): ?ErrorsDTO;
 }

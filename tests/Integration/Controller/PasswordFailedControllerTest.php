@@ -125,12 +125,12 @@ class PasswordFailedControllerTest extends TestCase
     public function testSendMail(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['password-reset'] = 'push';
+        $_POST['password-failed'] = 'push';
         $_POST['email'] = 'push@example.com';
 
         $this->controller->load($this->view);
         $parameters = $this->view->getParameters();
-        $output = $parameters['status'];
+        $output = $parameters['passwordStatus'];
         self::assertSame('password-failed.twig', $this->view->getTemplate());
         self::assertNotEmpty($parameters);
         self::assertTrue($output);
@@ -139,14 +139,14 @@ class PasswordFailedControllerTest extends TestCase
     public function testSendMailFailed(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['password-reset'] = 'push';
+        $_POST['password-failed'] = 'push';
         $_POST['email'] = 'pull@example.com';
 
         $this->controller->load($this->view);
         $parameters = $this->view->getParameters();
         self::assertSame('password-failed.twig', $this->view->getTemplate());
         self::assertNotEmpty($parameters);
-        $output = $parameters['status'];
+        $output = $parameters['passwordStatus'];
         self::assertFalse($output);
     }
 }

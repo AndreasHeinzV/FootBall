@@ -6,9 +6,8 @@ namespace App\Components\PasswordReset\Communication\Controller;
 
 use App\Components\PasswordReset\Business\PasswordResetBusinessFacadeInterface;
 use App\Components\PasswordReset\Persistence\DTOs\ActionDTO;
-use App\Components\PasswordReset\Persistence\DTOs\MailDTO;
 use App\Components\PasswordReset\Persistence\DTOs\ResetDTO;
-use App\Core\Redirect;
+use App\Components\PasswordReset\Persistence\DTOs\ResetErrorDTO;
 use App\Core\RedirectInterface;
 use App\Core\ViewInterface;
 
@@ -24,15 +23,19 @@ readonly class PasswordResetController
     public function load(ViewInterface $view): void
     {
         $result = null;
-        $view->setTemplate('404.twig');
+        $resetErrorDto = null;
+        $view->setTemplate('error.twig');
 
         if (isset($_GET['ts'], $_GET['actionId'])) {
+
             $actionDTO = new ActionDTO();
-            $actionDTO->timestamp = $_GET['ts'];
+            $actionDTO->timestamp = (int)$_GET['ts'];
             $actionDTO->actionId = $_GET['actionId'];
             $result = $this->passwordResetBusinessFacade->checkInputsForIntegrity($actionDTO);
-            if (!$result) {
-                $this->redirect->to('404.twig');
+
+            if ($result) {
+                $view->setTemplate('password-reset.twig');
+                //    $this->redirect->to('?page=error');
             }
         }
 
@@ -41,13 +44,14 @@ readonly class PasswordResetController
             $resetDTO->FirstPassword = $_POST['firstPassword'];
             $resetDTO->SecondPassword = $_POST['secondPassword'];
 
-            $result = $this->passwordResetBusinessFacade->resetUserPassword($_GET['actionId'], $resetDTO);
-            if (!$result instanceof ResetDTO) {
+            $resetErrorDto = $this->passwordResetBusinessFacade->resetUserPassword($_GET['actionId'], $resetDTO);
+            if (!$resetErrorDto instanceof ResetErrorDTO) {
                 $this->redirect->to('');
             }
         }
-        $view->setTemplate('password-reset.twig');
-        $view->addParameter('resetErrorDto', $result);
+     //   $view->setTemplate('password-reset.twig');
+        $view->addParameter('resetErrorDto', $resetErrorDto);
+        $view->addParameter('resetAllowed', $result);
     }
 
 }

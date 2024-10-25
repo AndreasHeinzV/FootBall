@@ -6,7 +6,7 @@ namespace App\Components\PasswordReset\Persistence\Repository;
 
 use App\Components\Database\Persistence\SqlConnectorInterface;
 
-readonly class UserPasswordResetRepository
+readonly class UserPasswordResetRepository implements UserPasswordResetRepositoryInterface
 {
 
     public function __construct(private SqlConnectorInterface $sqlConnector)

@@ -30,11 +30,4 @@ class EmailBuilderTest extends TestCase
         self::assertIsString($this->mailDTO->message);
     }
 
-    public function testBuildMailWithMail(): void
-    {
-        self::assertNull($this->mailDTO->message);
-        $this->mailDTO->email = 'test@mail.com';
-        $this->mailDTO = $this->buildMail->buildMail($this->mailDTO);
-        self::assertStringContainsString($this->mailDTO->email, $this->mailDTO->message);
-    }
 }

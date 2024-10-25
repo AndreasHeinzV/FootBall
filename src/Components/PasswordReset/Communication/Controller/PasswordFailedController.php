@@ -20,7 +20,7 @@ readonly class PasswordFailedController
     public function load(ViewInterface $view): void
     {
         $status = null;
-        if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['password-reset'] === 'push') {
+        if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['password-failed'] === 'push') {
             $status = $this->passwordResetBusinessFacade->sendPasswordResetEmail($_POST['email']);
         }
         $view->addParameter('passwordStatus', $status);

@@ -155,7 +155,10 @@ class PasswordResetControllerTest extends TestCase
 
         $this->passwordResetController->load($this->view);
         $parameter = $this->view->getParameters();
-        assertTrue($parameter['resetErrorDto']);
+        $template = $this->view->getTemplate();
+        self::assertTrue($parameter['resetErrorDto']);
+        self::assertTrue($parameter['resetAllowed']);
+        self::assertSame('password-reset.twig', $template);
     }
 
     public function testResetTimeoutMail(): void
@@ -163,8 +166,8 @@ class PasswordResetControllerTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_GET['ts'] = time() - 60;
         $_GET['actionId'] = '123';
-        $time = time();
-        $twoHoursAgo = time() - (2 * 60 * 60+45);
+        $time = time() + 3;
+        $twoHoursAgo = time() - (2 * 60 * 60);
         $_GET['ts'] = $time;
         $mailerDto = new MailDTO();
         $mailerDto->timestamp = $twoHoursAgo;
@@ -179,19 +182,41 @@ class PasswordResetControllerTest extends TestCase
         $this->passwordResetController->load($this->view);
         $parameter = $this->view->getParameters();
         $result = $parameter['resetErrorDto'];
-
+        $template = $this->view->getTemplate();
         self::assertNotEmpty($parameter);
-        self::assertFalse($parameter['resetErrorDto']);
-
+        self::assertFalse($parameter['resetAllowed']);
+        self::assertSame('error.twig', $template);
     }
 
-    public function testTimeoutEmail(): void
+    public function testWrongPasswordEntry(): void
     {
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['password-reset'] = 'push';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $time = time();
+        $newTime = time() - 60;
+        $_GET['ts'] = $time;
+        $mailerDto = new MailDTO();
+        $mailerDto->timestamp = $newTime;
+        $mailerDto->actionId = '1234';
+        $_GET['actionId'] = '1234';
 
-        $twoHoursInSeconds = 2 * 60 * 60;
-        $timestampOlderThanTwoHours = time() - $twoHoursInSeconds;
-        assertTrue(true);
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['passwordReset'] = 'push';
+        $_POST['firstPassword'] = 'ILoveCats123#';
+        $_POST['secondPassword'] = 'ILoveCats123';
+        $userMapper = new UserMapper();
+        $userDto = $userMapper->UserDTOWithOnlyUserId(1);
+
+        $this->userPasswordResetEntityManager->savePasswordResetAction($userDto, $mailerDto);
+        $this->passwordResetController->load($this->view);
+        $parameter = $this->view->getParameters();
+        $result = $parameter['resetErrorDto'];
+        $template = $this->view->getTemplate();
+
+        self::assertNotNull($result['secondPWValidationError']);
+        self::assertIsString($result['differentPWerror']);
+      //  dump($result);
+        self::assertTrue($parameter['resetAllowed']);
+        self::assertSame('password-reset.twig', $template);
     }
+
 }

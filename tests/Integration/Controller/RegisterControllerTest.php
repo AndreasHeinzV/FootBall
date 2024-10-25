@@ -71,7 +71,7 @@ class RegisterControllerTest extends TestCase
             $registerMapper
         );
         $userRegisterBusinessFacade = new UserRegisterBusinessFacade(
-            $userBusinessFacade,
+           // $userBusinessFacade,
             $register
         );
         $this->registerController = new RegisterController($userRegisterBusinessFacade, $redirectSpy);

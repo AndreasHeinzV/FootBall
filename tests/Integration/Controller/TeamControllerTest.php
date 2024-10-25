@@ -90,4 +90,18 @@ class TeamControllerTest extends TestCase
 
 
     }
+
+    public function testIndexTeam(): void
+    {
+        $_POST['test'] = 1;
+        $_GET['id'] = '35624646';
+
+        $this->teamController->load($this->view);
+        $parameters = $this->view->getParameters();
+
+        self::assertNotContains('players', $parameters);
+
+
+    }
+
 }

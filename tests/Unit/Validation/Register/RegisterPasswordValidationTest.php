@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Validation\Register;
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\PasswordValidation;
 use PHPUnit\Framework\TestCase;
 
-class RegisterPasswordValidation extends TestCase
+class RegisterPasswordValidationTest extends TestCase
 {
     private PasswordValidation $validation;
 
