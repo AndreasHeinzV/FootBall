@@ -6,7 +6,6 @@ namespace App\Components\UserRegister\Business\Model;
 
 use App\Components\User\Business\UserBusinessFacadeInterface;
 use App\Components\User\Persistence\DTOs\ErrorsDTO;
-use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\UserRegister\Persistence\DTO\UserRegisterDto;
 use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
 

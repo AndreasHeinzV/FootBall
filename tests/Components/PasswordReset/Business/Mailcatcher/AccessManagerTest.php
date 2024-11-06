@@ -67,5 +67,4 @@ class AccessManagerTest extends TestCase
         $result = $this->accessManagerSecond->checkForAccess($actionDto);
         assertFalse($result);
     }
-
 }

@@ -15,17 +15,10 @@ use App\Components\UserRegister\Persistence\DTO\UserRegisterDto;
 readonly class UserRegisterBusinessFacade implements UserRegisterBusinessFacadeInterface
 {
 
-    public function __construct(
-       // private UserBusinessFacadeInterface $userBusinessFacade,
-        private RegisterInterface $register
-    ) {
-    }
-/*
-    public function registerUser(UserDTO $userDTO): void
+    public function __construct(private RegisterInterface $register)
     {
-        $this->userBusinessFacade->registerUser($userDTO);
     }
-*/
+
     public function registerUserNew(UserRegisterDto $userRegisterDto): ?ErrorsDTO
     {
         return $this->register->execute($userRegisterDto);

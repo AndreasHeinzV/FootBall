@@ -20,7 +20,7 @@ use App\Components\UserRegister\Business\Model\ValidationTypesRegister\FirstName
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\LastNameValidation;
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\PasswordValidation;
 use App\Components\UserRegister\Business\UserRegisterBusinessFacade;
-use App\Components\UserRegister\Communication\Controller\RegisterController;
+use App\Components\UserRegister\Communication\Controller\UserRegisterController;
 use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
@@ -34,7 +34,7 @@ class RegisterControllerTest extends TestCase
 
     private RedirectSpy $redirectSpy;
 
-    private RegisterController $registerController;
+    private UserRegisterController $registerController;
 
     protected function setUp(): void
     {
@@ -70,11 +70,8 @@ class RegisterControllerTest extends TestCase
             $userBusinessFacade,
             $registerMapper
         );
-        $userRegisterBusinessFacade = new UserRegisterBusinessFacade(
-           // $userBusinessFacade,
-            $register
-        );
-        $this->registerController = new RegisterController($userRegisterBusinessFacade, $redirectSpy);
+        $userRegisterBusinessFacade = new UserRegisterBusinessFacade($register);
+        $this->registerController = new UserRegisterController($userRegisterBusinessFacade, $redirectSpy);
     }
 
     protected function tearDown(): void

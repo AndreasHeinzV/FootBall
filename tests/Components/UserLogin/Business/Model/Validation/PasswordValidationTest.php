@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Components\UserLogin\Business\Validation;
+namespace App\Tests\Components\UserLogin\Business\Model\Validation;
 
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;

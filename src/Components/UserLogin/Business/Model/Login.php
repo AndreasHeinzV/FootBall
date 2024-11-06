@@ -30,18 +30,5 @@ readonly class Login implements LoginInterface
             return null;
         }
         return $errorDTO;
-        /*
-                              $userDTO = $this->userMapper->createDTO();
-                              $errorsDTO = $this->validator->userLoginGetErrorsDTO($userDTO);
-
-                              if ($this->validator->validateNoErrors($errorsDTO)) {
-                                  $userDTO = $this->userBusinessFacade->getUserByMail($userDTO->email);
-                                  $this->sessionHandler->startSession($userDTO);
-                                  $this->redirect->to('');
-                              }
-                          }
-                  */
     }
-
-
 }

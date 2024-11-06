@@ -23,6 +23,14 @@ readonly class UserLoginValidation implements UserLoginValidationInterface
     ) {
     }
 
+    public function userLoginGetErrorsDTO(UserLoginDto $userLoginDto): ErrorsDTO
+    {
+        $errorsDTO = $this->errorMapper->emptyErrorDto();
+        $errorsDTO->emailError = $this->emailLoginValidation->validateInput($userLoginDto);
+        $errorsDTO->passwordError = $this->passwordLoginValidation->validateInput($userLoginDto);
+        return $errorsDTO;
+    }
+
     public function validateNoErrors(ErrorsDTO $errorsDTO): bool
     {
         foreach ($errorsDTO as $error) {
@@ -32,13 +40,4 @@ readonly class UserLoginValidation implements UserLoginValidationInterface
         }
         return true;
     }
-
-    public function userLoginGetErrorsDTO(UserLoginDto $userLoginDto): ErrorsDTO
-    {
-        $errorsDTO = $this->errorMapper->emptyErrorDto();
-        $errorsDTO->emailError = $this->emailLoginValidation->validateInput($userLoginDto);
-        $errorsDTO->passwordError = $this->passwordLoginValidation->validateInput($userLoginDto);
-        return $errorsDTO;
-    }
-
 }

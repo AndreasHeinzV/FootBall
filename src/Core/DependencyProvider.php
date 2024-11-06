@@ -64,7 +64,7 @@ use App\Components\UserRegister\Business\Model\ValidationTypesRegister\FirstName
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\LastNameValidation;
 use App\Components\UserRegister\Business\Model\ValidationTypesRegister\PasswordValidation;
 use App\Components\UserRegister\Business\UserRegisterBusinessFacade;
-use App\Components\UserRegister\Communication\Controller\RegisterController;
+use App\Components\UserRegister\Communication\Controller\UserRegisterController;
 use App\Components\UserRegister\Persistence\Mapper\RegisterMapper;
 use PHPMailer\PHPMailer\PHPMailer;
 use Twig\Environment;
@@ -264,7 +264,7 @@ class DependencyProvider
             $container->get(Redirect::class)
         ));
 
-        $container->set(RegisterController::class, new RegisterController(
+        $container->set(UserRegisterController::class, new UserRegisterController(
             $container->get(UserRegisterBusinessFacade::class),
             $container->get(Redirect::class)
         ));

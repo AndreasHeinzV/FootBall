@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Components\UserFavorite\Business;
 
-class UserFavoriteBusinessFacadeTest
+use PHPUnit\Framework\TestCase;
+
+class UserFavoriteBusinessFacadeTest extends TestCase
 {
 
 }

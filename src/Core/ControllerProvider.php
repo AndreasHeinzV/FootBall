@@ -15,7 +15,7 @@ use App\Components\PasswordReset\Communication\Controller\PasswordResetControlle
 use App\Components\UserFavorite\Communication\Controller\FavoriteController;
 use App\Components\UserLogin\Communication\Controller\LoginController;
 use App\Components\UserLogin\Communication\Controller\LogoutController;
-use App\Components\UserRegister\Communication\Controller\RegisterController;
+use App\Components\UserRegister\Communication\Controller\UserRegisterController;
 
 class ControllerProvider
 {
@@ -33,7 +33,7 @@ class ControllerProvider
             'competitions' => LeaguesController::class,
             'team' => TeamController::class,
             'player' => PlayerController::class,
-            'register' => RegisterController::class,
+            'register' => UserRegisterController::class,
             'login' => LoginController::class,
             'logout' => LogoutController::class,
             'favorites' => FavoriteController::class,

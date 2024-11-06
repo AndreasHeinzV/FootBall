@@ -11,7 +11,7 @@ use App\Components\UserRegister\Persistence\DTO\UserRegisterDto;
 use App\Core\RedirectInterface;
 use App\Core\ViewInterface;
 
-readonly class RegisterController implements UserRegisterControllerInterface
+readonly class UserRegisterController implements UserRegisterControllerInterface
 {
     public function __construct(
         private UserRegisterBusinessFacadeInterface $userRegisterBusinessFacade,

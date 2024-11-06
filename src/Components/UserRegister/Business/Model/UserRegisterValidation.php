@@ -28,6 +28,7 @@ readonly class UserRegisterValidation implements UserRegisterValidationInterface
 
     public function userRegisterGetErrorsDTO(UserRegisterDto $userRegisterDto): ErrorsDTO
     {
+        //maybe change
         $errors['firstNameEmptyError'] = $this->FirstNameValidation->validateInput($userRegisterDto->firstName);
         $errors['lastNameEmptyError'] = $this->LastNameValidation->validateInput($userRegisterDto->lastName);
         $errors['emailError'] = $this->EmailValidation->validateInput($userRegisterDto->email);
