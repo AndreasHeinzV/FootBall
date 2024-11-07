@@ -33,7 +33,7 @@ readonly class PlayerController implements FootballControllerInterface
         }
 
         $playerDTO = $this->footballBusinessFacade->getPlayer($id);
-        if (!($playerDTO === null)) {
+        if ($playerDTO !== null) {
             $view->setTemplate('player.twig');
             $view->addParameter('playerName', $playerDTO->name);
             $view->addParameter('playerData', $playerDTO);

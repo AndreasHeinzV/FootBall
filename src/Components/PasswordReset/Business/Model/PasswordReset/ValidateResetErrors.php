@@ -31,7 +31,7 @@ readonly class ValidateResetErrors
 
     private function checkForErrors(ResetErrorDTO $resetErrorDTO): ResetErrorDTO|false
     {
-        foreach ($resetErrorDTO as $error) {
+        foreach (get_object_vars($resetErrorDTO) as $error) {
             if ($error !== null) {
                 return $resetErrorDTO;
             }

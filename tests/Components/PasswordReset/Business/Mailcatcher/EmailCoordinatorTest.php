@@ -16,6 +16,7 @@ use App\Components\User\Business\UserBusinessFacadeInterface;
 use App\Components\User\Persistence\DTOs\UserDTO;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
@@ -25,29 +26,14 @@ class EmailCoordinatorTest extends TestCase
 {
 
     private EmailCoordinator $coordinator;
-
-    private EmailCoordinator $coordinatorNoUser;
-
+    private MockObject $userBusinessFacadeMock;
     /**
      * @throws Exception
      */
     protected function setUp(): void
     {
-        /*
-        $sqlConnector = new SqlConnector();
-        $userRepository = new UserRepository($sqlConnector);
-        $userEntityManager = new UserEntityManager($sqlConnector);
-        $userBusinessFacade = new UserBusinessFacade($userRepository, $userEntityManager);
-*/
-        $sqlConnector = new SqlConnector();
-        $userBusinessFacadeMock = $this->createMock(UserBusinessFacadeInterface::class);
-        $userDTOStub = new UserDTO(1, 'name', '', '', '');
-        $userBusinessFacadeMock->method('getUserByMail')->willReturn($userDTOStub);
 
-
-        $userBusinessFacadeMockFail = $this->createMock(UserBusinessFacadeInterface::class);
-        $userDTOStub2 = new UserDTO(null, 'name', '', '', '');
-        $userBusinessFacadeMockFail->method('getUserByMail')->willReturn($userDTOStub2);
+        $this->userBusinessFacadeMock = $this->createMock(UserBusinessFacadeInterface::class);
 
 
         $emailValidation = new EmailValidationPasswordFailed();
@@ -55,7 +41,7 @@ class EmailCoordinatorTest extends TestCase
         $emailDispatcher = new EmailDispatcher(new PHPMailer());
         $timeManager = new TimeManager();
         $actionIdGenerator = new ActionIdGenerator();
-        // $userPasswordResetEntityManager = new UserPasswordResetEntityManager($sqlConnector);
+
         $userPasswordResetEntityManagerMock = $this->createMock(UserPasswordResetEntityManager::class);
 
         $this->coordinator = new EmailCoordinator(
@@ -65,22 +51,15 @@ class EmailCoordinatorTest extends TestCase
             $timeManager,
             $actionIdGenerator,
             $userPasswordResetEntityManagerMock,
-            $userBusinessFacadeMock
-        );
-        $this->coordinatorNoUser = new EmailCoordinator(
-            $emailBuilder,
-            $emailDispatcher,
-            $emailValidation,
-            $timeManager,
-            $actionIdGenerator,
-            $userPasswordResetEntityManagerMock,
-            $userBusinessFacadeMockFail
+            $this->userBusinessFacadeMock
         );
     }
 
     public function testSend(): void
     {
         $testEmail = 'test@test.test';
+        $userDTOStub = new UserDTO(1, 'name', '', '', '');
+        $this->userBusinessFacadeMock->method('getUserByMail')->willReturn($userDTOStub);
         $status = $this->coordinator->coordinateEmailTransfer($testEmail);
         assertTrue($status);
     }
@@ -88,6 +67,8 @@ class EmailCoordinatorTest extends TestCase
     public function testSendFailBadMail(): void
     {
         $testEmail = 'gwghw';
+        $userDTOStub = new UserDTO(1, 'name', '', '', '');
+        $this->userBusinessFacadeMock->method('getUserByMail')->willReturn($userDTOStub);
         $status = $this->coordinator->coordinateEmailTransfer($testEmail);
         assertFalse($status);
     }
@@ -95,7 +76,9 @@ class EmailCoordinatorTest extends TestCase
     public function testSendFailNotExistingMail(): void
     {
         $testEmail = 'test@test.test';
-        $status = $this->coordinatorNoUser->coordinateEmailTransfer($testEmail);
+        $userDTOStub2 = new UserDTO(null, 'name', '', '', '');
+        $this->userBusinessFacadeMock->method('getUserByMail')->willReturn($userDTOStub2);
+        $status = $this->coordinator->coordinateEmailTransfer($testEmail);
         assertFalse($status);
     }
 }

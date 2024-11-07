@@ -23,6 +23,10 @@ readonly class Favorite implements FavoriteInterface
     ) {
     }
 
+    /**
+     * @@param array{add?: string, delete?: string, up?: string, down?: string} $input
+     * @return void
+     */
     public function manageFav(array $input): void
     {
         foreach ($input as $keyValue => $value) {

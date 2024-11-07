@@ -8,6 +8,7 @@ interface ViewInterface
 {
     public function addParameter(string $key, mixed $value): void;
 
+    public function setTemplate(string $template): void;
     public function display(): void;
 
 }

@@ -22,7 +22,7 @@ class EmailDispatcher implements EmailDispatcherInterface
         $this->mail->Host = 'localhost';
         $this->mail->Port = 1025;
         $this->mail->SMTPAuth = false;
-        $this->mail->SMTPSecure = false;
+        $this->mail->SMTPSecure = 'false';
         $this->mail->setFrom('FootballApi@service.com', 'EmailDispatcher');
         $this->mail->Subject = 'Test Mail';
         $this->mail->isHTML();

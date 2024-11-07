@@ -21,11 +21,15 @@ class ControllerProvider
 {
 
     public string $testData = "";
+
     public function __construct(private readonly Container $container)
     {
-
     }
 
+    /**
+     * @return array<string, class-string>
+     * @phpstan-return array<'home'|'competitions'|'team'|'player'|'register'|'login'|'logout'|'favorites'|'password-failed'|'password-reset'|'404', class-string>
+     */
     public function getList(): array
     {
         return [
@@ -49,13 +53,9 @@ class ControllerProvider
         $controllerList = $this->getList();
 
 
-        if (empty($controllerList[$page])) {
-            $controllerToRender = $controllerList['404'];
-        }else{
-            $controllerToRender = $controllerList[$page];
-        }
+        $controllerToRender = $controllerList[$page] ?? $controllerList['404'];
 
-        if (isset($_ENV['test'])){
+        if (isset($_ENV['test'])) {
             $this->testData = $controllerToRender;
         }
         $controller = $this->container->get($controllerToRender);

@@ -8,6 +8,9 @@ use Twig\Environment;
 
 class View implements ViewInterface
 {
+    /**
+     * @var array<mixed> Parameters to be used in the view.
+     */
     protected array $parameters = [];
     protected string $template = 'home.twig';
 

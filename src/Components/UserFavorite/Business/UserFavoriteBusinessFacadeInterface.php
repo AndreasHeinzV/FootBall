@@ -4,6 +4,7 @@ namespace App\Components\UserFavorite\Business;
 
 use App\Components\User\Persistence\DTOs\UserDTO;
 
+
 interface UserFavoriteBusinessFacadeInterface
 {
     public function manageFavoriteInput(array $input): void;

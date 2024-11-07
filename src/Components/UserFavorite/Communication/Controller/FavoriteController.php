@@ -24,11 +24,11 @@ readonly class FavoriteController implements FavoriteControllerInterface
     public function load(ViewInterface $view): void
     {
         $user = $this->sessionHandler->getUserDTO();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST)) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->userFavoriteBusinessFacade->manageFavoriteInput($_POST);
         }
         $view->setTemplate('favorites.twig');
-        $view->addParameter('favorites', $this->userFavoriteBusinessFacade->getUserFavorites($user) ?? []);
+        $view->addParameter('favorites', $this->userFavoriteBusinessFacade->getUserFavorites($user));
     }
 
 

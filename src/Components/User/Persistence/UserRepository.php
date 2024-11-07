@@ -10,9 +10,12 @@ use App\Components\User\Persistence\Mapper\UserMapper;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function __construct(public SqlConnectorInterface $sqlConnector)
-    {
+    public function __construct
+    (
+        public SqlConnectorInterface $sqlConnector,
+    ) {
     }
+
     public function getUser(string $email): UserDTO
     {
         $user = $this->sqlConnector->querySelect(
@@ -21,7 +24,7 @@ class UserRepository implements UserRepositoryInterface
         );
         $userMapper = new UserMapper();
         if (!$user) {
-            return new UserDTO(null,'', '', '', '');
+            return new UserDTO(null, '', '', '', '');
         }
 
         return $userMapper->createDTO([
@@ -47,7 +50,6 @@ class UserRepository implements UserRepositoryInterface
 
         return $userID['user_id'] ?? false;
     }
-
 
 
 }

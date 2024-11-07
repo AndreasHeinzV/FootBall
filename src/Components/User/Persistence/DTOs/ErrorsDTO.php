@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\User\Persistence\DTOs;
 
  class ErrorsDTO
-{
+ {
     public function __construct(
         public ?string $firstNameEmptyError,
         public ?string $lastNameEmptyError,

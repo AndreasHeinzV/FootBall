@@ -33,7 +33,7 @@ readonly class UserLoginValidation implements UserLoginValidationInterface
 
     public function validateNoErrors(ErrorsDTO $errorsDTO): bool
     {
-        foreach ($errorsDTO as $error) {
+        foreach (get_object_vars($errorsDTO) as $error) {
             if ($error !== null) {
                 return false;
             }

@@ -27,7 +27,6 @@ readonly class PasswordResetController
         $view->setTemplate('error.twig');
 
         if (isset($_GET['ts'], $_GET['actionId'])) {
-
             $actionDTO = new ActionDTO();
             $actionDTO->timestamp = (int)$_GET['ts'];
             $actionDTO->actionId = $_GET['actionId'];
@@ -35,11 +34,11 @@ readonly class PasswordResetController
 
             if ($result) {
                 $view->setTemplate('password-reset.twig');
-                //    $this->redirect->to('?page=error');
             }
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['passwordReset'] = 'push') {
+        //if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['passwordReset'] = 'push') {
+        if ($_POST['passwordReset'] === 'push') {
             $resetDTO = new ResetDTO();
             $resetDTO->FirstPassword = $_POST['firstPassword'];
             $resetDTO->SecondPassword = $_POST['secondPassword'];
@@ -49,7 +48,7 @@ readonly class PasswordResetController
                 $this->redirect->to('');
             }
         }
-     //   $view->setTemplate('password-reset.twig');
+        //   $view->setTemplate('password-reset.twig');
         $view->addParameter('resetErrorDto', $resetErrorDto);
         $view->addParameter('resetAllowed', $result);
     }

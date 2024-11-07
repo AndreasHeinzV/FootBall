@@ -21,7 +21,7 @@ readonly class TeamController implements FootballControllerInterface
     public function load(ViewInterface $view): void
     {
 
-        if (isset($_POST)) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST'){
             $this->userFavoriteBusinessFacade->manageFavoriteInput($_POST);
         }
 
