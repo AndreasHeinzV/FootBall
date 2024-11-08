@@ -19,6 +19,9 @@
         <env name="test" value="1"/>
         <ini name="display_errors" value="1"/>
         <ini name="error_reporting" value="-1"/>
+
+
+
     </php>
 
     <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">

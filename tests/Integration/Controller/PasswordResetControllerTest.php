@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\ActionIdGenerator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
@@ -33,9 +35,6 @@ use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\ViewFaker;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\CodeUnit\Mapper;
-
-use function PHPUnit\Framework\assertTrue;
 
 class PasswordResetControllerTest extends TestCase
 {
@@ -55,8 +54,10 @@ class PasswordResetControllerTest extends TestCase
         $this->view = new ViewFaker();
 
         $sqlConnector = new SqlConnector();
-        $userRepository = new UserRepository($sqlConnector);
-        $userEntityManager = new UserEntityManager($sqlConnector);
+        $ormSqlConnector = new ORMSqlConnector();
+        $userEntityMapper = new UserEntityMapper();
+        $userRepository = new UserRepository($ormSqlConnector, $userEntityMapper);
+        $userEntityManager = new UserEntityManager($ormSqlConnector);
         $userBusinessFacade = new UserBusinessFacade($userRepository, $userEntityManager);
 
         $testData = [
@@ -214,7 +215,7 @@ class PasswordResetControllerTest extends TestCase
 
         self::assertNotNull($result['secondPWValidationError']);
         self::assertIsString($result['differentPWerror']);
-      //  dump($result);
+        //  dump($result);
         self::assertTrue($parameter['resetAllowed']);
         self::assertSame('password-reset.twig', $template);
     }

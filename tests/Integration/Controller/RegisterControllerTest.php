@@ -6,10 +6,11 @@ namespace App\Tests\Integration\Controller;
 
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
-use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
 use App\Components\UserLogin\Business\Model\UserLoginValidation;
@@ -45,15 +46,16 @@ class RegisterControllerTest extends TestCase
 
         $errorMapper = new ErrorMapper();
         $redirectSpy = new RedirectSpy();
-
+        $userEntityMapper = new UserEntityMapper();
+        $ORMSqlConnector = new ORMSqlConnector();
         $sqlConnector = new SqlConnector();
         $databaseBusinessFacade = new DatabaseBusinessFacade(
             new Fixtures($sqlConnector)
         );
         $databaseBusinessFacade->createUserTables();
         $userBusinessFacade = new UserBusinessFacade(
-            new UserRepository($sqlConnector),
-            new UserEntityManager($sqlConnector)
+            new UserRepository($ORMSqlConnector, $userEntityMapper),
+            new UserEntityManager($ORMSqlConnector)
         );
 
         $userRegisterValidation = new UserRegisterValidation(

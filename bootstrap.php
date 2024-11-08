@@ -23,4 +23,5 @@ $connection = DriverManager::getConnection([
 ], $config);
 
 
-$entityManager = new EntityManager($connection, $config);
+
+$entityManager = EntityManager::create($conn, $config);

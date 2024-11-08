@@ -4,52 +4,53 @@ declare(strict_types=1);
 
 namespace App\Components\User\Persistence;
 
-use App\Components\Database\Persistence\SqlConnectorInterface;
+use App\Components\Database\Persistence\Entity\UserEntity;
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\User\Persistence\DTOs\UserDTO;
-use App\Components\User\Persistence\Mapper\UserMapper;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityNotFoundException;
 
-class UserRepository implements UserRepositoryInterface
+readonly class UserRepository implements UserRepositoryInterface
 {
+    private EntityManager $entityManager;
+
     public function __construct
     (
-        public SqlConnectorInterface $sqlConnector,
+
+        private ORMSqlConnector $ORMSqlConnector,
+        private UserEntityMapper $userEntityMapper,
     ) {
+        $this->entityManager = $this->ORMSqlConnector->getEntityManager();
     }
 
     public function getUser(string $email): UserDTO
     {
-        $user = $this->sqlConnector->querySelect(
-            'SELECT user_id, user_email, first_name, last_name, password FROM users WHERE user_email = :user_email',
-            ['user_email' => $email]
-        );
-        $userMapper = new UserMapper();
-        if (!$user) {
-            return new UserDTO(null, '', '', '', '');
-        }
+        $user = $this->entityManager->getRepository(UserEntity::class)->findOneBy(['email' => $email]);
 
-        return $userMapper->createDTO([
-            'userId' => $user["user_id"],
-            'firstName' => $user["first_name"],
-            'lastName' => $user["last_name"],
-            'email' => $user["user_email"],
-            'password' => $user["password"],
-        ]);
+        if ($user instanceof UserEntity) {
+            return $this->userEntityMapper->mapUserEntityToUserDto($user);
+        }
+        return new UserDTO(null, '', '', '', '');;
     }
 
     public function getUsers(): array
     {
-        return $this->sqlConnector->querySelectAll('SELECT * FROM users');
+        $users = $this->entityManager->getRepository(UserEntity::class)->findAll();
+
+        if (!$users) {
+            throw new EntityNotFoundException('No users found.');
+        }
+        return $users;
     }
 
     public function getUserIdByMail(UserDTO $userDTO): int|false
     {
-        $userID = $this->sqlConnector->querySelect(
-            'SELECT user_id FROM users WHERE user_email = :user_email',
-            ['user_email' => $userDTO->email]
-        );
+        $user = $this->entityManager->getRepository(UserEntity::class)->findOneBy(['email' => $userDTO->email]);
 
-        return $userID['user_id'] ?? false;
+        if ($user instanceof UserEntity) {
+            return $user->getId();
+        }
+        return false;
     }
-
-
 }

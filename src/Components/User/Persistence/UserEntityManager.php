@@ -4,58 +4,74 @@ declare(strict_types=1);
 
 namespace App\Components\User\Persistence;
 
-use App\Components\Database\Persistence\SqlConnectorInterface;
+use App\Components\Database\Persistence\Entity\UserEntity;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\User\Persistence\DTOs\UserDTO;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 
 readonly class UserEntityManager implements UserEntityManagerInterface
 {
+    private EntityManager $entityManager;
     public function __construct(
-        private SqlConnectorInterface $sqlConnector
+        private ORMSqlConnector $sqlConnectorNew,
     ) {
+        $this->entityManager = $this->sqlConnectorNew->getEntityManager();
     }
 
-
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function saveUser(UserDTO $userDTO): void
     {
-        $userId = $this->sqlConnector->querySelect(
-            'SELECT user_id from users WHERE user_email =:user_email',
-            ['user_email' => $userDTO->email]
-        );
-        if (!$userId) {
-            $this->sqlConnector->queryInsert(
-                'INSERT INTO users(user_email,password, first_name, last_name) VALUES(:user_email,:password,:first_name,:last_name)',
-                [
-                    'user_email' => $userDTO->email,
-                    'password' => $userDTO->password,
-                    'first_name' => $userDTO->firstName,
-                    'last_name' => $userDTO->lastName,
-                ]
-            );
-        } else {
-            $this->updateUser($userId['user_id'], $userDTO);
+        $userRepository = $this->entityManager->getRepository(UserEntity::class);
+        $user = $userRepository->findOneBy(['email' => $userDTO->email]);
+
+        if ($user === null) {
+            $user = new UserEntity();
+            $user->setEmail($userDTO->email);
+        }
+        $user->setPassword($userDTO->password);
+        $user->setFirstName($userDTO->firstName);
+        $user->setLastName($userDTO->lastName);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function updateUserPassword(UserDTO $userDTO): void
+    {
+        $userRepository = $this->entityManager->getRepository(UserEntity::class);
+        $userEntity = $userRepository->findOneBy(['email' => $userDTO->email]);
+
+
+        if ($userEntity !== null) {
+            $userEntity->setPassword($userDTO->password);
+            $this->entityManager->persist($userEntity);
+            $this->entityManager->flush();
         }
     }
 
-    public function updateUserPassword(UserDTO $userDTO): void
-    {
-        $this->sqlConnector->queryInsert(
-            'UPDATE users SET password= :password WHERE user_email =:user_email',
-            ['user_email' => $userDTO->email, 'password' => password_hash($userDTO->password, PASSWORD_DEFAULT)]
-        );
-    }
 
-
-    private function updateUser(int $userId, userDTO $user): void
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    private function updateUser(int $userId, userDTO $userDTO): void
     {
-        $this->sqlConnector->queryInsert(
-            'UPDATE users SET user_email= :user_email, first_name = :first_name, last_name =:last_name WHERE user_id = :user_id',
-            [
-                'user_email' => $user->email,
-                'first_name' => $user->firstName,
-                'last_name' => $user->lastName,
-                'user_id' => $userId,
-            ]
-        );
+        $userRepository = $this->entityManager->getRepository(UserEntity::class);
+        $userEntity = $userRepository->findOneBy(['id' => $userId]);
+
+        if ($userEntity !== null) {
+            $userEntity->setPassword($userDTO->password);
+            $this->entityManager->persist($userEntity);
+            $this->entityManager->flush();
+        }
     }
 
 }

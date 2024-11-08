@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Facade;
 
 use App\Components\Api\Business\ApiRequesterFacade;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -15,7 +16,6 @@ use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\UserFavorite\Business\Model\Favorite;
 use App\Components\UserFavorite\Business\UserFavoriteBusinessFacade;
-use App\Components\UserFavorite\Communication\Controller\FavoriteController;
 use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapper;
 use App\Components\UserFavorite\Persistence\UserFavoriteEntityManager;
 use App\Components\UserFavorite\Persistence\UserFavoriteRepository;
@@ -23,10 +23,9 @@ use App\Core\SessionHandler;
 use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\ViewFaker;
-
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
-
-use function PHPUnit\Framework\assertFalse;
 
 class UserFavoriteBusinessFacadeTest extends TestCase
 {
@@ -35,9 +34,12 @@ class UserFavoriteBusinessFacadeTest extends TestCase
 
     private DatabaseBuilder $databaseBuilder;
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     protected function setUp(): void
     {
-
         $jsonfile = file_get_contents(__DIR__ . '/../../Fixtures/FavoritesBasic/favorites_test.json');
         file_put_contents(__DIR__ . '/../../../favorites_test.json', $jsonfile);
 
@@ -80,12 +82,12 @@ class UserFavoriteBusinessFacadeTest extends TestCase
         $this->businessFacade = new userFavoriteBusinessFacade($favorite, $favoriteRepository);
 
 
-
-        $userEntityManager = new UserEntityManager($sqlConnector);
+        $ORMSqlConnector = new ORMSQLConnector();
+        $userEntityManager = new UserEntityManager($ORMSqlConnector);
         $userEntityManager->saveUser($userDTO);
         $this->databaseBuilder->loadData($userDTO);
-
     }
+
     protected function tearDown(): void
     {
         unset($_ENV);
@@ -94,7 +96,6 @@ class UserFavoriteBusinessFacadeTest extends TestCase
 
     public function testGetFavoriteStatus(): void
     {
-
         $_SESSION['status'] = true;
         $_SESSION['userDto'] = [
             'userId' => 1,
@@ -105,8 +106,7 @@ class UserFavoriteBusinessFacadeTest extends TestCase
         ];
 
 
-
-        $status= $this->businessFacade->getFavoriteStatus('4');
+        $status = $this->businessFacade->getFavoriteStatus('4');
         self::assertTrue($status);
     }
 }
