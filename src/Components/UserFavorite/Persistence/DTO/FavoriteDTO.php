@@ -9,7 +9,8 @@ readonly class FavoriteDTO
     public function __construct(
         public int $teamID,
         public string $teamName,
-        public string $crest
+        public string $crest,
+        public int $position,
     ) {
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Components\Database\Persistence\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -11,6 +13,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'users')]
 class UserEntity
 {
+    public function __construct()
+    {
+        $this->favorites = new ArrayCollection();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: 'integer')]
@@ -26,6 +33,9 @@ class UserEntity
 
     #[ORM\Column(type: 'string')]
     private string $lastName;
+
+    #[ORM\OneToMany(targetEntity: FavoriteEntity::class, mappedBy: 'userIdFk')]
+    private Collection $favorites;
 
     public function getId(): int
     {
@@ -74,5 +84,25 @@ class UserEntity
     {
         $this->lastName = $lastName;
         return $this;
+    }
+
+    public function getFavorites(): Collection
+    {
+        return $this->favorites;
+    }
+
+    public function addFavorite(FavoriteEntity $favorite): void
+    {
+        if (!$this->favorites->contains($favorite)) {
+            $this->favorites->add($favorite);
+
+        }
+    }
+
+    public function removeFavorite(FavoriteEntity $favorite): void
+    {
+        if ($this->favorites->removeElement($favorite)) {
+            $this->favorites->removeElement($favorite);
+        }
     }
 }

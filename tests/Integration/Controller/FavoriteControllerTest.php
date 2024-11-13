@@ -8,6 +8,7 @@ use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -27,6 +28,7 @@ use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\DataLoader;
 use App\Tests\Fixtures\ViewFaker;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 
 class FavoriteControllerTest extends TestCase
@@ -37,10 +39,13 @@ class FavoriteControllerTest extends TestCase
 
     private FavoriteController $favoriteController;
 
-    private DatabaseBuilder $databaseBuilder;
+
+    private ORMSqlConnector $connector;
+    private SchemaTool $schemaTool;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $jsonfile = file_get_contents(__DIR__ . '/../../Fixtures/FavoritesBasic/favorites_test.json');
         file_put_contents(__DIR__ . '/../../../favorites_test.json', $jsonfile);
 
@@ -64,19 +69,29 @@ class FavoriteControllerTest extends TestCase
         ];
         $userDTO = $userMapper->createDTO($testData);
 
-        $sqlConnector = new SqlConnector();
+
+        $this->connector = new ORMSqlConnector();
+        $entityManager = $this->connector->getEntityManager();
+        $this->schemaTool = new SchemaTool($entityManager);
+
+
+        $classes = $entityManager->getMetadataFactory()->getAllMetadata();
+        $this->schemaTool->createSchema($classes);
+
+
+ /*
         $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
         $this->databaseBuilder->buildTables();
-
+*/
         $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
         $favoriteMapper = new FavoriteMapper();
-        $favoriteRepository = new UserFavoriteRepository($sqlConnector);
+        $favoriteRepository = new UserFavoriteRepository($this->connector , $favoriteMapper);
 
         $favorite = new Favorite(
             $sessionHandler,
             $footballBusinessFacade,
-            new UserFavoriteEntityManager($sqlConnector),
+            new UserFavoriteEntityManager($this->connector),
             $favoriteRepository,
             $favoriteMapper
         );
@@ -84,15 +99,18 @@ class FavoriteControllerTest extends TestCase
         $this->favoriteController = new FavoriteController($sessionHandler, $userFavoriteBusinessFacade);
 
 
-        $userEntityManager = new UserEntityManager($sqlConnector);
+        $userEntityManager = new UserEntityManager($this->connector);
         $userEntityManager->saveUser($userDTO);
-        $this->databaseBuilder->loadData($userDTO);
-        parent::setUp();
+    //    $this->databaseBuilder->loadData($userDTO);
+
     }
 
     protected function tearDown(): void
     {
-        $this->databaseBuilder->dropTables();
+     //   $this->databaseBuilder->dropTables();
+        $classes = $this->connector->getEntityManager()->getMetadataFactory()->getAllMetadata();
+        $this->schemaTool->dropSchema($classes);
+
         $_SESSION = [];
         $_POST = [];
         unset($_ENV);

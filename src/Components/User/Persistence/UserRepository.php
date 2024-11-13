@@ -31,7 +31,7 @@ readonly class UserRepository implements UserRepositoryInterface
         if ($user instanceof UserEntity) {
             return $this->userEntityMapper->mapUserEntityToUserDto($user);
         }
-        return new UserDTO(null, '', '', '', '');;
+        return new UserDTO(null, '', '', '', '');
     }
 
     public function getUsers(): array

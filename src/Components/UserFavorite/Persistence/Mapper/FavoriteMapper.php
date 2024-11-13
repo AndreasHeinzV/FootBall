@@ -13,7 +13,8 @@ class FavoriteMapper implements FavoriteMapperInterface
         return new favoriteDTO(
             $favoriteData['teamID'],
             $favoriteData['teamName'],
-            $favoriteData['crest']
+            $favoriteData['crest'],
+            $favoriteData['position']
         );
     }
 }

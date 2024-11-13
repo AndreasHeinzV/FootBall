@@ -4,28 +4,42 @@ declare(strict_types=1);
 
 namespace App\Components\UserFavorite\Persistence;
 
+use App\Components\Database\Persistence\Entity\FavoriteEntity;
+use App\Components\Database\Persistence\Entity\UserEntity;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SqlConnectorInterface;
 use App\Components\User\Persistence\DTOs\UserDTO;
+use App\Components\UserFavorite\Business\Model\Favorite;
 use App\Components\UserFavorite\Persistence\DTO\FavoriteDTO;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 
 readonly class UserFavoriteEntityManager implements UserFavoriteEntityManagerInterface
 {
+    private EntityManager $entityManager;
+
     public function __construct(
-        private SqlConnectorInterface $sqlConnector
+        private ORMSqlConnector $sqlConnector
     ) {
+        $this->entityManager = $sqlConnector->getEntityManager();
     }
 
-    public function saveUserFavorite(UserDTO $userDTO, FavoriteDTO $favoriteDTO): void
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function saveUserFavorite(UserEntity $userEntity, FavoriteDTO $favoriteDTO): void
     {
-        $this->sqlConnector->queryInsert(
-            'INSERT INTO favorites(user_id,team_id, team_name, team_crest ) VALUES (:user_id,:team_id,:team_name,:team_crest)',
-            [
-                'user_id' => $userDTO->userId,
-                'team_id' => $favoriteDTO->teamID,
-                'team_name' => $favoriteDTO->teamName,
-                'team_crest' => $favoriteDTO->crest,
-            ]
-        );
+        $favorite = new FavoriteEntity();
+        $favorite->setFavoritePosition($favoriteDTO->position);
+        $favorite->setTeamCrest($favoriteDTO->crest);
+        $favorite->setTeamName($favoriteDTO->teamName);
+        $favorite->setTeamId($favoriteDTO->teamID);
+        $favorite->setUser($userEntity);
+
+        $this->entityManager->persist($favorite);
+        $this->entityManager->flush();
     }
 
     public function updateUserFavoritePosition(
@@ -72,5 +86,9 @@ readonly class UserFavoriteEntityManager implements UserFavoriteEntityManagerInt
                 'user_id' => $userDTO->userId,
             ]
         );
+/*
+        $this->entityManager->getRepository()
+       $this->entityManager->remove($userDTO);
+*/
     }
 }
