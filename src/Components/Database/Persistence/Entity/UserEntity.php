@@ -13,11 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'users')]
 class UserEntity
 {
-    public function __construct()
-    {
-        $this->favorites = new ArrayCollection();
-    }
-
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: 'integer')]
@@ -36,6 +31,11 @@ class UserEntity
 
     #[ORM\OneToMany(targetEntity: FavoriteEntity::class, mappedBy: 'userIdFk')]
     private Collection $favorites;
+
+    public function __construct()
+    {
+        $this->favorites = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -95,7 +95,6 @@ class UserEntity
     {
         if (!$this->favorites->contains($favorite)) {
             $this->favorites->add($favorite);
-
         }
     }
 

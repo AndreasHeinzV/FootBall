@@ -14,15 +14,16 @@ class FavoriteEntity
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer', unique: true)]
     private int $favoriteId;
 
     #[ORM\Column(type: 'integer')]
     private int $favorite_position;
 
-    #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: UserEntity::class, inversedBy: 'favorites')]
-    #[ORM\JoinColumn(name: "user_id_fk", referencedColumnName: "id")]
-    private UserEntity $userIdFk;
+    #[ORM\Column(name: 'user_id_fk', type: 'integer')]
+    // #[ORM\JoinColumn(name: "user_id_fk", referencedColumnName: "id")]
+    private int $userIdFk;
 
     #[ORM\Column(type: 'integer', unique: true)]
     private int $teamId;
@@ -32,7 +33,7 @@ class FavoriteEntity
     #[ORM\Column(type: 'string')]
     private string $team_crest;
 
-    public function getUserId(): UserEntity
+    public function getUserIdFk(): int
     {
         return $this->userIdFk;
     }
@@ -57,7 +58,7 @@ class FavoriteEntity
         return $this->team_name;
     }
 
-    public function setUser(UserEntity $user): self
+    public function setUserIdFk(int $user): self
     {
         $this->userIdFk = $user;
         return $this;

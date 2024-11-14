@@ -8,6 +8,7 @@ use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
 use App\Components\Database\Persistence\Mapper\UserEntityMapper;
 use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
@@ -37,6 +38,8 @@ class RegisterControllerTest extends TestCase
 
     private UserRegisterController $registerController;
 
+    private SchemaBuilder $schemaBuilder;
+
     protected function setUp(): void
     {
         $_ENV['test'] = 1;
@@ -48,11 +51,17 @@ class RegisterControllerTest extends TestCase
         $redirectSpy = new RedirectSpy();
         $userEntityMapper = new UserEntityMapper();
         $ORMSqlConnector = new ORMSqlConnector();
+        /*
         $sqlConnector = new SqlConnector();
         $databaseBusinessFacade = new DatabaseBusinessFacade(
             new Fixtures($sqlConnector)
         );
         $databaseBusinessFacade->createUserTables();
+
+        */
+        $this->schemaBuilder = new SchemaBuilder($ORMSqlConnector);
+        $this->schemaBuilder->createSchema();
+
         $userBusinessFacade = new UserBusinessFacade(
             new UserRepository($ORMSqlConnector, $userEntityMapper),
             new UserEntityManager($ORMSqlConnector)
@@ -79,6 +88,7 @@ class RegisterControllerTest extends TestCase
     protected function tearDown(): void
     {
         unset($_SERVER['REQUEST_METHOD'], $_ENV, $_POST);
+        $this->schemaBuilder->dropSchema();
         parent::tearDown();
     }
 

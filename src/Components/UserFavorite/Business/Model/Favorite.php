@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Components\UserFavorite\Business\Model;
 
+use App\Components\Database\Persistence\Entity\FavoriteEntity;
 use App\Components\Football\Business\Model\FootballBusinessFacadeInterface;
+use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapperInterface;
 use App\Components\UserFavorite\Persistence\UserFavoriteEntityManagerInterface;
 use App\Components\UserFavorite\Persistence\UserFavoriteRepositoryInterface;
@@ -39,11 +41,11 @@ readonly class Favorite implements FavoriteInterface
                     break;
 
                 case ($keyValue === 'up'):
-                    $this->userFavoriteUp($value);
+                    $this->userFavoriteUp((int)$value);
                     break;
 
                 case ($keyValue === 'down'):
-                    $this->userFavoriteDown($value);
+                    $this->userFavoriteDown((int)$value);
                     break;
             }
         }
@@ -59,13 +61,24 @@ readonly class Favorite implements FavoriteInterface
     {
         $userDTO = $this->sessionHandler->getUserDTO();
         $team = $this->footballBusinessFacade->getTeam($teamId);
+        $position = $this->calculatePosition($userDTO);
 
         if (!empty($team) && !$this->getFavStatus($teamId)) {
+            $team['favoritePosition'] = $position;
             $this->userFavoriteEntityManager->saveUserFavorite(
                 $userDTO,
                 $this->favoriteMapper->createFavoriteDTO($team)
             );
         }
+    }
+
+    public function calculatePosition(UserDTO $userDTO): int
+    {
+        $lastPosition = $this->userFavoriteRepository->getUserFavoritesLastPosition($userDTO);
+        if ($lastPosition === false) {
+            return 1;
+        }
+        return $lastPosition + 1;
     }
 
     public function getFavStatus(string $teamId): bool
@@ -74,66 +87,64 @@ readonly class Favorite implements FavoriteInterface
         return $this->userFavoriteRepository->checkExistingFavorite($userDTO, $teamId);
     }
 
-    private function userFavoriteUp(string $teamId): void
+    private function userFavoriteUp(int $teamId): void
     {
         $userDTO = $this->sessionHandler->getUserDTO();
-        $minPosition = $this->userFavoriteRepository->getUserMinFavoritePosition($userDTO);
-        $position = $this->userFavoriteRepository->getUserFavoritePosition($userDTO, $teamId);
-
-        if ($position > $minPosition) {
-            $favoritesArray = $this->userFavoriteRepository->getUserFavorites($userDTO);
+        $userFavoriteEntity = $this->userFavoriteRepository->getUserFavoriteByTeamId($userDTO, $teamId);
 
 
-            foreach ($favoritesArray as $i => $favorite) {
-                if ($favorite['favoritePosition'] === $position) {
-                    $currentIndex = $i;
-                    $prevIndex = $currentIndex - 1;
+        if ($userFavoriteEntity instanceof FavoriteEntity) {
+            $favoritePosition = $userFavoriteEntity->getFavoritePosition();
+            $firstPosition = $this->userFavoriteRepository->getUserFavoritesFirstPosition($userDTO);
 
-                    $currentFavoriteTeamID = $favorite['teamID'];
-                    $prevFavTeamIndex = $favoritesArray[$prevIndex];
-                    $prevFavTeamID = $prevFavTeamIndex['teamID'];
+            if ($firstPosition !== false && $firstPosition < $favoritePosition) {
+                $positionToChange = $this->userFavoriteRepository->getFavoritePositionAboveCurrentPosition(
+                    $userDTO,
+                    $favoritePosition
+                );
+                $positionEntityToChange = $this->userFavoriteRepository->getUserFavoriteEntityByPosition(
+                    $userDTO,
+                    $positionToChange
+                );
 
-                    $this->userFavoriteEntityManager->updateUserFavoritePosition(
-                        $userDTO->userId,
-                        $currentFavoriteTeamID,
-                        $prevFavTeamID,
-                        $position,
-                        $prevFavTeamIndex['favoritePosition']
-                    );
-                    break;
-                }
+
+                $this->userFavoriteEntityManager->updateUserFavoritePosition(
+                    $userFavoriteEntity,
+                    $positionEntityToChange,
+                    $favoritePosition,
+                    $positionToChange
+                );
             }
         }
     }
 
-    private function userFavoriteDown(string $id): void
+    private function userFavoriteDown(int $teamId): void
     {
         $userDTO = $this->sessionHandler->getUserDTO();
-        $maxPosition = $this->userFavoriteRepository->getUserMaxFavoritePosition($userDTO);
-        $position = $this->userFavoriteRepository->getUserFavoritePosition($userDTO, $id);
+        $userFavoriteEntity = $this->userFavoriteRepository->getUserFavoriteByTeamId($userDTO, $teamId);
 
-        if ($position < $maxPosition) {
-            $favoritesArray = $this->userFavoriteRepository->getUserFavorites($userDTO);
 
-            foreach ($favoritesArray as $i => $favorite) {
-                if ($favorite['favoritePosition'] === $position) {
-                    $currentIndex = $i;
-                    $nextIndex = $currentIndex + 1;
-                    if (isset($favoritesArray[$nextIndex])) {
-                        $currentFavoriteTeamID = $favorite['teamID'];
-                        $nextFavTeamIndex = $favoritesArray[$nextIndex];
-                        $nextFavTeamID = $nextFavTeamIndex['teamID'];
+        if ($userFavoriteEntity instanceof FavoriteEntity) {
+            $favoritePosition = $userFavoriteEntity->getFavoritePosition();
+            $lastPosition = $this->userFavoriteRepository->getUserFavoritesLastPosition($userDTO);
 
-                        $this->userFavoriteEntityManager->updateUserFavoritePosition(
-                            $userDTO->userId,
-                            $currentFavoriteTeamID,
-                            $nextFavTeamID,
-                            $position,
-                            $nextFavTeamIndex['favoritePosition']
-                        );
-                    }
-                    break;
-                }
+            if ($lastPosition !== false && $lastPosition > $favoritePosition) {
+                $positionToChange = $this->userFavoriteRepository->getFavoritePositionBelowCurrentPosition(
+                    $userDTO,
+                    $favoritePosition
+                );
+                $positionEntityToChange = $this->userFavoriteRepository->getUserFavoriteEntityByPosition(
+                    $userDTO,
+                    $positionToChange
+                );
+
+
+                $this->userFavoriteEntityManager->updateUserFavoritePosition(
+                    $userFavoriteEntity,
+                    $positionEntityToChange,
+                    $favoritePosition,
+                    $positionToChange
+                );
             }
         }
     }

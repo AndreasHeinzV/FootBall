@@ -9,7 +9,12 @@ use App\Components\Database\Persistence\Entity\FavoriteEntity;
 use App\Components\Database\Persistence\Entity\UserEntity;
 use App\Components\Database\Persistence\ORMSqlConnector;
 
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
+use App\Components\User\Persistence\DTOs\UserDTO;
+use App\Components\User\Persistence\UserEntityManager;
+use App\Components\UserFavorite\Persistence\DTO\FavoriteDTO;
+use App\Components\UserFavorite\Persistence\UserFavoriteEntityManager;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -18,25 +23,34 @@ use PHPUnit\Framework\TestCase;
 class SqlConnectionTest extends TestCase
 {
     private ORMSqlConnector $connector;
-    private SchemaTool $schemaTool;
+//    private SchemaTool $schemaTool;
+
+    private UserEntityManager $userEntityManager;
+    private UserFavoriteEntityManager $userFavoriteEntityManager;
+    private SchemaBuilder $schemaBuilder;
 
     protected function setUp(): void
     {
         parent::setUp();
         $_ENV['DATABASE'] = 'football_test';
         $this->connector = new ORMSqlConnector();
-        $entityManager = $this->connector->getEntityManager();
-        $this->schemaTool = new SchemaTool($entityManager);
 
+        $this->schemaBuilder = new SchemaBuilder($this->connector);
+        $this->schemaBuilder->createSchema();
 
-        $classes = $entityManager->getMetadataFactory()->getAllMetadata();
-        $this->schemaTool->createSchema($classes);
+        /*
+                $this->schemaTool = new SchemaTool($entityManager);
+                $classes = $entityManager->getMetadataFactory()->getAllMetadata();
+                $this->schemaTool->createSchema($classes);
+        */
+        $this->userEntityManager = new UserEntityManager($this->connector);
+        $this->userFavoriteEntityManager = new UserFavoriteEntityManager($this->connector);
     }
 
     protected function tearDown(): void
     {
-        $classes = $this->connector->getEntityManager()->getMetadataFactory()->getAllMetadata();
-        $this->schemaTool->dropSchema($classes);
+        $this->schemaBuilder->dropSchema();
+
 
         parent::tearDown();
     }
@@ -56,6 +70,9 @@ class SqlConnectionTest extends TestCase
         $user->setFirstName('Tree');
         $user->setLastName('Springfield');
 
+
+        $userDTO = new UserDTO(null, 'Tim', 'Gabel', 'test2@g.com', 'aegew');
+        $this->userEntityManager->saveUser($userDTO);
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -84,14 +101,23 @@ class SqlConnectionTest extends TestCase
         $entityManager->flush();
 
         $favorite = new FavoriteEntity();
-        $favorite->setFavoritePosition(1);
-        $favorite->setTeamId(1);
+        $favorite->setFavoritePosition(2);
+        $favorite->setTeamId(2);
         $favorite->setTeamName("test");
         $favorite->setTeamCrest("CREST");
-        $favorite->setUser($user);
+        $favorite->setUserIdFk($user->getId());
+
+
+        $favoriteDto = new FavoriteDTO(1, 'testName', 'crest', 2);
+        $userDTO = new UserDTO(null, 'Tim', 'Gabel', 'test2@g.com', 'aegew');
+        $this->userEntityManager->saveUser($userDTO);
+        $userDTO2 = new UserDTO(1, '', '', '', '');
+
 
         $entityManager->persist($favorite);
         $entityManager->flush();
+
+        $this->userFavoriteEntityManager->saveUserFavorite($userDTO2, $favoriteDto);
 
         $this->assertNotEmpty($user->getId());
         $this->assertEquals('cat@g.com', $user->getEmail());

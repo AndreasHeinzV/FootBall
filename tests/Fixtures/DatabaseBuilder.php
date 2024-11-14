@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Fixtures;
 
 
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Persistence\DTOs\UserDTO;
 
 
 class DatabaseBuilder
 {
-    public function __construct(public SqlConnector $sqlConnector)
+    public function __construct(public ORMSqlConnector $sqlConnector)
     {
     }
 
@@ -75,7 +76,7 @@ class DatabaseBuilder
             try {
                 $dataLoader = new DataLoader();
                 $dataLoader->loadTestDataIntoDatabase($userDTO);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
         }
     }

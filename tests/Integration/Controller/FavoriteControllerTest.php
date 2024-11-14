@@ -9,6 +9,7 @@ use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
 use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -28,6 +29,8 @@ use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\DataLoader;
 use App\Tests\Fixtures\ViewFaker;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 
@@ -41,8 +44,12 @@ class FavoriteControllerTest extends TestCase
 
 
     private ORMSqlConnector $connector;
-    private SchemaTool $schemaTool;
+    private SchemaBuilder $schemaBuilder;
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -71,22 +78,15 @@ class FavoriteControllerTest extends TestCase
 
 
         $this->connector = new ORMSqlConnector();
-        $entityManager = $this->connector->getEntityManager();
-        $this->schemaTool = new SchemaTool($entityManager);
+        $this->schemaBuilder = new SchemaBuilder($this->connector);
+        $this->schemaBuilder->createSchema();
+        $this->databaseBuilder = new DatabaseBuilder($this->connector);
 
 
-        $classes = $entityManager->getMetadataFactory()->getAllMetadata();
-        $this->schemaTool->createSchema($classes);
-
-
- /*
-        $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
-        $this->databaseBuilder->buildTables();
-*/
         $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
         $favoriteMapper = new FavoriteMapper();
-        $favoriteRepository = new UserFavoriteRepository($this->connector , $favoriteMapper);
+        $favoriteRepository = new UserFavoriteRepository($this->connector, $favoriteMapper);
 
         $favorite = new Favorite(
             $sessionHandler,
@@ -101,15 +101,14 @@ class FavoriteControllerTest extends TestCase
 
         $userEntityManager = new UserEntityManager($this->connector);
         $userEntityManager->saveUser($userDTO);
-    //    $this->databaseBuilder->loadData($userDTO);
-
+        $this->databaseBuilder->loadData($userDTO);
     }
 
     protected function tearDown(): void
     {
-     //   $this->databaseBuilder->dropTables();
-        $classes = $this->connector->getEntityManager()->getMetadataFactory()->getAllMetadata();
-        $this->schemaTool->dropSchema($classes);
+        //   $this->databaseBuilder->dropTables();
+
+        $this->schemaBuilder->dropSchema();
 
         $_SESSION = [];
         $_POST = [];
@@ -147,8 +146,8 @@ class FavoriteControllerTest extends TestCase
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
         self::assertCount(4, $favorites);
-        self::assertSame("FC Bayern München", $favorites[0]['teamName'], "Base value");
-        self::assertSame('Fortaleza EC', $favorites[3]['teamName'], "expected team name");
+        self::assertSame("FC Bayern München", $favorites[0]->teamName, "Base value");
+        self::assertSame('Fortaleza EC', $favorites[3]->teamName, "expected team name");
     }
 
     public function testAddFalse(): void
@@ -179,7 +178,6 @@ class FavoriteControllerTest extends TestCase
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
         self::assertCount(3, $favorites);
-
     }
 
 
@@ -207,7 +205,7 @@ class FavoriteControllerTest extends TestCase
 
         self::assertSame('favorites.twig', $template);
         self::assertNotEmpty($parameters);
-        self::assertSame("FC Bayern München", $favorites[0]['teamName'], "Base value");
+        self::assertSame("FC Bayern München", $favorites[0]->teamName, "Base value");
         self::assertCount(3, $favorites);
     }
 
@@ -238,7 +236,7 @@ class FavoriteControllerTest extends TestCase
     {
         $_ENV['test'] = 1;
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['up'] = "4";
+        $_POST['up'] = 4;
         $_SESSION['status'] = true;
         $_SESSION['userDto'] = [
             'userId' => 1,
@@ -254,16 +252,16 @@ class FavoriteControllerTest extends TestCase
 
         $favorites = $parameters['favorites'];
 
-        self::assertSame('FC Bayern München', $favorites[0]['teamName']);
+        self::assertSame('FC Bayern München', $favorites[0]->teamName);
         self::assertCount(3, $favorites);
-        self::assertSame('Borussia Dortmund', $favorites[1]['teamName']);
+        self::assertSame('Borussia Dortmund', $favorites[1]->teamName);
     }
 
     public function testMoveDown(): void
     {
         $_ENV['test'] = 1;
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['down'] = "1770";
+        $_POST['down'] = 1770;
         $_SESSION['status'] = true;
         $_SESSION['userDto'] = [
             'userId' => 1,
@@ -277,9 +275,9 @@ class FavoriteControllerTest extends TestCase
         $parameters = $this->view->getParameters();
         $favorites = $parameters['favorites'];
 
-        self::assertSame('Borussia Dortmund', $favorites[1]['teamName']);
+        self::assertSame('Borussia Dortmund', $favorites[1]->teamName);
         self::assertCount(3, $favorites);
-        self::assertSame('FC Bayern München', $favorites[0]['teamName']);
-        self::assertSame('Botafogo FR', $favorites[2]['teamName']);
+        self::assertSame('FC Bayern München', $favorites[0]->teamName);
+        self::assertSame('Botafogo FR', $favorites[2]->teamName);
     }
 }

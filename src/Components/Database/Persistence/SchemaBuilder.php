@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\Database\Persistence;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\ToolsException;
 
@@ -11,27 +12,39 @@ readonly class SchemaBuilder
 {
 
 
+    private SchemaTool $schemaTool;
+
+    private EntityManager $entityManager;
     public function __construct(private ORMSqlConnector $ormSqlConnector)
     {
+        $this->entityManager = $this->ormSqlConnector->getEntityManager();
+        $this->schemaTool = new SchemaTool($this->entityManager);
     }
 
-    public function createSchema(): string
+    public function createSchema(): void
     {
-        $entityManager = $this->ormSqlConnector->getEntityManager();
-        $schemaTool = new SchemaTool($entityManager);
-        $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
 
-        $updateSql = $schemaTool->getUpdateSchemaSql($metadata);
+
+        $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
+
+        $updateSql = $this->schemaTool->getUpdateSchemaSql($metadata);
         if (empty($updateSql)) {
-            return 'Schema already exists.\n';
+         return;
         }
 
         try {
-            $schemaTool->createSchema($metadata);
-            return 'successfully created schema.\n';
+            $this->schemaTool->createSchema($metadata);
         } catch (ToolsException $exception) {
-            return 'failed to create schema: ' . $exception->getMessage() . '\n';
+
         }
     }
+
+    public function dropSchema(): void{
+
+        $classes = $this->entityManager->getMetadataFactory()->getAllMetadata();
+        $this->schemaTool->dropSchema($classes);
+
+    }
+
 
 }

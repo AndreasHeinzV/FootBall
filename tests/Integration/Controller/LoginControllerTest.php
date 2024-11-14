@@ -6,6 +6,9 @@ namespace App\Tests\Integration\Controller;
 
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\DTOs\UserDTO;
@@ -23,7 +26,7 @@ use App\Components\UserLogin\Communication\Controller\LoginController;
 use App\Core\SessionHandler;
 use App\Tests\Fixtures\RedirectSpy;
 use App\Tests\Fixtures\ViewFaker;
-use Couchbase\User;
+
 use PHPUnit\Framework\TestCase;
 
 class LoginControllerTest extends TestCase
@@ -37,8 +40,10 @@ class LoginControllerTest extends TestCase
     private ErrorMapper $errorMapper;
 
     private UserMapper $userMapper;
+    private SchemaBuilder $schemaBuilder;
 
-    private DatabaseBusinessFacade $databaseBusinessFacade;
+  //  private DatabaseBusinessFacade $databaseBusinessFacade;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -49,15 +54,25 @@ class LoginControllerTest extends TestCase
         $this->errorMapper = new ErrorMapper();
         $redirectSpy = new RedirectSpy();
 
-        $sqlConnector = new SqlConnector();
+       /* $sqlConnector = new SqlConnector();
+
         $this->databaseBusinessFacade = new DatabaseBusinessFacade(
             new Fixtures($sqlConnector)
         );
-          $this->databaseBusinessFacade->createUserTables();
+*/
+        $ormSqlConnector = new OrmSqlConnector();
+
+        $this->schemaBuilder = new SchemaBuilder($ormSqlConnector);
+        $this->schemaBuilder->createSchema();
+        $userEntityMapper = new UserEntityMapper();
+        $userRepository = new UserRepository($ormSqlConnector, $userEntityMapper);
+        $userEntityManager = new UserEntityManager($ormSqlConnector);
+
+    //    $this->databaseBusinessFacade->createUserTables();
         $userBusinessFacade = new UserBusinessFacade(
-            new UserRepository($sqlConnector),
-            new UserEntityManager($sqlConnector)
+            $userRepository, $userEntityManager
         );
+
 
         $userAuthentication = new UserAuthentication($userBusinessFacade);
         $emailLoginValidation = new EmailLoginValidation();
@@ -96,10 +111,9 @@ class LoginControllerTest extends TestCase
                  'password' => '$2y$10$kBSL5Jj3hSMv24dq1zm3tuNvmfgUHYNxmGOofNoKb0WIHNDRj1Nne',
              ],
          */
-        $userMapper = new UserMapper();
-        $userEntityManager = new UserEntityManager($sqlConnector);
-        $userEntityManager->saveUser($userMapper->createDTO($testData));
 
+        $userMapper = new UserMapper();
+        $userEntityManager->saveUser($userMapper->createDTO($testData));
     }
 
     protected function tearDown(): void
@@ -117,7 +131,8 @@ class LoginControllerTest extends TestCase
             $this->sessionHandler,
             $this->redirectSpy
         );
-        $this->databaseBusinessFacade->dropUserTables();
+
+        $this->schemaBuilder->dropSchema();
         parent::tearDown();
     }
 
@@ -156,11 +171,10 @@ class LoginControllerTest extends TestCase
         $_POST['password'] = 'passw0rd';
 
 
-
         $this->loginController->load($this->viewFaker);
         $parameters = $this->viewFaker->getParameters();
         $template = $this->viewFaker->getTemplate();
-     //   $errors = $this->errorMapper->arrayToDto($parameters['errors']);
+        //   $errors = $this->errorMapper->arrayToDto($parameters['errors']);
         $userDto = $this->userMapper->createDTO($parameters['userLoginDto']);
 
 

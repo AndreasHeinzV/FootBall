@@ -14,7 +14,7 @@ class FavoriteMapper implements FavoriteMapperInterface
             $favoriteData['teamID'],
             $favoriteData['teamName'],
             $favoriteData['crest'],
-            $favoriteData['position']
+            $favoriteData['favoritePosition']
         );
     }
 }

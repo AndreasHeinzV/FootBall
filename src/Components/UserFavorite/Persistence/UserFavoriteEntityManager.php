@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace App\Components\UserFavorite\Persistence;
 
 use App\Components\Database\Persistence\Entity\FavoriteEntity;
-use App\Components\Database\Persistence\Entity\UserEntity;
 use App\Components\Database\Persistence\ORMSqlConnector;
-use App\Components\Database\Persistence\SqlConnectorInterface;
 use App\Components\User\Persistence\DTOs\UserDTO;
-use App\Components\UserFavorite\Business\Model\Favorite;
 use App\Components\UserFavorite\Persistence\DTO\FavoriteDTO;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Exception\ORMException;
@@ -19,76 +16,55 @@ readonly class UserFavoriteEntityManager implements UserFavoriteEntityManagerInt
 {
     private EntityManager $entityManager;
 
+
     public function __construct(
         private ORMSqlConnector $sqlConnector
     ) {
-        $this->entityManager = $sqlConnector->getEntityManager();
+        $this->entityManager = $this->sqlConnector->getEntityManager();
     }
 
     /**
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function saveUserFavorite(UserEntity $userEntity, FavoriteDTO $favoriteDTO): void
+    public function saveUserFavorite(UserDTO $userDTO, FavoriteDTO $favoriteDTO): void
     {
         $favorite = new FavoriteEntity();
         $favorite->setFavoritePosition($favoriteDTO->position);
         $favorite->setTeamCrest($favoriteDTO->crest);
         $favorite->setTeamName($favoriteDTO->teamName);
         $favorite->setTeamId($favoriteDTO->teamID);
-        $favorite->setUser($userEntity);
+        $favorite->setUserIdFk($userDTO->userId);
 
         $this->entityManager->persist($favorite);
         $this->entityManager->flush();
     }
 
     public function updateUserFavoritePosition(
-        int $userID,
-        int $currentTeamID,
-        int $prevTeamID,
-        int $currentPosition,
-        int $previousPosition
+        FavoriteEntity $favoriteEntity,
+        FavoriteEntity $favoriteEntityChange,
+        int $position,
+        int $positionToChange,
+
     ): void {
-        $this->sqlConnector->queryManipulate(
-            'UPDATE favorites SET favorite_position = -1 WHERE user_id = :user_id AND team_id = :team_id',
-            [
-                'user_id' => $userID,
-                'team_id' => $currentTeamID,
-            ]
-        );
-
-        $this->sqlConnector->queryManipulate(
-            'UPDATE favorites SET favorite_position =:favorite_position WHERE user_id = :user_id AND team_id = :team_id ',
-            [
-                'favorite_position' => $currentPosition,
-                'user_id' => $userID,
-                'team_id' => $prevTeamID,
-            ]
-        );
-
-        $this->sqlConnector->queryManipulate(
-            'UPDATE favorites SET favorite_position =:favorite_position WHERE user_id = :user_id AND team_id = :team_id ',
-            [
-                'favorite_position' => $previousPosition,
-                'user_id' => $userID,
-                'team_id' => $currentTeamID,
-            ]
-        );
+        $favoriteEntity->setFavoritePosition($positionToChange);
+        $favoriteEntityChange->setFavoritePosition($position);
+        $this->entityManager->persist($favoriteEntity);
+        $this->entityManager->persist($favoriteEntityChange);
+        $this->entityManager->flush();
     }
 
+    /**
+     * @throws ORMException
+     */
     public function deleteUserFavorite(UserDTO $userDTO, string $id): void
     {
-        $this->sqlConnector->queryManipulate(
-            '
-       DELETE FROM favorites where team_id = :team_id and user_id = :user_id',
-            [
-                'team_id' => (int)$id,
-                'user_id' => $userDTO->userId,
-            ]
+        $favoriteEntity = $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
+            ['userIdFk' => $userDTO->userId, 'teamId' => $id]
         );
-/*
-        $this->entityManager->getRepository()
-       $this->entityManager->remove($userDTO);
-*/
+
+        if ($favoriteEntity !== null) {
+            $this->entityManager->remove($favoriteEntity);
+        }
     }
 }

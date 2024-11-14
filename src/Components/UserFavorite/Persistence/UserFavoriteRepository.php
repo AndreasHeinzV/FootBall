@@ -11,6 +11,7 @@ use App\Components\Database\Persistence\SqlConnectorInterface;
 use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapper;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 class UserFavoriteRepository implements UserFavoriteRepositoryInterface
 {
@@ -33,44 +34,32 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
 
     public function getUserFavorites(UserDTO $userDTO): array
     {
-        /*
-        $favoriteArray = $this->sqlConnector->querySelectAll(
-            'SELECT favorite_position, team_id, team_name, team_crest FROM favorites WHERE user_id = :user_id ORDER BY favorite_position ASC ',
-            ['user_id' => $userDTO->userId]
+        $userFavorites = $this->entityManager->getRepository(FavoriteEntity::class)->findBy(
+            ['userIdFk' => $userDTO->userId], ['favorite_position' => 'ASC']
         );
-        if (!$favoriteArray) {
-            return [];
-        }
-        $returnArray = [];
-        foreach ($favoriteArray as $favorite) {
-            $returnArray[] = [
-                'favoritePosition' => $favorite["favorite_position"],
-                'teamName' => $favorite['team_name'],
-                'teamID' => $favorite['team_id'],
-                'crest' => $favorite['team_crest'],
-            ];
-        }
-        return $returnArray;
-        */
 
-        $userEntity = $this->entityManager->getRepository(UserEntity::class)->find($userDTO->userId);
-
-        if (!$userEntity) {
+        if (empty($userFavorites)) {
             return [];
         }
 
-        $favorites = $userEntity->getFavorites();
         $FavoriteDTOArray = [];
-        foreach ($favorites as $favorite) {
+        foreach ($userFavorites as $favorite) {
             $returnValue = [
                 'teamName' => $favorite->getTeamName(),
-                'teamID' => $favorite->getTeamID(),
+                'teamID' => $favorite->getTeamId(),
                 'crest' => $favorite->getTeamCrest(),
-                'position' => $favorite->getPosition(),
+                'favoritePosition' => $favorite->getFavoritePosition(),
             ];
             $FavoriteDTOArray[] = $this->mapper->createFavoriteDTO($returnValue);
         }
         return $FavoriteDTOArray;
+    }
+
+    public function getUserFavoriteByTeamId(UserDTO $userDTO, int $teamId): ?FavoriteEntity
+    {
+        return $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
+            ['userIdFk' => $userDTO->userId, 'teamId' => $teamId]
+        );
     }
 
     public function checkExistingFavorite(UserDTO $userDTO, string $teamID): bool
@@ -78,43 +67,91 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
         $returnValue = $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
             ['userIdFk' => $userDTO->userId, 'teamId' => $teamID]
         );
-        return $returnValue !== false;
+        return ($returnValue instanceof FavoriteEntity);
     }
 
-
-    public function getUserFavoritePosition(UserDTO $userDTO, string $id): int|false
+    public function getUserFavoriteEntityByPosition(UserDTO $userDTO, int $position): ?FavoriteEntity
     {
-        /*
-        $favoritePosition = $this->sqlConnector->querySelect(
-            'SELECT favorite_position FROM favorites WHERE user_id = :user_id AND team_id = :team_id',
-            [
-                'userIdFk' => (int)$userDTO->userId,
-                'teamId' => (int)$id,
-            ]
+        return $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
+            ['userIdFk' => $userDTO->userId, 'favorite_position' => $position]
         );
-        return $favoritePosition['favorite_position'] ?? false;
-        */
+    }
+
+    public function getUserFavoritePositionByTeamId(UserDTO $userDTO, string $id): int|false
+    {
+        $returnValue = $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
+            ['userIdFk' => $userDTO->userId, 'teamId' => $id]
+        );
+
+        return $returnValue->getFavoritePosition() ?? false;
+    }
+
+    public function getFavoritePositionAboveCurrentPosition(UserDTO $userDTO, int $position): int|false
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+
+        $qb->select('f')
+            ->from(FavoriteEntity::class, 'f')
+            ->where('f.userIdFk = :userId')
+            ->andWhere('f.favorite_position < :favoritePosition')
+            ->setParameter('userId', $userDTO->userId)
+            ->setParameter('favoritePosition', $position)
+            ->orderBy('f.favorite_position', 'DESC')
+            ->setMaxResults(1);
+
+        $result = $qb->getQuery()->getOneOrNullResult();
+
+        if ($result instanceof FavoriteEntity) {
+            return $result->getFavoritePosition();
+        }
+        return false;
+    }
+
+    public function getFavoritePositionBelowCurrentPosition(UserDTO $userDTO, int $position): int|false
+    {
+        $qb = $this->entityManager->createQueryBuilder();
+
+        $qb->select('f')
+            ->from(FavoriteEntity::class, 'f')
+            ->where('f.userIdFk = :userId')
+            ->andWhere('f.favorite_position > :favoritePosition')
+            ->setParameter('userId', $userDTO->userId)
+            ->setParameter('favoritePosition', $position)
+            ->orderBy('f.favorite_position', 'ASC')
+            ->setMaxResults(1);
+
+        $result = $qb->getQuery()->getOneOrNullResult();
+
+        if ($result instanceof FavoriteEntity) {
+            return $result->getFavoritePosition();
+        }
+        return false;
     }
 
     public function getUserMinFavoritePosition(UserDTO $userDTO): int|false
     {
-        {
-            $minPosition = $this->sqlConnector->querySelect(
-                'SELECT MIN(favorite_position) AS min_position FROM favorites WHERE user_id = :user_id',
-                ['user_id' => $userDTO->userId]
-            );
-            return $minPosition['min_position'] ?? false;
-        }
+        $minPosition = $this->sqlConnector->querySelect(
+            'SELECT MIN(favorite_position) AS min_position FROM favorites WHERE user_id = :user_id',
+            ['user_id' => $userDTO->userId]
+        );
+        return $minPosition['min_position'] ?? false;
     }
 
-    public function getUserMaxFavoritePosition(UserDTO $userDTO): int|false
+
+    public function getUserFavoritesLastPosition(UserDTO $userDTO): int|false
     {
-        {
-            $max = $this->sqlConnector->querySelect(
-                'SELECT MAX(favorite_position) AS max_position FROM favorites WHERE user_id = :user_id',
-                ['user_id' => $userDTO->userId]
-            );
-            return $max['max_position'] ?? false;
-        }
+        $lastRow = $this->entityManager->getRepository(FavoriteEntity::class)->findBy(['userIdFk' => $userDTO->userId],
+            ['favorite_position' => 'DESC'],
+            1);
+        return $lastRow[0]->getFavoritePosition() ?? false;
+    }
+
+
+    public function getUserFavoritesFirstPosition(UserDTO $userDTO): int|false
+    {
+        $firstRow = $this->entityManager->getRepository(FavoriteEntity::class)->findBy(['userIdFk' => $userDTO->userId],
+            ['favorite_position' => 'ASC'],
+            1);
+        return $firstRow[0]->getFavoritePosition() ?? false;
     }
 }
