@@ -27,7 +27,6 @@ class TeamControllerTest extends TestCase
 
     protected function setUp(): void
     {
-
         $apiRequester = new ApiRequesterFaker(
             new LeaguesMapper(),
             new CompetitionMapper(),
@@ -38,7 +37,7 @@ class TeamControllerTest extends TestCase
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
         $userFavoriteBusinessFacadeMock = $this->createMock(UserFavoriteBusinessFacade::class);
 
-        $this->teamController = new TeamController($footballBusinessFacade,$userFavoriteBusinessFacadeMock);
+        $this->teamController = new TeamController($footballBusinessFacade, $userFavoriteBusinessFacadeMock);
         $this->view = new ViewFaker();
         parent::setUp();
     }
@@ -55,6 +54,7 @@ class TeamControllerTest extends TestCase
     public function testController(): void
     {
         $_GET['id'] = '3984';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $this->teamController->load($this->view);
         $parameters = $this->view->getParameters();
 
@@ -62,37 +62,34 @@ class TeamControllerTest extends TestCase
         $playerData = $parameters['players'];
         $playerCount = count($playerData['squad']);
 
-        self::assertTrue($playerCount> 10, "Player Count should always be greater than 10");
+        self::assertTrue($playerCount > 10, "Player Count should always be greater than 10");
         self::assertSame(1631, $playerData['squad'][0]->playerID);
-
     }
 
     public function testIndexNoGet(): void
     {
-
-
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $this->teamController->load($this->view);
         $parameters = $this->view->getParameters();
 
         self::assertNotContains('players', $parameters);
         self::assertEmpty($parameters);
-
     }
 
     public function testIndexEmptyTeam(): void
     {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $_GET['id'] = '35624646';
 
         $this->teamController->load($this->view);
         $parameters = $this->view->getParameters();
 
         self::assertNotContains('players', $parameters);
-
-
     }
 
     public function testIndexTeam(): void
     {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['test'] = 1;
         $_GET['id'] = '35624646';
 
@@ -100,8 +97,6 @@ class TeamControllerTest extends TestCase
         $parameters = $this->view->getParameters();
 
         self::assertNotContains('players', $parameters);
-
-
     }
 
 }

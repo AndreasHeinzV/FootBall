@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Controller;
 
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\ActionIdGenerator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
@@ -41,6 +44,9 @@ class PasswordFailedControllerTest extends TestCase
     private ViewFaker $view;
 
     private DatabaseBuilder $databaseBuilder;
+    private ORMSqlConnector $sqlConnector;
+
+    private SchemaBuilder $schemaBuilder;
 
     protected function setUp(): void
     {
@@ -48,10 +54,10 @@ class PasswordFailedControllerTest extends TestCase
 
         $_ENV['DATABASE'] = 'football_test';
         $this->view = new ViewFaker();
-
-        $sqlConnector = new SqlConnector();
-        $userRepository = new UserRepository($sqlConnector);
-        $userEntityManager = new UserEntityManager($sqlConnector);
+        $userEntityMapper = new UserEntityMapper();
+        $this->sqlConnector = new ORMSqlConnector();
+        $userRepository = new UserRepository($this->sqlConnector, $userEntityMapper);
+        $userEntityManager = new UserEntityManager($this->sqlConnector);
         $userBusinessFacade = new UserBusinessFacade($userRepository, $userEntityManager);
 
         $testData = [
@@ -64,8 +70,11 @@ class PasswordFailedControllerTest extends TestCase
         $userMapper = new UserMapper();
         $userDTO = $userMapper->createDTO($testData);
 
-        $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
-        $this->databaseBuilder->buildTables();
+        $this->schemaBuilder = new SchemaBuilder($this->sqlConnector);
+        $this->schemaBuilder->createSchema();
+        $this->databaseBuilder = new DatabaseBuilder($this->sqlConnector);
+
+      //  $this->databaseBuilder->loadData($userDTO);
         $userEntityManager->saveUser($userDTO);
 
 
@@ -74,7 +83,7 @@ class PasswordFailedControllerTest extends TestCase
         $emailDispatcher = new EmailDispatcher(new PHPMailer());
         $timeManager = new TimeManager();
         $actionIdGenerator = new ActionIdGenerator();
-        $userPasswordResetEntityManager = new UserPasswordResetEntityManager($sqlConnector);
+        $userPasswordResetEntityManager = new UserPasswordResetEntityManager($this->sqlConnector);
 
 
         $emailCoordinator = new EmailCoordinator(
@@ -87,7 +96,8 @@ class PasswordFailedControllerTest extends TestCase
             $userBusinessFacade
         );
         $redirect = new Redirect();
-        $userPasswordResetRepository = new UserPasswordResetRepository($sqlConnector);
+        $actionMapper = new ActionMapper();
+        $userPasswordResetRepository = new UserPasswordResetRepository($this->sqlConnector, $actionMapper);
 
 
         $validateFirstPassword = new ValidateFirstPassword();
@@ -108,15 +118,19 @@ class PasswordFailedControllerTest extends TestCase
             $userMapper
         );
 
-        $actionMapper = new ActionMapper();
+
         $accessManager = new AccessManager($userPasswordResetRepository, $actionMapper, $timeManager);
-        $passwordFailedBusinessFacade = new PasswordResetBusinessFacade($emailCoordinator, $resetCoordinator, $accessManager);
+        $passwordFailedBusinessFacade = new PasswordResetBusinessFacade(
+            $emailCoordinator,
+            $resetCoordinator,
+            $accessManager
+        );
         $this->controller = new PasswordFailedController($passwordFailedBusinessFacade, $redirect);
     }
 
     protected function tearDown(): void
     {
-        $this->databaseBuilder->dropTables();
+        $this->schemaBuilder->dropSchema();
         unset($_ENV);
 
         parent::tearDown();

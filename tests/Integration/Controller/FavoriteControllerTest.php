@@ -29,10 +29,13 @@ use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\DataLoader;
 use App\Tests\Fixtures\ViewFaker;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
+
+use function PHPUnit\Framework\assertTrue;
 
 class FavoriteControllerTest extends TestCase
 {
@@ -45,6 +48,8 @@ class FavoriteControllerTest extends TestCase
 
     private ORMSqlConnector $connector;
     private SchemaBuilder $schemaBuilder;
+    private UserEntityManager $userEntityManager;
+    private UserMapper $userMapper;
 
     /**
      * @throws OptimisticLockException
@@ -58,8 +63,8 @@ class FavoriteControllerTest extends TestCase
 
         $_ENV['test'] = 1;
         $_ENV['DATABASE'] = 'football_test';
-        $userMapper = new UserMapper();
-        $sessionHandler = new SessionHandler($userMapper);
+        $this->userMapper = new UserMapper();
+        $sessionHandler = new SessionHandler($this->userMapper);
         $this->view = new ViewFaker();
         $apiRequester = new ApiRequesterFaker(
             new LeaguesMapper(),
@@ -74,13 +79,13 @@ class FavoriteControllerTest extends TestCase
             'email' => 'dog@gmail.com',
             'password' => password_hash('passw0rd', PASSWORD_DEFAULT),
         ];
-        $userDTO = $userMapper->createDTO($testData);
+        $userDTO = $this->userMapper->createDTO($testData);
 
 
         $this->connector = new ORMSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($this->connector);
         $this->schemaBuilder->createSchema();
-        $this->databaseBuilder = new DatabaseBuilder($this->connector);
+        $databaseBuilder = new DatabaseBuilder($this->connector);
 
 
         $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
@@ -99,15 +104,13 @@ class FavoriteControllerTest extends TestCase
         $this->favoriteController = new FavoriteController($sessionHandler, $userFavoriteBusinessFacade);
 
 
-        $userEntityManager = new UserEntityManager($this->connector);
-        $userEntityManager->saveUser($userDTO);
-        $this->databaseBuilder->loadData($userDTO);
+        $this->userEntityManager = new UserEntityManager($this->connector);
+        $this->userEntityManager->saveUser($userDTO);
+        $databaseBuilder->loadData($userDTO);
     }
 
     protected function tearDown(): void
     {
-        //   $this->databaseBuilder->dropTables();
-
         $this->schemaBuilder->dropSchema();
 
         $_SESSION = [];
@@ -149,6 +152,54 @@ class FavoriteControllerTest extends TestCase
         self::assertSame("FC Bayern München", $favorites[0]->teamName, "Base value");
         self::assertSame('Fortaleza EC', $favorites[3]->teamName, "expected team name");
     }
+
+    public function testAddFirstFavorite(): void
+    {
+
+
+
+
+        $testData = [
+
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'doggo@gmail.com',
+            'password' => password_hash('passw0rd', PASSWORD_DEFAULT),
+        ];
+
+        $this->userEntityManager->saveUser($this->userMapper->createDTO($testData));
+        $_ENV['test'] = 1;
+
+
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['add'] = "3984";
+
+
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'userId' => 2,
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "doggo@gmail.com",
+            'password' => "passw0rd",
+        ];
+
+
+        $this->favoriteController->load($this->view);
+        $parameters = $this->view->getParameters();
+        $template = $this->view->getTemplate();
+
+
+        $favorites = $parameters['favorites'];
+
+
+        self::assertSame('favorites.twig', $template);
+        self::assertNotEmpty($parameters);
+        self::assertCount(1, $favorites);
+        self::assertSame('Fortaleza EC', $favorites[0]->teamName, "expected team name");
+    }
+
 
     public function testAddFalse(): void
     {
@@ -217,6 +268,7 @@ class FavoriteControllerTest extends TestCase
 
         $_SESSION['status'] = true;
         $_SESSION['userDto'] = [
+            'userId' => 1,
             'firstName' => "testName",
             'lastName' => "dog",
             'email' => "dog@gmail.com",
@@ -228,7 +280,7 @@ class FavoriteControllerTest extends TestCase
 
 
         $favorites = $parameters['favorites'];
-        self::assertCount(0, $favorites);
+        self::assertCount(2, $favorites);
         self::assertSame('favorites.twig', $template);
     }
 
@@ -255,6 +307,31 @@ class FavoriteControllerTest extends TestCase
         self::assertSame('FC Bayern München', $favorites[0]->teamName);
         self::assertCount(3, $favorites);
         self::assertSame('Borussia Dortmund', $favorites[1]->teamName);
+    }
+
+    public function testMoveUpHighestObject(): void
+    {
+        $_ENV['test'] = 1;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['up'] = 5;
+        $_SESSION['status'] = true;
+        $_SESSION['userDto'] = [
+            'userId' => 1,
+            'firstName' => "testName",
+            'lastName' => "dog",
+            'email' => "dog@gmail.com",
+            'password' => "passw0rd",
+        ];
+
+        $this->favoriteController->load($this->view);
+        $parameters = $this->view->getParameters();
+
+
+        $favorites = $parameters['favorites'];
+
+        self::assertSame('FC Bayern München', $favorites[0]->teamName);
+        self::assertCount(3, $favorites);
+        self::assertSame('Borussia Dortmund', $favorites[2]->teamName);
     }
 
     public function testMoveDown(): void

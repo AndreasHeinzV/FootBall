@@ -21,17 +21,6 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
     {
         $this->entityManager = $this->sqlConnector->getEntityManager();
     }
-
-    public function findFavoritesByUserOrdered($userId)
-    {
-        return $this->createQueryBuilder('f')
-            ->where('f.user = :user_id')
-            ->setParameter('user_id', $userId)
-            ->orderBy('f.favoritePosition', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
     public function getUserFavorites(UserDTO $userDTO): array
     {
         $userFavorites = $this->entityManager->getRepository(FavoriteEntity::class)->findBy(
@@ -76,7 +65,7 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
             ['userIdFk' => $userDTO->userId, 'favorite_position' => $position]
         );
     }
-
+/*
     public function getUserFavoritePositionByTeamId(UserDTO $userDTO, string $id): int|false
     {
         $returnValue = $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
@@ -85,7 +74,7 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
 
         return $returnValue->getFavoritePosition() ?? false;
     }
-
+*/
     public function getFavoritePositionAboveCurrentPosition(UserDTO $userDTO, int $position): int|false
     {
         $qb = $this->entityManager->createQueryBuilder();
@@ -128,21 +117,14 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
         return false;
     }
 
-    public function getUserMinFavoritePosition(UserDTO $userDTO): int|false
-    {
-        $minPosition = $this->sqlConnector->querySelect(
-            'SELECT MIN(favorite_position) AS min_position FROM favorites WHERE user_id = :user_id',
-            ['user_id' => $userDTO->userId]
-        );
-        return $minPosition['min_position'] ?? false;
-    }
-
-
     public function getUserFavoritesLastPosition(UserDTO $userDTO): int|false
     {
         $lastRow = $this->entityManager->getRepository(FavoriteEntity::class)->findBy(['userIdFk' => $userDTO->userId],
             ['favorite_position' => 'DESC'],
             1);
+        if (empty($lastRow)) {
+            return false;
+        }
         return $lastRow[0]->getFavoritePosition() ?? false;
     }
 

@@ -6,6 +6,7 @@ namespace App\Tests\Integration\Facade;
 
 use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -33,6 +34,8 @@ class UserFavoriteBusinessFacadeTest extends TestCase
     private UserFavoriteBusinessFacade $businessFacade;
 
     private DatabaseBuilder $databaseBuilder;
+
+    private SchemaBuilder $schemaBuilder;
 
     /**
      * @throws OptimisticLockException
@@ -63,14 +66,16 @@ class UserFavoriteBusinessFacadeTest extends TestCase
         ];
         $userDTO = $userMapper->createDTO($testData);
 
-        $sqlConnector = new SqlConnector();
+        $sqlConnector = new ORMSqlConnector();
+        $this->schemaBuilder = new SchemaBuilder($sqlConnector);
+        $this->schemaBuilder->createSchema();
         $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
-        $this->databaseBuilder->buildTables();
+
 
         $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
         $favoriteMapper = new FavoriteMapper();
-        $favoriteRepository = new UserFavoriteRepository($sqlConnector);
+        $favoriteRepository = new UserFavoriteRepository($sqlConnector, $favoriteMapper);
 
         $favorite = new Favorite(
             $sessionHandler,
@@ -91,7 +96,7 @@ class UserFavoriteBusinessFacadeTest extends TestCase
     protected function tearDown(): void
     {
         unset($_ENV);
-        $this->databaseBuilder->dropTables();
+      $this->schemaBuilder->dropSchema();
     }
 
     public function testGetFavoriteStatus(): void

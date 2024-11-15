@@ -18,7 +18,7 @@ class SqlConnector implements SqlConnectorInterface
 
     private string $dsn;
     private PDO $pdo;
-
+/*
     public function __construct()
     {
         if (isset($_ENV['DATABASE'])) {
@@ -78,5 +78,5 @@ class SqlConnector implements SqlConnectorInterface
         }
         $stmt->execute();
     }
-
+*/
 }

@@ -22,7 +22,6 @@ class FavoriteEntity
 
     #[ORM\ManyToOne(targetEntity: UserEntity::class, inversedBy: 'favorites')]
     #[ORM\Column(name: 'user_id_fk', type: 'integer')]
-    // #[ORM\JoinColumn(name: "user_id_fk", referencedColumnName: "id")]
     private int $userIdFk;
 
     #[ORM\Column(type: 'integer', unique: true)]

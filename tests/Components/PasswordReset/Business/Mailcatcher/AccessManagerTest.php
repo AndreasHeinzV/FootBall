@@ -9,6 +9,7 @@ use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
 use App\Components\PasswordReset\Persistence\DTOs\ActionDTO;
 use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
 use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
@@ -19,16 +20,16 @@ class AccessManagerTest extends TestCase
 
     private AccessManager $accessManager;
 
-    private AccessManager $accessManagerSecond;
 
+    private MockObject $userPasswordResetRepositoryMock;
     protected function setUp(): void
     {
         $array = ['test' => 'test'];
-        $userPasswordResetRepositoryMock = $this->createMock(UserPasswordResetRepository::class);
-        $userPasswordResetRepositoryMock->method('getActionIdEntry')->willReturn(false);
+        $this->userPasswordResetRepositoryMock = $this->createMock(UserPasswordResetRepository::class);
+        $this->userPasswordResetRepositoryMock->method('getActionIdEntry')->willReturn(false);
 
-        $userPasswordResetRepositoryMockTwo = $this->createMock(UserPasswordResetRepository::class);
-        $userPasswordResetRepositoryMockTwo->method('getActionIdEntry')->willReturn($array);
+
+
 
         $actionDto = new ActionDTO();
 
@@ -37,34 +38,30 @@ class AccessManagerTest extends TestCase
         $actionMapper = new ActionMapper();
         $timeManager = new TimeManager();
         $this->accessManager = new AccessManager(
-            $userPasswordResetRepositoryMock,
+            $this->userPasswordResetRepositoryMock,
             $actionMapper,
             $timeManager
         );
 
-        $this->accessManagerSecond = new AccessManager(
-            $userPasswordResetRepositoryMockTwo,
-            $actionMapperMock,
-            $timeManager
-        );
+
     }
 
     public function testAccess(): void
     {
         $actionDto = new ActionDto();
+        $this->userPasswordResetRepositoryMock->method('getActionIdEntry')->willReturn(false);
         $actionDto->actionId = '3';
         $actionDto->timestamp = 3;
-      $result = $this->accessManager->checkForAccess($actionDto);
+        $result = $this->accessManager->checkForAccess($actionDto);
         assertFalse($result);
-
     }
 
     public function testAccessTimestampIsNull(): void
     {
         $actionDto = new ActionDto();
         $actionDto->actionId = '3';
-
-        $result = $this->accessManagerSecond->checkForAccess($actionDto);
+        $this->userPasswordResetRepositoryMock->method('getActionIdEntry')->willReturn(new ActionDTO());
+        $result = $this->accessManager->checkForAccess($actionDto);
         assertFalse($result);
     }
 }

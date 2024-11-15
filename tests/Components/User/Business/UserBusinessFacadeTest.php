@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Components\User\Business;
 
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\UserMapper;
@@ -19,17 +22,19 @@ class UserBusinessFacadeTest extends TestCase
 
     private DatabaseBuilder $databaseBuilder;
 
+    private SchemaBuilder $schemaBuilder;
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        $sqlConnector = new SqlConnector();
-        $userRepository = new UserRepository($sqlConnector);
+        $_ENV['DATABASE'] = 'football_test';
+        $sqlConnector = new ORMSqlConnector();
+        $userRepository = new UserRepository($sqlConnector, new UserEntityMapper());
         $userEntityManager = new UserEntityManager($sqlConnector);
         $this->userBusinessFacade = new userBusinessFacade($userRepository, $userEntityManager);
 
-        $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
-        $this->databaseBuilder->buildTables();
+        $this->schemaBuilder = new SchemaBuilder($sqlConnector);
+        $this->schemaBuilder->createSchema();
 
         $testData = [
             'userId' => -1,
@@ -44,7 +49,7 @@ class UserBusinessFacadeTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->databaseBuilder->dropTables();
+        $this->schemaBuilder->dropSchema();
         parent::tearDown();
     }
 

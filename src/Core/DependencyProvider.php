@@ -8,6 +8,9 @@ use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Communication\Controller\HomeController;
@@ -91,6 +94,13 @@ class DependencyProvider
         $container->set(LastNameValidation::class, new LastNameValidation());
         $container->set(EmailValidation::class, new EmailValidation());
         $container->set(PasswordValidation::class, new PasswordValidation());
+        $container->set(FavoriteMapper::class, new FavoriteMapper());
+        $container->set(ORMSqlConnector::class, new ORMSqlConnector());
+        $container->set(UserEntityMapper::class, new UserEntityMapper());
+        $container->set(SchemaBuilder::class, new SchemaBuilder(
+            $container->get(ORMSqlConnector::class),
+        ));
+
         $container->set(ApiRequester::class, new ApiRequester(
             $container->get(LeaguesMapper::class),
             $container->get(CompetitionMapper::class),
@@ -99,22 +109,26 @@ class DependencyProvider
         ));
 
         $container->set(SqlConnector::class, new SqlConnector());
+
         $container->set(Fixtures::class, new Fixtures(
             $container->get(SqlConnector::class)
         ));
         $container->set(DatabaseBusinessFacade::class, new DatabaseBusinessFacade(
-            $container->get(Fixtures::class),
+            $container->get(SchemaBuilder::class),
         ));
         $container->set(FilesystemLoader::class, new FilesystemLoader(__DIR__ . '/../View'));
 
         $container->set(UserRepository::class, new UserRepository(
-            $container->get(SqlConnector::class)));
+            $container->get(ORMSqlConnector::class),
+            $container->get(UserEntityMapper::class)));
 
         $container->set(UserFavoriteRepository::class, new UserFavoriteRepository(
-            $container->get(SqlConnector::class),
+            $container->get(ORMSqlConnector::class),
+          $container->get(FavoriteMapper::class),
         ));
         $container->set(UserEntityManager::class, new UserEntityManager(
-            $container->get(SqlConnector::class)
+            $container->get(ORMSqlConnector::class),
+
 
         ));
         $container->set(UserBusinessFacade::class, new UserBusinessFacade(
@@ -135,7 +149,7 @@ class DependencyProvider
         ));
 
         $container->set(UserFavoriteEntityManager::class, new UserFavoriteEntityManager(
-            $container->get(SqlConnector::class),
+            $container->get(ORMSqlConnector::class),
         ));
         $container->set(ApiRequesterFacade::class, new ApiRequesterFacade(
             $container->get(ApiRequester::class),
@@ -200,11 +214,13 @@ class DependencyProvider
             $container->get(Environment::class),
             $container->get(SessionHandler::class),
         ));
+        $container->set(ActionMapper::class, new ActionMapper());
         $container->set(UserPasswordResetRepository::class, new UserPasswordResetRepository(
-           $container->get(SqlConnector::class)
+           $container->get(ORMSqlConnector::class),
+            $container->get(ActionMapper::class),
         ));
 
-        $container->set(ActionMapper::class, new ActionMapper());
+
         $container->set(TimeManager::class, new TimeManager());
 
         $container->set(AccessManager::class, new AccessManager(
@@ -222,7 +238,7 @@ class DependencyProvider
         $container->set(ActionIdGenerator::class, new ActionIdGenerator());
 
         $container->set(UserPasswordResetEntityManager::class, new UserPasswordResetEntityManager(
-            $container->get(SqlConnector::class),
+            $container->get(ORMSqlConnector::class),
         ));
         $container->set(ValidateFirstPassword::class, new ValidateFirstPassword());
         $container->set(ValidateSecondPassword::class, new ValidateSecondPassword());

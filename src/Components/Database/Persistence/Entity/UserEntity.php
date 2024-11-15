@@ -32,9 +32,13 @@ class UserEntity
     #[ORM\OneToMany(targetEntity: FavoriteEntity::class, mappedBy: 'userIdFk')]
     private Collection $favorites;
 
+    #[ORM\OneToMany(targetEntity: FavoriteEntity::class, mappedBy: 'userId')]
+    private Collection $tokens;
+
     public function __construct()
     {
         $this->favorites = new ArrayCollection();
+
     }
 
     public function getId(): int
@@ -104,4 +108,16 @@ class UserEntity
             $this->favorites->removeElement($favorite);
         }
     }
+
+    public function getTokens(): Collection
+    {
+        return $this->tokens;
+    }
+
+    public function setTokens(Collection $tokens): UserEntity
+    {
+        $this->tokens = $tokens;
+        return $this;
+    }
+
 }

@@ -6,6 +6,7 @@ use PDO;
 
 interface SqlConnectorInterface
 {
+    /*
     public function getPdo(): PDO;
 
     public function queryInsert(string $query, array $params = []): void;
@@ -15,4 +16,5 @@ interface SqlConnectorInterface
     public function querySelectAll(string $query, array $params = []): array;
 
     public function queryManipulate(string $query, array $params = []): void;
+    */
 }

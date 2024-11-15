@@ -11,9 +11,7 @@ interface UserFavoriteRepositoryInterface
 
     public function checkExistingFavorite(UserDTO $userDTO, string $teamID): bool;
 
-    public function getUserFavoritePositionByTeamId(UserDTO $userDTO, string $id): int|false;
-
-    public function getUserMinFavoritePosition(UserDTO $userDTO): int|false;
+   // public function getUserFavoritePositionByTeamId(UserDTO $userDTO, string $id): int|false;
 
     public function getUserFavoritesFirstPosition(UserDTO $userDTO): int|false;
 
@@ -21,7 +19,7 @@ interface UserFavoriteRepositoryInterface
 
     public function getFavoritePositionAboveCurrentPosition(UserDTO $userDTO, int $position): int|false;
 
-    public function getUserFavoriteEntityByPosition(UserDTO $userDTO, int $maxPosition): ?FavoriteEntity;
+    public function getUserFavoriteEntityByPosition(UserDTO $userDTO, int $position): ?FavoriteEntity;
 
     public function getFavoritePositionBelowCurrentPosition(UserDTO $userDTO, int $position): int|false;
 }

@@ -6,6 +6,7 @@ namespace App\Tests\Integration\Controller;
 
 use App\Components\Database\Persistence\Mapper\UserEntityMapper;
 use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\ActionIdGenerator;
 use App\Components\PasswordReset\Business\Model\PasswordFailed\EmailBuilder;
@@ -33,6 +34,8 @@ use App\Components\User\Persistence\UserRepository;
 use App\Core\Redirect;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\ViewFaker;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPUnit\Framework\TestCase;
 
@@ -46,6 +49,10 @@ class PasswordResetControllerTest extends TestCase
 
     private UserPasswordResetEntityManager $userPasswordResetEntityManager;
 
+    private ORMSqlConnector $ormSqlConnector;
+
+    private SchemaBuilder $schemaBuilder;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -53,11 +60,10 @@ class PasswordResetControllerTest extends TestCase
         $_ENV['DATABASE'] = 'football_test';
         $this->view = new ViewFaker();
 
-        $sqlConnector = new SqlConnector();
-        $ormSqlConnector = new ORMSqlConnector();
+        $this->ormSqlConnector = new ORMSqlConnector();
         $userEntityMapper = new UserEntityMapper();
-        $userRepository = new UserRepository($ormSqlConnector, $userEntityMapper);
-        $userEntityManager = new UserEntityManager($ormSqlConnector);
+        $userRepository = new UserRepository($this->ormSqlConnector, $userEntityMapper);
+        $userEntityManager = new UserEntityManager($this->ormSqlConnector);
         $userBusinessFacade = new UserBusinessFacade($userRepository, $userEntityManager);
 
         $testData = [
@@ -70,8 +76,10 @@ class PasswordResetControllerTest extends TestCase
         $userMapper = new UserMapper();
         $userDTO = $userMapper->createDTO($testData);
 
-        $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
-        $this->databaseBuilder->buildTables();
+        $this->schemaBuilder = new SchemaBuilder($this->ormSqlConnector);
+        $this->schemaBuilder->createSchema();
+        $this->databaseBuilder = new DatabaseBuilder($this->ormSqlConnector);
+
         $userEntityManager->saveUser($userDTO);
 
 
@@ -80,7 +88,7 @@ class PasswordResetControllerTest extends TestCase
         $emailDispatcher = new EmailDispatcher(new PHPMailer());
         $timeManager = new TimeManager();
         $actionIdGenerator = new ActionIdGenerator();
-        $this->userPasswordResetEntityManager = new UserPasswordResetEntityManager($sqlConnector);
+        $this->userPasswordResetEntityManager = new UserPasswordResetEntityManager($this->ormSqlConnector);
 
         $emailCoordinator = new EmailCoordinator(
             $emailBuilder,
@@ -104,8 +112,8 @@ class PasswordResetControllerTest extends TestCase
             $validateDuplicatePassword
         );
         $resetErrorDtoProvider = new ResetErrorDtoProvider($validateResetErrors);
-
-        $userPasswordResetRepository = new UserPasswordResetRepository($sqlConnector);
+        $actionMapper = new ActionMapper();
+        $userPasswordResetRepository = new UserPasswordResetRepository($this->ormSqlConnector, $actionMapper);
         $resetCoordinator = new ResetCoordinator(
             $resetErrorDtoProvider,
             $userPasswordResetRepository,
@@ -113,7 +121,7 @@ class PasswordResetControllerTest extends TestCase
             $userBusinessFacade,
             $userMapper
         );
-        $actionMapper = new ActionMapper();
+
         $accessManager = new AccessManager($userPasswordResetRepository, $actionMapper, $timeManager);
         $passwordFailedBusinessFacade = new PasswordResetBusinessFacade(
             $emailCoordinator,
@@ -128,7 +136,7 @@ class PasswordResetControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->databaseBuilder->dropTables();
+        $this->schemaBuilder->dropSchema();
         unset($this->view, $_GET, $_POST);
 
         parent::tearDown();
@@ -162,11 +170,14 @@ class PasswordResetControllerTest extends TestCase
         self::assertSame('password-reset.twig', $template);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function testResetTimeoutMail(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_GET['ts'] = time() - 60;
-        $_GET['actionId'] = '123';
+        $_POST['passwordReset'] = 'push';
         $time = time() + 3;
         $twoHoursAgo = time() - (2 * 60 * 60);
         $_GET['ts'] = $time;
@@ -182,13 +193,16 @@ class PasswordResetControllerTest extends TestCase
 
         $this->passwordResetController->load($this->view);
         $parameter = $this->view->getParameters();
-        $result = $parameter['resetErrorDto'];
         $template = $this->view->getTemplate();
         self::assertNotEmpty($parameter);
         self::assertFalse($parameter['resetAllowed']);
         self::assertSame('error.twig', $template);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function testWrongPasswordEntry(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';

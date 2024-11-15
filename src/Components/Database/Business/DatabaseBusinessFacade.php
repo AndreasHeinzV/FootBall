@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace App\Components\Database\Business;
 
 use App\Components\Database\Business\Model\FixturesInterface;
+use App\Components\Database\Persistence\SchemaBuilder;
 
 readonly class DatabaseBusinessFacade implements DatabaseBusinessFacadeInterface
 {
     public function __construct(
-        private FixturesInterface $fixtures
+        private SchemaBuilder $schemaBuilder,
     ) {
     }
 
     public function createUserTables(): void
     {
-        $this->fixtures->buildTables();
+        $this->schemaBuilder->createSchema();
     }
 
     public function dropUserTables(): void
     {
-        $this->fixtures->dropTables();
+        $this->schemaBuilder->dropSchema();
     }
 }

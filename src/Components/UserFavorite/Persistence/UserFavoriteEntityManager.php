@@ -65,6 +65,7 @@ readonly class UserFavoriteEntityManager implements UserFavoriteEntityManagerInt
 
         if ($favoriteEntity !== null) {
             $this->entityManager->remove($favoriteEntity);
+            $this->entityManager->flush();
         }
     }
 }

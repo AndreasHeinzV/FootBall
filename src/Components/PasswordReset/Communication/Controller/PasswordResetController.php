@@ -38,7 +38,7 @@ readonly class PasswordResetController
         }
 
         //if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['passwordReset'] = 'push') {
-        if ($_POST['passwordReset'] === 'push') {
+        if (isset( $_POST['firstPassword'], $_POST['secondPassword']) && $_POST['passwordReset'] === 'push') {
             $resetDTO = new ResetDTO();
             $resetDTO->FirstPassword = $_POST['firstPassword'];
             $resetDTO->SecondPassword = $_POST['secondPassword'];

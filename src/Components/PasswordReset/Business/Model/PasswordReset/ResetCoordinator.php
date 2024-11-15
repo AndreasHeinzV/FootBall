@@ -9,6 +9,7 @@ use App\Components\PasswordReset\Persistence\DTOs\ResetErrorDTO;
 use App\Components\PasswordReset\Persistence\EntityManager\UserPasswordResetEntityManager;
 use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
 use App\Components\User\Business\UserBusinessFacadeInterface;
+use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\User\Persistence\Mapper\UserMapper;
 
 readonly class ResetCoordinator
@@ -33,7 +34,9 @@ readonly class ResetCoordinator
         }
 
         $userId = $this->userPasswordResetRepository->getUserIdFromActionId($actionId);
-        $this->userBusinessFacade->updateUserPassword($this->userMapper->UserDTOWithOnlyUserId($userId));
+        $userDto = new UserDTO($userId,'','','',$resetDTO->FirstPassword);
+
+        $this->userBusinessFacade->updateUserPassword($userDto);
         $this->userPasswordResetEntityManager->deletePasswordResetAction($actionId);
         return true;
     }

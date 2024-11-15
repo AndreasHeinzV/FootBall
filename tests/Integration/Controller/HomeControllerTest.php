@@ -6,6 +6,8 @@ namespace App\Tests\Integration\Controller;
 
 use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
+use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\Football\Business\Model\FootballBusinessFacade;
 use App\Components\Football\Communication\Controller\HomeController;
@@ -35,6 +37,8 @@ class HomeControllerTest extends TestCase
 
     private HomeController $homeController;
 
+    private SchemaBuilder $schemaBuilder;
+
     protected function setUp(): void
     {
         $_ENV['test'] = 1;
@@ -52,23 +56,26 @@ class HomeControllerTest extends TestCase
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
 
 
-        $sqlConnector = new SqlConnector();
+        $sqlConnector = new ORMSqlConnector();
+        $this->schemaBuilder = new SchemaBuilder($sqlConnector);
+        $this->schemaBuilder->createSchema();
         $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
-        $this->databaseBuilder->buildTables();
 
 
         $this->homeController = new HomeController($footballBusinessFacade);
         parent::setUp();
     }
+
     protected function tearDown(): void
     {
+        $this->schemaBuilder->dropSchema();
         unset($_ENV['test'], $_SERVER['REQUEST_METHOD'], $_POST['loginButton'], $_POST['email'], $_POST['password']);
         parent::tearDown();
     }
+
     public function testIndex(): void
     {
-
-     $this->homeController->load($this->view);
+        $this->homeController->load($this->view);
         $parameters = $this->view->getParameters();
 
 

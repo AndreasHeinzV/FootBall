@@ -12,7 +12,7 @@ class Fixtures implements FixturesInterface
     public function __construct(public SqlConnector $sqlConnector)
     {
     }
-
+/*
     public function buildTables(): void
     {
         $statements =
@@ -65,4 +65,5 @@ class Fixtures implements FixturesInterface
         $pdo->exec($dropResetPasswords);
         $pdo->exec($dropUsers);
     }
+*/
 }

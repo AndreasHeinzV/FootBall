@@ -61,7 +61,7 @@ class SqlConnectionTest extends TestCase
     public function testAddUser(): void
     {
         $entityManager = $this->connector->getEntityManager();
-        echo "Connection successful.\n";
+
 
 
         $user = new UserEntity();
@@ -88,7 +88,7 @@ class SqlConnectionTest extends TestCase
     public function testAddFav(): void
     {
         $entityManager = $this->connector->getEntityManager();
-        echo "Connection successful.\n";
+
 
 
         $user = new UserEntity();

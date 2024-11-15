@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\PasswordReset\Persistence\Mapper;
 
+use App\Components\Database\Persistence\Entity\ResetPasswordEntity;
 use App\Components\PasswordReset\Persistence\DTOs\ActionDTO;
 
 class ActionMapper
@@ -18,4 +19,11 @@ class ActionMapper
         return $actionDto;
     }
 
+    public function mapEntityToActionDto(ResetPasswordEntity $resetPasswordEntity): ActionDto{
+        $actionDto = new ActionDto();
+        $actionDto->userId = $resetPasswordEntity->getUserId();
+        $actionDto->timestamp = $resetPasswordEntity->getTimestamp();
+        $actionDto->actionId = $resetPasswordEntity->getActionId();
+        return $actionDto;
+    }
 }

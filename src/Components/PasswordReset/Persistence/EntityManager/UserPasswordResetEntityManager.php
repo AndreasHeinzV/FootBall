@@ -4,34 +4,45 @@ declare(strict_types=1);
 
 namespace App\Components\PasswordReset\Persistence\EntityManager;
 
-use App\Components\Database\Persistence\SqlConnectorInterface;
+use App\Components\Database\Persistence\Entity\ResetPasswordEntity;
+use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\PasswordReset\Persistence\DTOs\MailDTO;
 use App\Components\User\Persistence\DTOs\UserDTO;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 
 readonly class UserPasswordResetEntityManager
 {
+    private EntityManager $entityManager;
 
-    public function __construct(private SqlConnectorInterface $sqlConnector)
+    public function __construct(private ORMSqlConnector $sqlConnector)
     {
+        $this->entityManager = $this->sqlConnector->getEntityManager();
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function savePasswordResetAction(UserDTO $userDTO, MailDTO $mailDTO): void
     {
-        $this->sqlConnector->queryInsert(
-            'INSERT INTO reset_passwords(user_id, action_id, timestamp) Values(:user_id,:action_id,:timestamp)'
-            , [
-                'user_id' => $userDTO->userId,
-                'action_id' => $mailDTO->actionId,
-                'timestamp' => $mailDTO->timestamp,
-            ]
-        );
+        $passwordResetEntity = new ResetPasswordEntity();
+        $passwordResetEntity->setActionId($mailDTO->actionId);
+        $passwordResetEntity->setUserId($userDTO->userId);
+        $passwordResetEntity->setTimestamp($mailDTO->timestamp);
+
+
+        $this->entityManager->persist($passwordResetEntity);
+        $this->entityManager->flush();
     }
 
     public function deletePasswordResetAction(string $actionId): void
     {
-        $this->sqlConnector->queryManipulate(
-            'DELETE FROM reset_passwords WHERE action_id = :action_id',
-            ['action_id' => $actionId]
-        );
+        $entity = $this->entityManager->find(ResetPasswordEntity::class, $actionId);
+        if ($entity !== null) {
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
+        }
     }
 }

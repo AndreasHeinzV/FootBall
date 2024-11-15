@@ -6,6 +6,9 @@ namespace App\Tests\Components\UserLogin\Business\Model\Validation;
 
 use App\Components\Database\Business\DatabaseBusinessFacade;
 use App\Components\Database\Business\Model\Fixtures;
+use App\Components\Database\Persistence\Mapper\UserEntityMapper;
+use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\UserMapper;
@@ -28,9 +31,9 @@ class PasswordValidationTest extends TestCase
         $_ENV['DATABASE'] = 'football_test';
         //----------------------------------------------------------------------------------------
         //DB prepare for use
-        $sqlConnector = new SqlConnector();
+        $sqlConnector = new ORMSqlConnector();
         $this->databaseBusinessFacade = new DatabaseBusinessFacade(
-            new Fixtures($sqlConnector)
+            new SchemaBuilder($sqlConnector)
         );
         $this->databaseBusinessFacade->createUserTables();
         //----------------------------------------------------------------------------------------
@@ -42,7 +45,7 @@ class PasswordValidationTest extends TestCase
             'email' => 'dog@gmail.com',
             'password' => password_hash('passw0rd', PASSWORD_DEFAULT),
         ];
-        $userRepository = new UserRepository($sqlConnector);
+        $userRepository = new UserRepository($sqlConnector, new UserEntityMapper());
         $userMapper = new UserMapper();
         $userEntityManager = new UserEntityManager($sqlConnector);
         $userEntityManager->saveUser($userMapper->createDTO($testData));
@@ -53,10 +56,10 @@ class PasswordValidationTest extends TestCase
         $userBusinessFacade = new UserBusinessFacade($userRepository, $userEntityManager);
         $userAuthentication = new UserAuthentication($userBusinessFacade);
         $this->validation = new PasswordLoginValidation($userAuthentication);
-
     }
 
-    protected function tearDown(): void{
+    protected function tearDown(): void
+    {
         $this->databaseBusinessFacade->dropUserTables();
         unset($_ENV);
         parent::tearDown();
@@ -68,7 +71,7 @@ class PasswordValidationTest extends TestCase
         $userLoginDto->email = 'dog@gmail.com';
         $userLoginDto->password = 'passw0rd';
 
-       $status =  $this->validation->validateInput($userLoginDto);
+        $status = $this->validation->validateInput($userLoginDto);
         self::assertNull($status);
     }
 
@@ -78,7 +81,7 @@ class PasswordValidationTest extends TestCase
         $userLoginDto->email = 'wagahh@gwg.de';
         $userLoginDto->password = 'eagewhhw';
 
-        $status =  $this->validation->validateInput($userLoginDto);
+        $status = $this->validation->validateInput($userLoginDto);
         self::assertIsString($status);
         self::assertSame('email or password is wrong', $status);
     }
@@ -89,7 +92,7 @@ class PasswordValidationTest extends TestCase
         $userLoginDto->email = 'wagahh@gwg.de';
         $userLoginDto->password = '';
 
-        $status =  $this->validation->validateInput($userLoginDto);
+        $status = $this->validation->validateInput($userLoginDto);
         self::assertIsString($status);
         self::assertSame('Password is empty.', $status);
     }

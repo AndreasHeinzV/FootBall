@@ -17,6 +17,7 @@ readonly class UserAuthentication
     public function authenticateLogin(UserLoginDto $userLoginDto): bool
     {
         $userDTOFromDB = $this->userBusinessFacade->getUserByMail($userLoginDto->email);
+
         return password_verify($userLoginDto->password, $userDTOFromDB->password);
     }
 }

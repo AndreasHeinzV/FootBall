@@ -14,6 +14,7 @@ use Doctrine\ORM\OptimisticLockException;
 readonly class UserEntityManager implements UserEntityManagerInterface
 {
     private EntityManager $entityManager;
+
     public function __construct(
         private ORMSqlConnector $sqlConnectorNew,
     ) {
@@ -47,7 +48,7 @@ readonly class UserEntityManager implements UserEntityManagerInterface
     public function updateUserPassword(UserDTO $userDTO): void
     {
         $userRepository = $this->entityManager->getRepository(UserEntity::class);
-        $userEntity = $userRepository->findOneBy(['email' => $userDTO->email]);
+        $userEntity = $userRepository->findOneBy(['id' => $userDTO->userId]);
 
 
         if ($userEntity !== null) {
@@ -62,6 +63,7 @@ readonly class UserEntityManager implements UserEntityManagerInterface
      * @throws OptimisticLockException
      * @throws ORMException
      */
+    /*
     private function updateUser(int $userId, userDTO $userDTO): void
     {
         $userRepository = $this->entityManager->getRepository(UserEntity::class);
@@ -73,5 +75,5 @@ readonly class UserEntityManager implements UserEntityManagerInterface
             $this->entityManager->flush();
         }
     }
-
+*/
 }

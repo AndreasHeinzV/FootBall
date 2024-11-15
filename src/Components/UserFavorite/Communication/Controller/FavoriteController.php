@@ -30,6 +30,4 @@ readonly class FavoriteController implements FavoriteControllerInterface
         $view->setTemplate('favorites.twig');
         $view->addParameter('favorites', $this->userFavoriteBusinessFacade->getUserFavorites($user));
     }
-
-
 }

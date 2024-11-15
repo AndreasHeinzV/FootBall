@@ -20,14 +20,13 @@ readonly class AccessManager
     public function checkForAccess(ActionDTO $actionDTO): bool
     {
         $actionEntry = $this->repository->getActionIdEntry($actionDTO->actionId);
-        if (!$actionEntry) {
+        if (!($actionEntry instanceof ActionDTO)) {
             return false;
         }
-        $actionDTO = $this->actionMapper->mapArrayToActionDto($actionEntry);
 
         if ($actionDTO->timestamp === null) {
             return false;
         }
-        return $this->timeManager->compareTimestamp($actionDTO->timestamp);
+        return $this->timeManager->compareTimestamp($actionEntry->timestamp);
     }
 }
