@@ -54,12 +54,6 @@ class LoginControllerTest extends TestCase
         $this->errorMapper = new ErrorMapper();
         $redirectSpy = new RedirectSpy();
 
-       /* $sqlConnector = new SqlConnector();
-
-        $this->databaseBusinessFacade = new DatabaseBusinessFacade(
-            new Fixtures($sqlConnector)
-        );
-*/
         $ormSqlConnector = new OrmSqlConnector();
 
         $this->schemaBuilder = new SchemaBuilder($ormSqlConnector);

@@ -15,6 +15,7 @@ readonly class SchemaBuilder
     private SchemaTool $schemaTool;
 
     private EntityManager $entityManager;
+
     public function __construct(private ORMSqlConnector $ormSqlConnector)
     {
         $this->entityManager = $this->ormSqlConnector->getEntityManager();
@@ -23,27 +24,19 @@ readonly class SchemaBuilder
 
     public function createSchema(): void
     {
-
-
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
         $updateSql = $this->schemaTool->getUpdateSchemaSql($metadata);
         if (empty($updateSql)) {
-         return;
+            return;
         }
-
-        try {
-            $this->schemaTool->createSchema($metadata);
-        } catch (ToolsException $exception) {
-
-        }
+        $this->schemaTool->createSchema($metadata);
     }
 
-    public function dropSchema(): void{
-
+    public function dropSchema(): void
+    {
         $classes = $this->entityManager->getMetadataFactory()->getAllMetadata();
         $this->schemaTool->dropSchema($classes);
-
     }
 
 

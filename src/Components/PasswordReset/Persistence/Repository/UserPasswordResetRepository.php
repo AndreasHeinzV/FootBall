@@ -23,12 +23,7 @@ readonly class UserPasswordResetRepository implements UserPasswordResetRepositor
 
     public function getUserIdFromActionId(string $actionId): int|false
     {
-        /*
-        $value =  $this->sqlConnector->querySelect(
-            'SELECT user_id FROM reset_passwords WHERE action_id = :action_id', ['action_id' => $actionId]
-        );
-        return $value['user_id'] ?? false;
-        */
+
         $entity = $this->entityManager->getRepository(ResetPasswordEntity::class)->findOneBy(['actionId' => $actionId]);
         if ($entity instanceof ResetPasswordEntity) {
             return $entity->getUserId();
@@ -38,12 +33,6 @@ readonly class UserPasswordResetRepository implements UserPasswordResetRepositor
 
     public function getActionIdEntry(string $actionId): ActionDTO|false
     {
-        /*
-        return $this->sqlConnector->querySelectAll(
-            'SELECT user_id, action_id, timestamp FROM reset_passwords WHERE action_id = :action_id',
-            ['action_id' => $actionId]
-        );
-        */
 
         $entity = $this->entityManager->getRepository(ResetPasswordEntity::class)->findOneBy(['actionId' => $actionId]);
         if ($entity instanceof ResetPasswordEntity) {

@@ -89,7 +89,7 @@ class UserEntity
         $this->lastName = $lastName;
         return $this;
     }
-
+/*
     public function getFavorites(): Collection
     {
         return $this->favorites;
@@ -119,5 +119,5 @@ class UserEntity
         $this->tokens = $tokens;
         return $this;
     }
-
+*/
 }

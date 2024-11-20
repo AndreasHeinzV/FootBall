@@ -9,7 +9,7 @@ use App\Components\PasswordReset\Persistence\DTOs\ActionDTO;
 
 class ActionMapper
 {
-
+/*
     public function mapArrayToActionDto(array $actionEntry): ActionDto
     {
         $actionDto = new ActionDto();
@@ -18,7 +18,7 @@ class ActionMapper
         $actionDto->timestamp = $actionEntry[0]['timestamp'];
         return $actionDto;
     }
-
+*/
     public function mapEntityToActionDto(ResetPasswordEntity $resetPasswordEntity): ActionDto{
         $actionDto = new ActionDto();
         $actionDto->userId = $resetPasswordEntity->getUserId();

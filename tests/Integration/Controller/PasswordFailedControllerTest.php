@@ -43,7 +43,6 @@ class PasswordFailedControllerTest extends TestCase
 
     private ViewFaker $view;
 
-    private DatabaseBuilder $databaseBuilder;
     private ORMSqlConnector $sqlConnector;
 
     private SchemaBuilder $schemaBuilder;
@@ -115,7 +114,6 @@ class PasswordFailedControllerTest extends TestCase
             $userPasswordResetRepository,
             $userPasswordResetEntityManager,
             $userBusinessFacade,
-            $userMapper
         );
 
 

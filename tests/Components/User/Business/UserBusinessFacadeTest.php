@@ -7,20 +7,16 @@ namespace App\Tests\Components\User\Business;
 use App\Components\Database\Persistence\Mapper\UserEntityMapper;
 use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SchemaBuilder;
-use App\Components\Database\Persistence\SqlConnector;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\User\Persistence\UserEntityManager;
 use App\Components\User\Persistence\UserRepository;
-use App\Tests\Fixtures\DatabaseBuilder;
 use PHPUnit\Framework\TestCase;
 
 class UserBusinessFacadeTest extends TestCase
 {
 
     private UserBusinessFacade $userBusinessFacade;
-
-    private DatabaseBuilder $databaseBuilder;
 
     private SchemaBuilder $schemaBuilder;
 
@@ -43,7 +39,6 @@ class UserBusinessFacadeTest extends TestCase
             'email' => 'dog@gmail.com',
             'password' => password_hash('passw0rd', PASSWORD_DEFAULT),
         ];
-
         $userEntityManager->saveUser((new UserMapper())->createDTO($testData));
     }
 
@@ -55,6 +50,14 @@ class UserBusinessFacadeTest extends TestCase
 
     public function testGetUser(): void
     {
+        $userDTO = $this->userBusinessFacade->getUserByMail('dog@gmail.com');
+
+        self::assertSame('dog@gmail.com', $userDTO->email);
+        self::assertNotSame(-1, $userDTO->userId);
+    }
+    public function testGetUserFailed(): void
+    {
+
         $userDTO = $this->userBusinessFacade->getUserByMail('dog@gmail.com');
 
         self::assertSame('dog@gmail.com', $userDTO->email);
@@ -102,11 +105,19 @@ class UserBusinessFacadeTest extends TestCase
     {
         $users = $this->userBusinessFacade->getUsers();
 
-        self:
         self::assertNotEmpty($users);
         self::assertCount(1, $users);
     }
 
+    public function testGetUsersButEmptyDb(): void
+    {
+        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->createSchema();
+
+        $users = $this->userBusinessFacade->getUsers();
+
+        self::assertEmpty($users);
+    }
 
     public function testRegisterUser(): void
     {

@@ -31,7 +31,7 @@ class FavoriteEntity
 
     #[ORM\Column(type: 'string')]
     private string $team_crest;
-
+/*
     public function getUserIdFk(): int
     {
         return $this->userIdFk;
@@ -41,7 +41,7 @@ class FavoriteEntity
     {
         return $this->favoriteId;
     }
-
+*/
     public function getFavoritePosition(): int
     {
         return $this->favorite_position;

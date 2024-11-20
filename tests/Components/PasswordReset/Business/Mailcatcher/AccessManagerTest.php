@@ -9,6 +9,7 @@ use App\Components\PasswordReset\Business\Model\PasswordReset\TimeManager;
 use App\Components\PasswordReset\Persistence\DTOs\ActionDTO;
 use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
 use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
+use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepositoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -22,19 +23,13 @@ class AccessManagerTest extends TestCase
 
 
     private MockObject $userPasswordResetRepositoryMock;
+
     protected function setUp(): void
     {
         $array = ['test' => 'test'];
         $this->userPasswordResetRepositoryMock = $this->createMock(UserPasswordResetRepository::class);
-        $this->userPasswordResetRepositoryMock->method('getActionIdEntry')->willReturn(false);
+        $this->userPasswordResetRepositoryInterfaceMock = $this->createMock(UserPasswordResetRepositoryInterface::class);
 
-
-
-
-        $actionDto = new ActionDTO();
-
-        $actionMapperMock = $this->createMock(ActionMapper::class);
-        $actionMapperMock->method('mapArrayToActionDto')->willReturn($actionDto);
         $actionMapper = new ActionMapper();
         $timeManager = new TimeManager();
         $this->accessManager = new AccessManager(

@@ -10,16 +10,6 @@ use App\Components\User\Persistence\DTOs\UserDTO;
 class UserEntityMapper
 {
 
-    public function mapUserDtoToUserEntity(UserDTO $userDTO): UserEntity
-    {
-        $userEntity = new UserEntity();
-        $userEntity->setEmail($userDTO->email);
-        $userEntity->setPassword($userDTO->password);
-        $userEntity->setFirstName($userDTO->firstName);
-        $userEntity->setLastName($userDTO->lastName);
-        return $userEntity;
-    }
-
     public function mapUserEntityToUserDto(UserEntity $userEntity): UserDTO
     {
         return new UserDTO(

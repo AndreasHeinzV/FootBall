@@ -12,6 +12,7 @@ use App\Components\Football\Communication\Controller\TeamController;
 use App\Components\Pages\Business\Communication\Controller\NoPageController;
 use App\Components\PasswordReset\Communication\Controller\PasswordFailedController;
 use App\Components\PasswordReset\Communication\Controller\PasswordResetController;
+use App\Components\Shop\Communication\ShopController;
 use App\Components\UserFavorite\Communication\Controller\FavoriteController;
 use App\Components\UserLogin\Communication\Controller\LoginController;
 use App\Components\UserLogin\Communication\Controller\LogoutController;
@@ -28,7 +29,7 @@ class ControllerProvider
 
     /**
      * @return array<string, class-string>
-     * @phpstan-return array<'home'|'competitions'|'team'|'player'|'register'|'login'|'logout'|'favorites'|'password-failed'|'password-reset'|'404', class-string>
+     * @phpstan-return array<'home'|'competitions'|'team'|'player'|'register'|'login'|'logout'|'favorites'|'password-failed'|'password-reset'|'404'|'clubShop', class-string>
      */
     public function getList(): array
     {
@@ -43,6 +44,7 @@ class ControllerProvider
             'favorites' => FavoriteController::class,
             'password-failed' => PasswordFailedController::class,
             'password-reset' => PasswordResetController::class,
+            'shop' => ShopController::class,
             '404' => NoPageController::class,
         ];
     }

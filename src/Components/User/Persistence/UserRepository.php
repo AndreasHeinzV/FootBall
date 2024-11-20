@@ -38,8 +38,8 @@ readonly class UserRepository implements UserRepositoryInterface
     {
         $users = $this->entityManager->getRepository(UserEntity::class)->findAll();
 
-        if (!$users) {
-            throw new EntityNotFoundException('No users found.');
+        if (empty($users)) {
+            return [];
         }
         return $users;
     }

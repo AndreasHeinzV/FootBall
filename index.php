@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Components\Database\Business\DatabaseBusinessFacade;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Core\Container;
 use App\Core\ControllerProvider;
 use App\Core\DependencyProvider;
@@ -20,8 +21,8 @@ $container = new Container();
 
 $dependencyProvider = new DependencyProvider();
 $dependencyProvider->fill($container);
-$build = $container->get(DatabaseBusinessFacade::class);
-$build->createUserTables();
+$build = $container->get(SchemaBuilder::class);
+$build->createSchema();
 $view = $container->get(View::class);
 
 $controllerProvider = new ControllerProvider($container);

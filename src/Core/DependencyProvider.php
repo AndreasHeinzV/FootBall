@@ -187,7 +187,6 @@ class DependencyProvider
             $container->get((RegisterMapper::class))
         ));
         $container->set(UserRegisterBusinessFacade::class, new UserRegisterBusinessFacade(
-           // $container->get(UserBusinessFacade::class),
             $container->get(Register::class),
         ));
         $container->set(LogoutController::class, new LogoutController(

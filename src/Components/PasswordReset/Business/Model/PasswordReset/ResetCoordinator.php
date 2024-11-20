@@ -21,7 +21,6 @@ readonly class ResetCoordinator
         private UserPasswordResetRepository $userPasswordResetRepository,
         private UserPasswordResetEntityManager $userPasswordResetEntityManager,
         private UserBusinessFacadeInterface $userBusinessFacade,
-        private UserMapper $userMapper,
     ) {
     }
 
