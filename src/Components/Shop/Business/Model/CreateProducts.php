@@ -5,67 +5,41 @@ declare(strict_types=1);
 namespace App\Components\Shop\Business\Model;
 
 use App\Components\Api\Business\ApiRequesterFacade;
+use App\Components\Shop\Persistence\DTOs\ProductDto;
+use App\Components\Shop\Persistence\ProductMapper;
 
 class CreateProducts
 {
 
-    public function __construct(private ApiRequesterFacade $apiRequesterFacade)
+    public function __construct(private ApiRequesterFacade $apiRequesterFacade, private ProductMapper $productMapper)
     {
     }
 
     public function createProducts(string $teamId): array
     {
         $teamDtoArray = $this->apiRequesterFacade->getTeam($teamId);
-        if (empty($teamDtoArray)) {
+
+        $squad = $teamDtoArray['squad'];
+        if (empty($squad)) {
             return [];
         }
-        $squad = $teamDtoArray['squad'];
+        $soccerImageLink = 'https://cdn.media.amplience.net/i/frasersdev/37966518_o?fmt=auto&upscale=false&w=345&h=345&sm=c&$h-ttl$';
         $teamName = $teamDtoArray['teamName'];
         $productsArray = [];
 
         foreach ($squad as $team) {
-            $productDto = new ProductDto();
-            $productDto->imageLink = 'imageLink';
-            $productDto->name = $team->name . ' soccer jersey';
-            $productDto->category = 'soccerJersey';
-            $productDto->link = $this->createProductLink(
-                $productDto->category,
-                $productDto->name,
-                $productDto->imageLink
+            $productsArray[] = $this->productMapper->createProductDto(
+                'soccerJersey',
+                $team->name . ' soccer jersey',
+                $soccerImageLink
             );
-            $productsArray[] = $productDto;
         }
-
-        $productDto = new ProductDto();
-        $productDto->imageLink = 'imageLink';
-        $productDto->name = $teamName . ' cup';
-        $productDto->category = 'cup';
-        $productDto->link = $this->createProductLink($productDto->category, $productDto->name, $productDto->imageLink);
-        $productsArray[] = $productDto;
-
-        $productDtoScarf = new ProductDto();
-        $productDtoScarf->imageLink = 'imageLink';
-        $productDtoScarf->name = $teamName . ' scarf';
-        $productDtoScarf->category = 'scarf';
-        $productDtoScarf->link = $this->createProductLink('scarf', $productDtoScarf->name, $productDtoScarf->imageLink);
-
-        $productsArray[] = $this->createProductDto('scarf', $teamName. ' scarf', $productDtoScarf->imageLink);
-//finish this
+        $cupImage = 'https://t4.ftcdn.net/jpg/00/72/09/65/360_F_72096563_ei7KGRxgaKIX3GU2gFKWS9sxCrudCe4g.jpg';
+        $scarfImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTg_Puj8YY6Yd4DIS230gL-k8IHVCG9T4QjZQ&s';
+        $productsArray[] = $this->productMapper->createProductDto('cup', $teamName . 'cup', $cupImage);
+        $productsArray[] = $this->productMapper->createProductDto('scarf', $teamName . ' scarf', $scarfImage);
         return $productsArray;
     }
 
-    public function createProductLink(string $category, string $name, string $imageLink): string
-    {
-        return 'http://localhost:8000/index.php?page=details&category=' . $category . '&imageLink=' . $imageLink . '&name=' . $name;
-    }
 
-    public function createProductDto(string $category, string $name, string $imageLink): ProductDto
-    {
-        $productDto = new ProductDto();
-        $productDto->imageLink = $imageLink;
-        $productDto->name = $name;
-        $productDto->category = $category;
-        $productDto->link = $this->createProductLink($category, $productDto->name, $productDto->imageLink);
-        return $productDto;
-    }
 }

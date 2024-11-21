@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Details</title>
+    <style>
+        .product-item {
+            flex: 0 1 30%;
+            box-sizing: border-box;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .product-item img {
+            border: 2px solid black;
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+
+
+</head>
+<body>
+{% if productDto %}
+
+    <div class="product-item">
+        <h1>Product Details</h1>
+        <h2>{{ productDto.name }}</h2>
+        <img src="{{ productDto.imageLink }}" alt="Image of {{ productDto.name }}">
+
+        {% if productDto.category == 'soccerJersey' %}<br>
+        Select Size:
+        <form method="POST">
+            <label for="size"></label>
+            <select name="size" id="size">
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="XXL">XXL</option>
+            </select>
+            {% endif %}
+            {% if productDto.price %}
+                Price: {{ productDto.price }}€
+            {% endif %}
+
+            <input type="hidden" name="name" value="{{ productDto.name }}">
+            <input type="hidden" name="category" value="{{ productDto.category }}">
+            <input type="hidden" name="imageLink" value="{{ productDto.imageLink }}">
+
+            {% if productDto.size %}
+                <input type="hidden" name="currentSize" value="{{ productDto.size }}">
+            {% endif %}
+            <button type="submit">Submit</button>
+
+
+        </form>
+    </div>
+
+{% else %}
+    <p>Product information is not available.</p>
+{% endif %}
+</body>
+</html>

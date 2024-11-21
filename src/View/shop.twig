@@ -1,0 +1,54 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Shop</title>
+    <style>
+        .products-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 0;
+            list-style: none;
+        }
+
+        .product-item {
+            flex: 0 1 30%;
+            box-sizing: border-box;
+            margin: 10px;
+
+            text-align: center;
+        }
+
+        .product-item img {
+            border: 2px solid black;
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+{% block header %}
+    {% include 'base.twig' %}
+{% endblock header %}
+
+{% block content %}
+    {% if products is not empty %}
+        <h1>Products for {{ teamName }}</h1>
+        <ul class="products-list">
+            {% for product in products %}
+                <li class="product-item">
+                    <a href="{{ product.link }}">
+                        <img src="{{ product.imageLink }}" alt="{{ product.name }}">
+                        <h2>{{ product.name }}</h2>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h1>No products found for this team.</h1>
+    {% endif %}
+{% endblock content %}
+</body>
+
+
+</html>

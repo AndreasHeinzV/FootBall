@@ -17,7 +17,7 @@ readonly class ShopController
     {
         $products = [];
 
-        if (isset($_GET['teamId']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($_GET['teamId'])) {
           //  $page = $_GET['page'];
             $teamId = $_GET['teamId'];
             $teamName = $_GET['teamName'];

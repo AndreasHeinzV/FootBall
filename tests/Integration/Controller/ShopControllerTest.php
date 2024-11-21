@@ -12,9 +12,11 @@ use App\Components\Football\Mapper\CompetitionMapper;
 use App\Components\Football\Mapper\LeaguesMapper;
 use App\Components\Football\Mapper\PlayerMapper;
 use App\Components\Football\Mapper\TeamMapper;
+use App\Components\Shop\Business\Model\CalculatePrice;
 use App\Components\Shop\Business\Model\CreateProducts;
 use App\Components\Shop\Business\ProductBusinessFacade;
 use App\Components\Shop\Communication\ShopController;
+use App\Components\Shop\Persistence\ProductMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\ViewFaker;
@@ -57,8 +59,10 @@ class ShopControllerTest extends TestCase
             new PlayerMapper()
         );
         $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
-        $createProducts = new CreateProducts($apiRequesterFacade);
-        $productBusinessFacade = new ProductBusinessFacade($createProducts);
+        $productMapper = new ProductMapper();
+        $createProducts = new CreateProducts($apiRequesterFacade, $productMapper);
+        $calculatePrice = new CalculatePrice();
+        $productBusinessFacade = new ProductBusinessFacade($createProducts, $calculatePrice, $productMapper);
         $this->controller = new ShopController($productBusinessFacade);
     }
 
@@ -79,9 +83,10 @@ class ShopControllerTest extends TestCase
         $this->controller->load($this->view);
         $template = $this->view->getTemplate();
         $parameters = $this->view->getParameters();
-
+        $products = $parameters['products'];
         self::assertSame('shop.twig', $template);
         self::assertSame('test', $parameters['teamName']);
+        self::assertNotEmpty($products);
         self::assertNotEmpty($parameters);
     }
 }

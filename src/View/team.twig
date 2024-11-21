@@ -4,28 +4,32 @@
 {% endblock %}
 <form action="" method="POST">
     {% if players is not empty %}
-    <h1>Team: {{ players.teamName }}
+        <h1>Team: {{ players.teamName }}
 
-        {% if status %}
-            {% if favoriteStatus %}
-                <button type="submit" value="{{ players.teamID }}" name="delete">delete</button>
-            {% else %}
-                <button type="submit" value="{{ players.teamID }}" name="add">add</button>
+
+
+            {% if status %}
+                {% if favoriteStatus %}
+                    <button type="submit" value="{{ players.teamID }}" name="delete">delete</button>
+                {% else %}
+                    <button type="submit" value="{{ players.teamID }}" name="add">add</button>
+                {% endif %}
             {% endif %}
-        {% endif %}
-    </h1>
+        </h1>
 
-    <ul>
+        <ul>
 
-        {% for player in players.squad %}
+            {% for player in players.squad %}
 
 
-            <li><a href="{{ player.link }}">{{ player.name }}</a></li>
-        {% endfor %}
-    </ul>
+                <li><a href="{{ player.link }}">{{ player.name }}</a></li>
+            {% endfor %}
+        </ul>
+        <a href="/?page=shop&teamId={{ players.teamID }}&teamName={{ players.teamName | url_encode }}" class="button">View
+            Products</a>
     {% else %}
 
-    <h1> Page not found return to homepage</h1>
+        <h1> Page not found return to homepage</h1>
         <a href="/">Index</a>
     {% endif %}
 </form>
