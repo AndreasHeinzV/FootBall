@@ -23,20 +23,30 @@ class DetailsController
             $category = $_GET['category'];
             $name = $_GET['name'];
             $image = $_GET['imageLink'];
-            $productDto = $this->productBusinessFacade->createProduct($category, $name, $image);
+            $productDto = $this->productBusinessFacade->createProduct($category, $name, $image, null, null);
             $view->addParameter('productDto', $productDto);
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['size'], $_POST['category'], $_POST['name'], $_POST['imageLink'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category'], $_POST['name'], $_POST['imageLink']) && $_POST['calculatePriceButton'] === 'submit') {
+            $customName = $_POST['customName'] ?? null;
+            $size = $_POST['size'] ?? null;
+            if (isset($_POST['amount']) && ctype_digit($_POST['amount']) && $_POST['amount'] > 0) {
+                $amount = (int)$_POST['amount'];
+            } else {
+                $amount = 1;
+            }
             $category = $_POST['category'];
             $name = $_POST['name'];
             $image = $_POST['imageLink'];
-            $size = $_POST['size'];
 
-            $productDto = $this->productBusinessFacade->createProduct($category, $name, $image);
-            $productDto->size = $size;
+            if ($customName !== null) {
+                $name = $customName . " " . $category;
+            }
+
+            $productDto = $this->productBusinessFacade->createProduct($category, $name, $image, $size, $amount);
             $productDto = $this->productBusinessFacade->getProductPrice($productDto);
             $view->addParameter('productDto', $productDto);
         }
+
 
 
         $view->setTemplate('details.twig');

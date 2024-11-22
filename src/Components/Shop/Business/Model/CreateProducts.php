@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Shop\Business\Model;
 
 use App\Components\Api\Business\ApiRequesterFacade;
-use App\Components\Shop\Persistence\DTOs\ProductDto;
-use App\Components\Shop\Persistence\ProductMapper;
+use App\Components\Shop\Persistence\Mapper\ProductMapper;
 
 class CreateProducts
 {
@@ -31,13 +30,21 @@ class CreateProducts
             $productsArray[] = $this->productMapper->createProductDto(
                 'soccerJersey',
                 $team->name . ' soccer jersey',
-                $soccerImageLink
+                $soccerImageLink,
+                null,
+                null
             );
         }
         $cupImage = 'https://t4.ftcdn.net/jpg/00/72/09/65/360_F_72096563_ei7KGRxgaKIX3GU2gFKWS9sxCrudCe4g.jpg';
         $scarfImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTg_Puj8YY6Yd4DIS230gL-k8IHVCG9T4QjZQ&s';
-        $productsArray[] = $this->productMapper->createProductDto('cup', $teamName . 'cup', $cupImage);
-        $productsArray[] = $this->productMapper->createProductDto('scarf', $teamName . ' scarf', $scarfImage);
+        $productsArray[] = $this->productMapper->createProductDto('cup', $teamName . 'cup', $cupImage, null, null);
+        $productsArray[] = $this->productMapper->createProductDto(
+            'scarf',
+            $teamName . ' scarf',
+            $scarfImage,
+            null,
+            null
+        );
         return $productsArray;
     }
 

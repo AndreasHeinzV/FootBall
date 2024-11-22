@@ -35,6 +35,9 @@ class UserEntity
     #[ORM\OneToMany(targetEntity: FavoriteEntity::class, mappedBy: 'userId')]
     private Collection $tokens;
 
+    #[ORM\OneToMany(targetEntity: ProductEntity::class, mappedBy: 'userId')]
+    private Collection $cartItems;
+
     public function __construct()
     {
         $this->favorites = new ArrayCollection();

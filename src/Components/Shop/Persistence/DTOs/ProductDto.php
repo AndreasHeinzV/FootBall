@@ -12,7 +12,8 @@ class ProductDto
         public string $category,
         public ?string $size,
         public ?float $price,
-        public string $link
+        public string $link,
+        public ?int $amount,
     ) {
     }
 }

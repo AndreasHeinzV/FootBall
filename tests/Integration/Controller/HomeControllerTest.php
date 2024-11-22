@@ -31,7 +31,7 @@ class HomeControllerTest extends TestCase
 {
 
 
-    private DatabaseBuilder $databaseBuilder;
+
 
     private ViewFaker $view;
 
@@ -59,7 +59,6 @@ class HomeControllerTest extends TestCase
         $sqlConnector = new ORMSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($sqlConnector);
         $this->schemaBuilder->createSchema();
-        $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
 
 
         $this->homeController = new HomeController($footballBusinessFacade);

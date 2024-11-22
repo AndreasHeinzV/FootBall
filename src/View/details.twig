@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% block header %}
+        {% include 'base.twig' %}
+    {% endblock %}
     <meta charset="UTF-8">
     <title>Product Details</title>
     <style>
@@ -28,33 +31,46 @@
         <h2>{{ productDto.name }}</h2>
         <img src="{{ productDto.imageLink }}" alt="Image of {{ productDto.name }}">
 
-        {% if productDto.category == 'soccerJersey' %}<br>
-        Select Size:
+
         <form method="POST">
-            <label for="size"></label>
-            <select name="size" id="size">
-                <option value="XS">XS</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-                <option value="XXL">XXL</option>
-            </select>
-            {% endif %}
             {% if productDto.price %}
-                Price: {{ productDto.price }}€
+                <h1>Price: {{ productDto.price }}€</h1>
+            {% endif %}
+            {% if productDto.category == 'soccerJersey' %}<br>
+                Select Size:
+                <label for="size"></label>
+                <select name="size" id="size">
+                    <option value="XS">XS</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                    <option value="XXL">XXL</option>
+                </select><br>
+                Custom Name:
+                <label>
+                    <input type="text" name="customName" value="">
+                </label>
             {% endif %}
 
             <input type="hidden" name="name" value="{{ productDto.name }}">
             <input type="hidden" name="category" value="{{ productDto.category }}">
             <input type="hidden" name="imageLink" value="{{ productDto.imageLink }}">
 
+            <label>
+                Amount:
+                <input type="text" name="amount" value="{{productDto.amount|default(1)}}">
+            </label>
+
             {% if productDto.size %}
                 <input type="hidden" name="currentSize" value="{{ productDto.size }}">
             {% endif %}
-            <button type="submit">Submit</button>
-
-
+            <br>
+            <button type="submit" name="calculatePriceButton" value="submit" id="submit">Submit</button>
+            <br>
+            {% if productDto.price %}
+                <button type="submit" name="addToCartButton" value="addToCart" id="addToCart">Add to cart</button>
+            {% endif %}
         </form>
     </div>
 

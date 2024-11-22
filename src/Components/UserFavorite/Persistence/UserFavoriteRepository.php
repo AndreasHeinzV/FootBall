@@ -50,7 +50,7 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
             ['userIdFk' => $userDTO->userId, 'teamId' => $teamId]
         );
     }
-
+//toDo delete method
     public function checkExistingFavorite(UserDTO $userDTO, string $teamID): bool
     {
         $returnValue = $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(

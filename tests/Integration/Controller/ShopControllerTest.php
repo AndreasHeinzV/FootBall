@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Controller;
 
 use App\Components\Api\Business\ApiRequesterFacade;
-use App\Components\Api\Business\Model\ApiRequester;
 use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -14,10 +13,15 @@ use App\Components\Football\Mapper\PlayerMapper;
 use App\Components\Football\Mapper\TeamMapper;
 use App\Components\Shop\Business\Model\CalculatePrice;
 use App\Components\Shop\Business\Model\CreateProducts;
+use App\Components\Shop\Business\Model\ProductManager;
 use App\Components\Shop\Business\ProductBusinessFacade;
 use App\Components\Shop\Communication\ShopController;
-use App\Components\Shop\Persistence\ProductMapper;
+use App\Components\Shop\Persistence\Mapper\ProductMapper;
+use App\Components\Shop\Persistence\ProductEntityManager;
+use App\Components\Shop\Persistence\ProductRepository;
 use App\Components\User\Persistence\Mapper\UserMapper;
+use App\Core\SessionHandler;
+use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use App\Tests\Fixtures\DatabaseBuilder;
 use App\Tests\Fixtures\ViewFaker;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +56,7 @@ class ShopControllerTest extends TestCase
         $databaseBuilder = new DatabaseBuilder($connector);
         $databaseBuilder->loadData($userDTO);
         $this->view = new ViewFaker();
-        $apiRequester = new ApiRequester(
+        $apiRequester = new ApiRequesterFaker(
             new LeaguesMapper(),
             new CompetitionMapper(),
             new TeamMapper(),
@@ -62,7 +66,21 @@ class ShopControllerTest extends TestCase
         $productMapper = new ProductMapper();
         $createProducts = new CreateProducts($apiRequesterFacade, $productMapper);
         $calculatePrice = new CalculatePrice();
-        $productBusinessFacade = new ProductBusinessFacade($createProducts, $calculatePrice, $productMapper);
+        $ormSqlConnector = new ORMSqlConnector();
+        $productRepository = new ProductRepository($ormSqlConnector);
+        $productEntityManager = new ProductEntityManager($ormSqlConnector);
+
+        $productManager = new ProductManager(
+            new SessionHandler(new UserMapper()),
+            $productRepository,
+            $productEntityManager
+        );
+        $productBusinessFacade = new ProductBusinessFacade(
+            $createProducts,
+            $calculatePrice,
+            $productMapper,
+            $productManager
+        );
         $this->controller = new ShopController($productBusinessFacade);
     }
 
@@ -78,7 +96,7 @@ class ShopControllerTest extends TestCase
     {
         $_GET['teamName'] = 'test';
         $_GET['page'] = 'shop';
-        $_GET['teamId'] = '5';
+        $_GET['teamId'] = '3984';
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $this->controller->load($this->view);
         $template = $this->view->getTemplate();
@@ -89,4 +107,6 @@ class ShopControllerTest extends TestCase
         self::assertNotEmpty($products);
         self::assertNotEmpty($parameters);
     }
+
+
 }
