@@ -16,6 +16,8 @@ use App\Components\User\Persistence\Mapper\UserMapperInterface;
 use App\Tests\Fixtures\DatabaseBuilder;
 use PHPUnit\Framework\TestCase;
 
+use function PHPUnit\Framework\assertInstanceOf;
+
 class ProductEntityManagerTest extends TestCase
 {
     private ProductEntityManager $productEntityManager;
@@ -45,11 +47,13 @@ class ProductEntityManagerTest extends TestCase
         ];
         $this->userMapper = new UserMapper();
         $userDTO = $this->userMapper->createDTO($testData);
-
-        $this->productRepository = new ProductRepository($ormSqlConnector);
-        $this->databaseBuilder = new DatabaseBuilder($ormSqlConnector);
-        $this->databaseBuilder->loadData($userDTO);
         $this->productMapper = new ProductMapper();
+        $this->productRepository = new ProductRepository($ormSqlConnector, $this->productMapper);
+        $this->databaseBuilder = new DatabaseBuilder($ormSqlConnector);
+
+
+        $this->databaseBuilder->loadData($userDTO);
+
         $this->productEntityManager = new ProductEntityManager($ormSqlConnector);
     }
 
@@ -62,8 +66,7 @@ class ProductEntityManagerTest extends TestCase
 
     public function testSaveProductEntity(): void
     {
-        $productDto = $this->productMapper->createProductDto('jersey', 'bayern jersey', 'imageLink', 'L', 3);
-        $productDto->price = 9.99;
+        $productDto = $this->productMapper->createProductDto('jersey', 'bayern jersey', 'imageLink', 'L', 3, 9.99);
 
         $userDto = $this->userMapper->UserDTOWithOnlyUserId(1);
         $this->productEntityManager->saveProductEntity($productDto, $userDto);
@@ -72,8 +75,44 @@ class ProductEntityManagerTest extends TestCase
         self::assertSame(1, $productEntity->getProductId());
     }
 
+
+    public function testUpdateProductEntityAmount(): void
+    {
+        $productDto = $this->productMapper->createProductDto('jersey', 'bayern jersey', 'imageLink', 'L', 3, 9.99);
+
+        $userDto = $this->userMapper->UserDTOWithOnlyUserId(1);
+        $this->productEntityManager->saveProductEntity($productDto, $userDto);
+        $productEntityOld = $this->productRepository->getProductEntity($productDto, $userDto);
+        $oldAmount = $productEntityOld->getAmount();
+
+        $this->productEntityManager->addProductEntityAmount($productEntityOld, 5);
+        $productEntityNew = $this->productRepository->getProductEntity($productDto, $userDto);
+        self::assertInstanceOf(ProductEntity::class, $productEntityNew);
+        self::assertSame(8, $productEntityNew->getAmount());
+        self::assertNotSame($oldAmount, $productEntityNew->getAmount());
+    }
+
+    public function testDeleteProductEntity(): void
+    {
+        $productDto = $this->productMapper->createProductDto('jersey', 'bayern jersey', 'imageLink', 'L', 3, 9.99);
+
+        $userDto = $this->userMapper->UserDTOWithOnlyUserId(1);
+        $this->productEntityManager->saveProductEntity($productDto, $userDto);
+        $productEntityOld = $this->productRepository->getProductEntity($productDto, $userDto);
+
+
+        $userDto = (new UserMapper())->UserDTOWithOnlyUserId(1);
+        $this->productEntityManager->deleteProductEntity($userDto, 1);
+        $deletedEntity = $this->productRepository->getProductEntity($productDto, $userDto);
+
+        self::assertInstanceOf(ProductEntity::class, $productEntityOld);
+        self::assertNull($deletedEntity);
+    }
+
     public function testNothing(): void
     {
         self::assertTrue(true);
     }
+
+
 }

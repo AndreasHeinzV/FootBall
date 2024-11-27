@@ -5,21 +5,53 @@ declare(strict_types=1);
 namespace App\Tests\Components\UserFavorite\Persistence;
 
 use App\Components\Database\Persistence\ORMSqlConnector;
+use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\User\Persistence\DTOs\UserDTO;
+use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Components\UserFavorite\Persistence\Mapper\FavoriteMapper;
 use App\Components\UserFavorite\Persistence\UserFavoriteRepository;
+use App\Tests\Fixtures\DatabaseBuilder;
 use PHPUnit\Framework\TestCase;
 
 class UserFavoriteRepositoryTest extends TestCase
 {
 
     private UserFavoriteRepository $userFavoriteRepository;
+    private UserMapper $userMapper;
+
+    private SchemaBuilder $schemaBuilder;
+
+    private DatabaseBuilder $databaseBuilder;
 
     protected function setUp(): void
     {
-        $this->userFavoriteRepository = new UserFavoriteRepository(new ORMSqlConnector(), new FavoriteMapper());
+        $_ENV['DATABASE'] = 'football_test';
+        $ormSqlConnector = new ORMSqlConnector();
+        $this->schemaBuilder = new SchemaBuilder($ormSqlConnector);
+        $this->schemaBuilder->createSchema();
+        $testData = [
+            'userId' => 1,
+            'firstName' => 'ImATestCat',
+            'lastName' => 'JustusCristus',
+            'email' => 'dog@gmail.com',
+            'password' => password_hash('passw0rd', PASSWORD_DEFAULT),
+        ];
+        $this->userMapper = new UserMapper();
+        $userDTO = $this->userMapper->createDTO($testData);
+        $this->databaseBuilder = new DatabaseBuilder($ormSqlConnector);
+
+
+        $this->databaseBuilder->loadData($userDTO);
+
+        $this->userFavoriteRepository = new UserFavoriteRepository($ormSqlConnector, new FavoriteMapper());
     }
 
+    protected function tearDown(): void
+    {
+        unset($_ENV, $_POST, $_GET);
+        $this->schemaBuilder->dropSchema();
+        parent::tearDown();
+    }
 
     public function testGetUserFavoritesEmptyEntries(): void
     {
@@ -35,6 +67,7 @@ class UserFavoriteRepositoryTest extends TestCase
         $favorite = $this->userFavoriteRepository->getFavoritePositionAboveCurrentPosition($userDto, 1);
         self::assertFalse($favorite);
     }
+
     public function testTryGetPositionBelow(): void
     {
         $userDto = new UserDto(2, 'test', '', '', '');

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block header %}
+        {% include 'base.twig' %}
+    {% endblock %}
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+
+</head>
+<body>
+<h1>Your Shopping Cart</h1>
+
+{% if products is empty %}
+    <p>Your cart is empty.</p>
+{% else %}
+    {% set total_price = 0 %}
+
+    <div class="products">
+        {% for product in products %}
+            <div class="product">
+                <img src="{{ product.imageLink }}" alt="{{ product.name }}" class="product-image"
+                     style="width: 100px; height: auto;">
+                <h2>{{ product.name }}</h2>
+                <p>Amount: {{ product.amount }}</p>
+                <p>Price: {{ product.price | number_format(2, '.', ',') }} </p>
+                <form action="/cart/update" method="post">
+                    <input type="hidden" name="productName" value="{{ product.name }}">
+                    <button type="submit" name="changeAmount" value="increase">+1</button>
+                    <button type="submit" name="changeAmount" value="decrease">-1</button>
+                    <button type="submit" name="deleteProduct" value="true">Delete</button>
+                </form>
+            </div>
+
+            {% set total_price = total_price + (product.price * product.amount) %}
+        {% endfor %}
+    </div>
+
+    <div class="total-price">
+        <h3>Total Price: {{ total_price | number_format(2, '.', ',') }}</h3>
+    </div>
+{% endif %}
+
+</body>
+</html>

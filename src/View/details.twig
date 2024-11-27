@@ -56,10 +56,10 @@
             <input type="hidden" name="name" value="{{ productDto.name }}">
             <input type="hidden" name="category" value="{{ productDto.category }}">
             <input type="hidden" name="imageLink" value="{{ productDto.imageLink }}">
-
+            <input type="hidden" name="teamName" value="{{ productDto.teamName }}">
             <label>
                 Amount:
-                <input type="text" name="amount" value="{{productDto.amount|default(1)}}">
+                <input type="text" name="amount" value="{{ productDto.amount|default(1) }}">
             </label>
 
             {% if productDto.size %}
@@ -70,6 +70,10 @@
             <br>
             {% if productDto.price %}
                 <button type="submit" name="addToCartButton" value="addToCart" id="addToCart">Add to cart</button>
+            {% endif %}
+
+            {% if message %}
+                {{ message }}
             {% endif %}
         </form>
     </div>

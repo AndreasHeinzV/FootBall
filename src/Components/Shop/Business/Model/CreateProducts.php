@@ -29,19 +29,23 @@ class CreateProducts
         foreach ($squad as $team) {
             $productsArray[] = $this->productMapper->createProductDto(
                 'soccerJersey',
+                $teamName,
                 $team->name . ' soccer jersey',
                 $soccerImageLink,
+                null,
                 null,
                 null
             );
         }
         $cupImage = 'https://t4.ftcdn.net/jpg/00/72/09/65/360_F_72096563_ei7KGRxgaKIX3GU2gFKWS9sxCrudCe4g.jpg';
         $scarfImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTg_Puj8YY6Yd4DIS230gL-k8IHVCG9T4QjZQ&s';
-        $productsArray[] = $this->productMapper->createProductDto('cup', $teamName . 'cup', $cupImage, null, null);
+        $productsArray[] = $this->productMapper->createProductDto('cup', $teamName , 'cup', $cupImage, null, null, null);
         $productsArray[] = $this->productMapper->createProductDto(
             'scarf',
+            $teamName,
             $teamName . ' scarf',
             $scarfImage,
+            null,
             null,
             null
         );

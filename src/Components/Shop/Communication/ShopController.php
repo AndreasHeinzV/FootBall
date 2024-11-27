@@ -18,7 +18,7 @@ readonly class ShopController
         $products = [];
 
         if (isset($_GET['teamId'])) {
-          //  $page = $_GET['page'];
+            //  $page = $_GET['page'];
             $teamId = $_GET['teamId'];
             $teamName = $_GET['teamName'];
             $products = $this->productBusinessFacade->getClubProducts($teamId);

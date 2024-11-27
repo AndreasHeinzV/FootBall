@@ -12,6 +12,7 @@ use App\Components\Football\Communication\Controller\TeamController;
 use App\Components\Pages\Business\Communication\Controller\NoPageController;
 use App\Components\PasswordReset\Communication\Controller\PasswordFailedController;
 use App\Components\PasswordReset\Communication\Controller\PasswordResetController;
+use App\Components\Shop\Communication\CartController;
 use App\Components\Shop\Communication\DetailsController;
 use App\Components\Shop\Communication\ShopController;
 use App\Components\UserFavorite\Communication\Controller\FavoriteController;
@@ -47,6 +48,7 @@ class ControllerProvider
             'password-reset' => PasswordResetController::class,
             'shop' => ShopController::class,
             'details' => DetailsController::class,
+            'cart' => CartController::class,
             '404' => NoPageController::class,
         ];
     }

@@ -21,20 +21,29 @@ class ProductEntity
     #[Column(type: 'integer', unique: true)]
     private ?int $productId;
 
+    #[Column(type: 'string')]
+    private string $teamName;
+
     #[Column(type: 'string', length: 255)]
     private string $name;
+
+
+    #[Column(type: 'string', length: 255)]
+    private string $category;
     #[Column(type: 'integer')]
     private int $amount;
 
-    #[Column(type: 'string', length: 255)]
+    #[Column(type: 'string', length: 255, nullable: true)]
     private ?string $size;
+    #[Column(type: 'string', length: 255)]
+    private ?string $imageLink;
 
     #[Column(type: 'float')]
     private float $price;
 
     #[ManyToOne(targetEntity: UserEntity::class, inversedBy: 'cartItems')]
     #[Column(name: 'user_id', type: 'integer')]
-    private int $userId;
+    private int $userIdPd;
 
     public function getProductId(): ?int
     {
@@ -43,18 +52,40 @@ class ProductEntity
 
     public function getUserId(): int
     {
-        return $this->userId;
+        return $this->userIdPd;
     }
 
     public function setUserId(int $userId): ProductEntity
     {
-        $this->userId = $userId;
+        $this->userIdPd = $userId;
+        return $this;
+    }
+
+    public function getCategory(): string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(string $category): ProductEntity
+    {
+        $this->category = $category;
         return $this;
     }
 
     public function getPrice(): float
     {
         return $this->price;
+    }
+
+    public function setImageLink(string $imageLink): ProductEntity
+    {
+        $this->imageLink = $imageLink;
+        return $this;
+    }
+
+    public function getImageLink(): ?string
+    {
+        return $this->imageLink;
     }
 
     public function setPrice(float $price): ProductEntity
@@ -93,6 +124,17 @@ class ProductEntity
     public function setName(string $name): ProductEntity
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function getTeamName(): string
+    {
+        return $this->teamName;
+    }
+
+    public function setTeamName(string $teamName)
+    {
+        $this->teamName = $teamName;
         return $this;
     }
 

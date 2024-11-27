@@ -21,20 +21,22 @@ class CalculatePriceTest extends TestCase
 
     public function testCalculatePriceXXl(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'XXl', null, '');
+        $productDto = new ProductDto('', '', 'soccerJersey', 'XXl', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
 
         self::assertNotEmpty($productDto->price);
         self::assertSame(34.99, $productDto->price);
     }
+
     public function testCalculatePriceXL(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'Xl', null, '');
+        $productDto = new ProductDto('', '', 'soccerJersey', 'Xl', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
 
         self::assertNotEmpty($productDto->price);
         self::assertSame(29.99, $productDto->price);
     }
+
     public function testCalculatePriceM(): void
     {
         $productDto = new ProductDto('', '', 'soccerJersey', 'M', null, '', 1);
@@ -52,6 +54,7 @@ class CalculatePriceTest extends TestCase
         self::assertNotEmpty($productDto->price);
         self::assertSame(14.99, $productDto->price);
     }
+
     public function testCalculateProductPriceNoSize(): void
     {
         $productDto = new ProductDto('', '', 'soccerJersey', null, null, '', 1);
@@ -65,9 +68,10 @@ class CalculatePriceTest extends TestCase
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertSame(9.99, $productDto->price);
     }
+
     public function testCalculateProductPriceScarf(): void
     {
-        $productDto = new ProductDto('', '', 'scarf', null, null, '', 1) ;
+        $productDto = new ProductDto('', '', 'scarf', null, null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertSame(19.99, $productDto->price);
     }

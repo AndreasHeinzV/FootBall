@@ -32,10 +32,10 @@ class UserEntity
     #[ORM\OneToMany(targetEntity: FavoriteEntity::class, mappedBy: 'userIdFk')]
     private Collection $favorites;
 
-    #[ORM\OneToMany(targetEntity: FavoriteEntity::class, mappedBy: 'userId')]
+    #[ORM\OneToMany(targetEntity: ResetPasswordEntity::class, mappedBy: 'userId')]
     private Collection $tokens;
 
-    #[ORM\OneToMany(targetEntity: ProductEntity::class, mappedBy: 'userId')]
+    #[ORM\OneToMany(targetEntity: ProductEntity::class, mappedBy: 'userIdPd')]
     private Collection $cartItems;
 
     public function __construct()

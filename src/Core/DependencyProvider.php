@@ -43,10 +43,14 @@ use App\Components\PasswordReset\Persistence\Mapper\ActionMapper;
 use App\Components\PasswordReset\Persistence\Repository\UserPasswordResetRepository;
 use App\Components\Shop\Business\Model\CalculatePrice;
 use App\Components\Shop\Business\Model\CreateProducts;
+use App\Components\Shop\Business\Model\ProductManager;
 use App\Components\Shop\Business\ProductBusinessFacade;
+use App\Components\Shop\Communication\CartController;
 use App\Components\Shop\Communication\DetailsController;
 use App\Components\Shop\Communication\ShopController;
 use App\Components\Shop\Persistence\Mapper\ProductMapper;
+use App\Components\Shop\Persistence\ProductEntityManager;
+use App\Components\Shop\Persistence\ProductRepository;
 use App\Components\User\Business\UserBusinessFacade;
 use App\Components\User\Persistence\Mapper\ErrorMapper;
 use App\Components\User\Persistence\Mapper\UserMapper;
@@ -225,6 +229,20 @@ class DependencyProvider
             $container->get(ActionMapper::class),
         ));
         $container->set(ProductMapper::class, new ProductMapper());
+        $container->set(ProductRepository::class, new ProductRepository(
+            $container->get(ORMSqlConnector::class),
+            $container->get(ProductMapper::class)
+
+        ));
+        $container->set(ProductEntityManager::class, new ProductEntityManager(
+            $container->get(ORMSqlConnector::class),
+        ));
+        $container->set(ProductManager::class, new ProductManager(
+           $container->get(SessionHandler::class),
+           $container->get(ProductRepository::class),
+           $container->get(ProductEntityManager::class),
+        ));
+
         $container->set(CalculatePrice::class, new CalculatePrice());
         $container->set(CreateProducts::class, new CreateProducts(
             $container->get(ApiRequesterFacade::class),
@@ -233,7 +251,9 @@ class DependencyProvider
         $container->set(ProductBusinessFacade::class, new ProductBusinessFacade(
             $container->get(CreateProducts::class),
             $container->get(CalculatePrice::class),
-            $container->get(ProductMapper::class)
+            $container->get(ProductMapper::class),
+            $container->get(ProductManager::class),
+            $container->get(ProductRepository::class),
         ));
         $container->set(ShopController::class, new ShopController(
            $container->get(ProductBusinessFacade::class)
@@ -287,7 +307,6 @@ class DependencyProvider
             $container->get(UserPasswordResetRepository::class),
             $container->get(UserPasswordResetEntityManager::class),
             $container->get(UserBusinessFacade::class),
-            $container->get(UserMapper::class),
         ));
 
         $container->set(PasswordResetBusinessFacade::class, new PasswordResetBusinessFacade(
@@ -330,6 +349,10 @@ class DependencyProvider
         $container->set(PasswordResetController::class, new PasswordResetController(
             $container->get(PasswordResetBusinessFacade::class),
             $container->get(Redirect::class),
+        ));
+        $container->set(CartController::class, new CartController(
+            $container->get(SessionHandler::class),
+            $container->get(ProductBusinessFacade::class),
         ));
     }
 

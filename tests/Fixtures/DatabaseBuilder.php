@@ -74,7 +74,7 @@ class DatabaseBuilder
     {
         if (isset($_ENV['DATABASE']) && $_ENV['DATABASE'] === 'football_test') {
             try {
-                $dataLoader = new DataLoader();
+                $dataLoader = new DataLoader((new ORMSqlConnector()));
                 $dataLoader->loadTestDataIntoDatabase($userDTO);
             } catch (\Exception) {
             }

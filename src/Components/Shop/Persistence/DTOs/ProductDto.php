@@ -8,6 +8,7 @@ class ProductDto
 {
     public function __construct(
         public string $name,
+        public string $teamName,
         public string $imageLink,
         public string $category,
         public ?string $size,

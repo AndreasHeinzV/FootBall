@@ -9,7 +9,6 @@ use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Shop\Persistence\DTOs\ProductDto;
 use App\Components\User\Persistence\DTOs\UserDTO;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 
 class ProductEntityManager
 {
@@ -29,22 +28,24 @@ class ProductEntityManager
         $productEntity->setAmount($productDto->amount);
         $productEntity->setSize($productDto->size);
         $productEntity->setUserId($userDTO->userId);
-
+        $productEntity->setCategory($productDto->category);
+        $productEntity->setImageLink($productDto->imageLink);
+        $productEntity->setTeamName($productDto->teamName);
         $this->entityManager->persist($productEntity);
         $this->entityManager->flush();
     }
 
-    public function updateProductEntity(ProductEntity $productEntity, int $amount): void
+    public function addProductEntityAmount(ProductEntity $productEntity, int $amount): void
     {
-        $productEntity->setAmount($amount);
+        $productEntity->setAmount($productEntity->getAmount() + $amount);
         $this->entityManager->persist($productEntity);
         $this->entityManager->flush();
     }
 
-    public function deleteProductEntity(UserDTO $userDTO, string $id): void
+    public function deleteProductEntity(UserDTO $userDTO, int $id): void
     {
         $favoriteProductEntity = $this->entityManager->getRepository(ProductEntity::class)->findOneBy(
-            ['id' => $id, 'userId' => $userDTO->userId]
+            ['productId' => $id, 'userIdPd' => $userDTO->userId]
         );
         if ($favoriteProductEntity !== null) {
             $this->entityManager->remove($favoriteProductEntity);

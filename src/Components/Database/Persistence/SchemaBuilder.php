@@ -26,12 +26,21 @@ readonly class SchemaBuilder
     {
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
-        $updateSql = $this->schemaTool->getUpdateSchemaSql($metadata);
-        if (empty($updateSql)) {
-            return;
+        $connection = $this->entityManager->getConnection();
+        $schemaManager = $connection->createSchemaManager();
+
+        $tablesToCreate = array_map(function($classMetadata) {
+            return $classMetadata->getTableName();
+        }, $metadata);
+
+        $existingTables = $schemaManager->listTableNames();
+        $needToCreateSchema = array_diff($tablesToCreate, $existingTables);
+
+        if (!empty($needToCreateSchema)) {
+            $this->schemaTool->createSchema($metadata);
         }
-        $this->schemaTool->createSchema($metadata);
     }
+
 
     public function dropSchema(): void
     {
