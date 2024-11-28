@@ -57,7 +57,7 @@ class PasswordResetControllerTest extends TestCase
     {
         parent::setUp();
 
-        $_ENV['DATABASE'] = 'football_test';
+
         $this->view = new ViewFaker();
 
         $this->ormSqlConnector = new ORMSqlConnector();
@@ -77,8 +77,6 @@ class PasswordResetControllerTest extends TestCase
         $userDTO = $userMapper->createDTO($testData);
 
         $this->schemaBuilder = new SchemaBuilder($this->ormSqlConnector);
-        $this->schemaBuilder->createSchema();
-        $this->databaseBuilder = new DatabaseBuilder($this->ormSqlConnector);
 
         $userEntityManager->saveUser($userDTO);
 
@@ -119,7 +117,7 @@ class PasswordResetControllerTest extends TestCase
             $userPasswordResetRepository,
             $this->userPasswordResetEntityManager,
             $userBusinessFacade,
-            $userMapper
+
         );
 
         $accessManager = new AccessManager($userPasswordResetRepository, $actionMapper, $timeManager);
@@ -136,7 +134,7 @@ class PasswordResetControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->clearDatabase();
         unset($this->view, $_GET, $_POST);
 
         parent::tearDown();

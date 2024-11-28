@@ -46,8 +46,7 @@ class UserFavoriteBusinessFacadeTest extends TestCase
         $jsonfile = file_get_contents(__DIR__ . '/../../Fixtures/FavoritesBasic/favorites_test.json');
         file_put_contents(__DIR__ . '/../../../favorites_test.json', $jsonfile);
 
-        $_ENV['test'] = 1;
-        $_ENV['DATABASE'] = 'football_test';
+
         $userMapper = new UserMapper();
         $sessionHandler = new SessionHandler($userMapper);
         $this->view = new ViewFaker();
@@ -69,7 +68,6 @@ class UserFavoriteBusinessFacadeTest extends TestCase
         $sqlConnector = new ORMSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($sqlConnector);
         $this->schemaBuilder->createSchema();
-        $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
 
 
         $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
@@ -90,13 +88,12 @@ class UserFavoriteBusinessFacadeTest extends TestCase
         $ORMSqlConnector = new ORMSQLConnector();
         $userEntityManager = new UserEntityManager($ORMSqlConnector);
         $userEntityManager->saveUser($userDTO);
-        $this->databaseBuilder->loadData($userDTO);
+      $this->schemaBuilder->fillTables($userDTO);
     }
 
     protected function tearDown(): void
     {
-        unset($_ENV);
-      $this->schemaBuilder->dropSchema();
+      $this->schemaBuilder->clearDatabase();
     }
 
     public function testGetFavoriteStatus(): void

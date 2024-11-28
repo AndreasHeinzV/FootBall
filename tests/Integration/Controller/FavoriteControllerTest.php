@@ -61,8 +61,7 @@ class FavoriteControllerTest extends TestCase
         $jsonfile = file_get_contents(__DIR__ . '/../../Fixtures/FavoritesBasic/favorites_test.json');
         file_put_contents(__DIR__ . '/../../../favorites_test.json', $jsonfile);
 
-        $_ENV['test'] = 1;
-        $_ENV['DATABASE'] = 'football_test';
+
         $this->userMapper = new UserMapper();
         $sessionHandler = new SessionHandler($this->userMapper);
         $this->view = new ViewFaker();
@@ -84,9 +83,6 @@ class FavoriteControllerTest extends TestCase
 
         $this->connector = new ORMSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($this->connector);
-        $this->schemaBuilder->createSchema();
-        $databaseBuilder = new DatabaseBuilder($this->connector);
-
 
         $apiRequesterFacade = new ApiRequesterFacade($apiRequester);
         $footballBusinessFacade = new FootballBusinessFacade($apiRequesterFacade);
@@ -106,23 +102,22 @@ class FavoriteControllerTest extends TestCase
 
         $this->userEntityManager = new UserEntityManager($this->connector);
         $this->userEntityManager->saveUser($userDTO);
-        $databaseBuilder->loadData($userDTO);
+        $this->schemaBuilder->fillTables($userDTO);
     }
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
-
+        $this->schemaBuilder->clearDatabase();
+        /*
         $_SESSION = [];
         $_POST = [];
-        unset($_ENV);
-
+        */
+        unset($_SESSION, $_POST);
         parent::tearDown();
     }
 
     public function testAdd(): void
     {
-        $_ENV['test'] = 1;
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['add'] = "3984";

@@ -21,7 +21,7 @@ class CalculatePriceTest extends TestCase
 
     public function testCalculatePriceXXl(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'XXl', null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', 'XXl', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
 
         self::assertNotEmpty($productDto->price);
@@ -30,7 +30,7 @@ class CalculatePriceTest extends TestCase
 
     public function testCalculatePriceXL(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'Xl', null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', 'Xl', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
 
         self::assertNotEmpty($productDto->price);
@@ -39,7 +39,7 @@ class CalculatePriceTest extends TestCase
 
     public function testCalculatePriceM(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'M', null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', 'M', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
 
         self::assertNotEmpty($productDto->price);
@@ -48,7 +48,7 @@ class CalculatePriceTest extends TestCase
 
     public function testCalculatePriceS(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'S', null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', 'S', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
 
         self::assertNotEmpty($productDto->price);
@@ -57,44 +57,50 @@ class CalculatePriceTest extends TestCase
 
     public function testCalculateProductPriceNoSize(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', null, null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', null, null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertNull($productDto->price);
     }
 
     public function testCalculateProductPriceCup(): void
     {
-        $productDto = new ProductDto('', '', 'cup', null, null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'cup', null, null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertSame(9.99, $productDto->price);
     }
 
     public function testCalculateProductPriceScarf(): void
     {
-        $productDto = new ProductDto('', '', 'scarf', null, null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'scarf', null, null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertSame(19.99, $productDto->price);
     }
 
     public function testCalculateProductPriceJerseyWrongSize(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'wegw', null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', 'wegw', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertSame(-1.0, $productDto->price);
     }
 
     public function testCalculateProductPriceCupSizeLowerCase(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', 'xs', null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', 'xs', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertSame(9.99, $productDto->price);
     }
 
     public function testCalculateProductPriceCupSizeNumber(): void
     {
-        $productDto = new ProductDto('', '', 'soccerJersey', '434', null, '', 1);
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', '434', null, '', 1);
         $productDto = $this->calculatePrice->calculateProductPrice($productDto);
         self::assertSame(-1.0, $productDto->price);
     }
 
+    public function testCalculateProductPriceJerseyAmountNull(): void
+    {
+        $productDto = new ProductDto('', 'team', '', 'soccerJersey', '434', null, '', null);
+        $productDto = $this->calculatePrice->calculateProductPrice($productDto);
+        self::assertNull($productDto->price);
+    }
 }

@@ -50,14 +50,7 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
             ['userIdFk' => $userDTO->userId, 'teamId' => $teamId]
         );
     }
-//toDo delete method
-    public function checkExistingFavorite(UserDTO $userDTO, string $teamID): bool
-    {
-        $returnValue = $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
-            ['userIdFk' => $userDTO->userId, 'teamId' => $teamID]
-        );
-        return ($returnValue instanceof FavoriteEntity);
-    }
+
 
     public function getUserFavoriteEntityByPosition(UserDTO $userDTO, int $position): ?FavoriteEntity
     {
@@ -65,16 +58,6 @@ class UserFavoriteRepository implements UserFavoriteRepositoryInterface
             ['userIdFk' => $userDTO->userId, 'favorite_position' => $position]
         );
     }
-/*
-    public function getUserFavoritePositionByTeamId(UserDTO $userDTO, string $id): int|false
-    {
-        $returnValue = $this->entityManager->getRepository(FavoriteEntity::class)->findOneBy(
-            ['userIdFk' => $userDTO->userId, 'teamId' => $id]
-        );
-
-        return $returnValue->getFavoritePosition() ?? false;
-    }
-*/
     public function getFavoritePositionAboveCurrentPosition(UserDTO $userDTO, int $position): int|false
     {
         $qb = $this->entityManager->createQueryBuilder();

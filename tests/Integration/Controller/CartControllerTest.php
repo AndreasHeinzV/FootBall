@@ -45,10 +45,10 @@ class CartControllerTest extends TestCase
     {
         parent::setUp();
         $sqlConnector = new ORMSqlConnector();
-        $_ENV['DATABASE'] = 'football_test';
+
         $this->schemaBuilder = new SchemaBuilder($sqlConnector);
-        $this->schemaBuilder->createSchema();
-        $this->databaseBuilder = new DatabaseBuilder($sqlConnector);
+
+
 
 
         $testData = [
@@ -61,6 +61,7 @@ class CartControllerTest extends TestCase
         $this->userMapper = new UserMapper();
         $userDTO = $this->userMapper->createDTO($testData);
 
+        $this->schemaBuilder->fillTables($userDTO);
         $this->view = new ViewFaker();
         $apiRequester = new ApiRequester(
             new LeaguesMapper(),
@@ -95,8 +96,8 @@ class CartControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
-        unset($_POST, $_GET, $_ENV);
+        $this->schemaBuilder->clearDatabase();
+        unset($_POST, $_GET);
         parent::tearDown();
     }
 
@@ -115,7 +116,7 @@ class CartControllerTest extends TestCase
 
     public function testCartWithOneEntry(): void
     {
-        $productDto = new ProductDto("messi jersey", "link", "jersey", "L", 9.99, "link", 1);
+        $productDto = new ProductDto("messi jersey", 'Barca', "link", "jersey", "L", 9.99, "link", 1);
 
         $this->productEntityManager->saveProductEntity($productDto, (new UserMapper())->UserDTOWithOnlyUserId(1));
 
@@ -132,4 +133,64 @@ class CartControllerTest extends TestCase
         self::assertSame($products[0]->name, "messi jersey");
     }
 
+
+    public function testIncreaseProductAmount(): void
+    {
+        $productDto = new ProductDto("messi jersey", 'Barca', "link", "jersey", "L", 9.99, "link", 1);
+        $this->productEntityManager->saveProductEntity($productDto, (new UserMapper())->UserDTOWithOnlyUserId(1));
+        $amount = $productDto->amount;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['productName'] = 'messi jersey';
+        $_POST['changeAmount'] = 'increase';
+        $this->cartController->load($this->view);
+        $template = $this->view->getTemplate();
+        $params = $this->view->getParameters();
+
+        self::assertNotSame($amount, $params['products'][0]->amount);
+    }
+
+    public function testDecreaseProductAmount(): void
+    {
+        $productDto = new ProductDto("messi jersey", 'Barca', "link", "jersey", "L", 9.99, "link", 2);
+        $this->productEntityManager->saveProductEntity($productDto, (new UserMapper())->UserDTOWithOnlyUserId(1));
+        $amount = $productDto->amount;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['productName'] = 'messi jersey';
+        $_POST['changeAmount'] = 'decrease';
+        $this->cartController->load($this->view);
+        $template = $this->view->getTemplate();
+        $params = $this->view->getParameters();
+
+        self::assertNotSame($amount, $params['products'][0]->amount);
+        self::assertSame(1, $params['products'][0]->amount);
+    }
+
+    public function testDecreaseProductAmountToZero(): void
+    {
+        $productDto = new ProductDto("messi jersey", 'Barca', "link", "jersey", "L", 9.99, "link", 1);
+        $this->productEntityManager->saveProductEntity($productDto, (new UserMapper())->UserDTOWithOnlyUserId(1));
+        $amount = $productDto->amount;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['productName'] = 'messi jersey';
+        $_POST['changeAmount'] = 'decrease';
+        $this->cartController->load($this->view);
+        $template = $this->view->getTemplate();
+        $params = $this->view->getParameters();
+        self::assertSame(1, $amount);
+        self::assertEmpty($params['products']);
+    }
+
+    public function testDeleteProduct(): void{
+        $productDto = new ProductDto("messi jersey", 'Barca', "link", "jersey", "L", 9.99, "link", 1);
+        $this->productEntityManager->saveProductEntity($productDto, (new UserMapper())->UserDTOWithOnlyUserId(1));
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['productName'] = 'messi jersey';
+        $_POST['deleteProduct'] = 'true';
+        $this->cartController->load($this->view);
+        $params = $this->view->getParameters();
+
+        self::assertEmpty($params['products']);
+
+    }
 }

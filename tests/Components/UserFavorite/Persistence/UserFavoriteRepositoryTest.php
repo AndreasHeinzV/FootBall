@@ -21,11 +21,9 @@ class UserFavoriteRepositoryTest extends TestCase
 
     private SchemaBuilder $schemaBuilder;
 
-    private DatabaseBuilder $databaseBuilder;
 
     protected function setUp(): void
     {
-        $_ENV['DATABASE'] = 'football_test';
         $ormSqlConnector = new ORMSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($ormSqlConnector);
         $this->schemaBuilder->createSchema();
@@ -38,18 +36,15 @@ class UserFavoriteRepositoryTest extends TestCase
         ];
         $this->userMapper = new UserMapper();
         $userDTO = $this->userMapper->createDTO($testData);
-        $this->databaseBuilder = new DatabaseBuilder($ormSqlConnector);
-
-
-        $this->databaseBuilder->loadData($userDTO);
+        $this->schemaBuilder->fillTables($userDTO);
 
         $this->userFavoriteRepository = new UserFavoriteRepository($ormSqlConnector, new FavoriteMapper());
     }
 
     protected function tearDown(): void
     {
-        unset($_ENV, $_POST, $_GET);
-        $this->schemaBuilder->dropSchema();
+        unset($_POST, $_GET);
+        $this->schemaBuilder->clearDatabase();
         parent::tearDown();
     }
 

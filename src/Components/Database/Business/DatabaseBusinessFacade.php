@@ -7,13 +7,13 @@ namespace App\Components\Database\Business;
 use App\Components\Database\Business\Model\FixturesInterface;
 use App\Components\Database\Persistence\SchemaBuilder;
 
-readonly class DatabaseBusinessFacade implements DatabaseBusinessFacadeInterface
+readonly class DatabaseBusinessFacade
 {
     public function __construct(
         private SchemaBuilder $schemaBuilder,
     ) {
     }
-
+/*
     public function createUserTables(): void
     {
         $this->schemaBuilder->createSchema();
@@ -21,6 +21,7 @@ readonly class DatabaseBusinessFacade implements DatabaseBusinessFacadeInterface
 
     public function dropUserTables(): void
     {
-        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->clearDatabase();
     }
+*/
 }

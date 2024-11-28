@@ -49,12 +49,12 @@ class ProductEntity
     {
         return $this->productId;
     }
-
+/*
     public function getUserId(): int
     {
         return $this->userIdPd;
     }
-
+*/
     public function setUserId(int $userId): ProductEntity
     {
         $this->userIdPd = $userId;

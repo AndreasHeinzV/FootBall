@@ -35,7 +35,7 @@ class ProductEntityManager
         $this->entityManager->flush();
     }
 
-    public function addProductEntityAmount(ProductEntity $productEntity, int $amount): void
+    public function manipulateProductEntityAmount(ProductEntity $productEntity, int $amount): void
     {
         $productEntity->setAmount($productEntity->getAmount() + $amount);
         $this->entityManager->persist($productEntity);

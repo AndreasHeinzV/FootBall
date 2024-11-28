@@ -41,8 +41,6 @@ class HomeControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        $_ENV['test'] = 1;
-        $_ENV['DATABASE'] = 'football_test';
 
         $this->view = new ViewFaker();
         $apiRequester = new ApiRequesterFaker(
@@ -58,7 +56,7 @@ class HomeControllerTest extends TestCase
 
         $sqlConnector = new ORMSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($sqlConnector);
-        $this->schemaBuilder->createSchema();
+
 
 
         $this->homeController = new HomeController($footballBusinessFacade);
@@ -67,8 +65,8 @@ class HomeControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
-        unset($_ENV['test'], $_SERVER['REQUEST_METHOD'], $_POST['loginButton'], $_POST['email'], $_POST['password']);
+        $this->schemaBuilder->clearDatabase();
+        unset( $_SERVER['REQUEST_METHOD'], $_POST['loginButton'], $_POST['email'], $_POST['password']);
         parent::tearDown();
     }
 

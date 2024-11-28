@@ -37,7 +37,7 @@ class ControllerProviderTest extends TestCase
     public function testControllerProvider(): void{
 
         $_GET['page'] = 'logout';
-        $_ENV['test']= '1';
+
 
         $container = new Container();
         $container->set(FilesystemLoader::class, new FilesystemLoader(__DIR__ . '/../../src/View'));

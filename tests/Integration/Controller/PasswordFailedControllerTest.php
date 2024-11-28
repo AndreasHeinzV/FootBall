@@ -51,7 +51,7 @@ class PasswordFailedControllerTest extends TestCase
     {
         parent::setUp();
 
-        $_ENV['DATABASE'] = 'football_test';
+
         $this->view = new ViewFaker();
         $userEntityMapper = new UserEntityMapper();
         $this->sqlConnector = new ORMSqlConnector();
@@ -70,7 +70,6 @@ class PasswordFailedControllerTest extends TestCase
         $userDTO = $userMapper->createDTO($testData);
 
         $this->schemaBuilder = new SchemaBuilder($this->sqlConnector);
-        $this->schemaBuilder->createSchema();
         $this->databaseBuilder = new DatabaseBuilder($this->sqlConnector);
 
       //  $this->databaseBuilder->loadData($userDTO);
@@ -128,8 +127,7 @@ class PasswordFailedControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
-        unset($_ENV);
+        $this->schemaBuilder->clearDatabase();
 
         parent::tearDown();
     }

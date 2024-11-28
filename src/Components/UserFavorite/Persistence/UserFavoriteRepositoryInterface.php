@@ -9,9 +9,10 @@ interface UserFavoriteRepositoryInterface
 {
     public function getUserFavorites(UserDTO $userDTO): array;
 
-    public function checkExistingFavorite(UserDTO $userDTO, string $teamID): bool;
 
-   // public function getUserFavoritePositionByTeamId(UserDTO $userDTO, string $id): int|false;
+    // public function getUserFavoritePositionByTeamId(UserDTO $userDTO, string $id): int|false;
+
+    public function getUserFavoriteByTeamId(UserDTO $userDTO, int $teamId): ?FavoriteEntity;
 
     public function getUserFavoritesFirstPosition(UserDTO $userDTO): int|false;
 

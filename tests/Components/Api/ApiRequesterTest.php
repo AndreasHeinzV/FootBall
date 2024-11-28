@@ -9,6 +9,7 @@ use App\Components\Football\Mapper\CompetitionMapper;
 use App\Components\Football\Mapper\LeaguesMapper;
 use App\Components\Football\Mapper\PlayerMapper;
 use App\Components\Football\Mapper\TeamMapper;
+use App\Tests\Fixtures\ApiRequest\ApiRequesterFaker;
 use PHPUnit\Framework\TestCase;
 
 class ApiRequesterTest extends TestCase
@@ -42,7 +43,7 @@ class ApiRequesterTest extends TestCase
 
     public function testApiRequestGetPlayer(): void
     {
-        $playerDTO = $this->apiRequester->getPlayer('1299');
+        $playerDTO = $this->apiRequester->getPlayer('348');
         self::assertNotEmpty($playerDTO);
         self::assertNotSame('', $playerDTO->name);
     }
@@ -51,7 +52,7 @@ class ApiRequesterTest extends TestCase
     {
         $playerDTO = $this->apiRequester->getPlayer('129943458679');
         self::assertEmpty($playerDTO);
-        //  self::assertNotSame('', $playerDTO->name);
+
     }
 
     public function testApiRequestGetCompetition(): void

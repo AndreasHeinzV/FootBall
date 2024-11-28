@@ -26,7 +26,7 @@ class AccessManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $array = ['test' => 'test'];
+
         $this->userPasswordResetRepositoryMock = $this->createMock(UserPasswordResetRepository::class);
         $this->userPasswordResetRepositoryInterfaceMock = $this->createMock(UserPasswordResetRepositoryInterface::class);
 

@@ -32,7 +32,7 @@ class SqlConnectionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $_ENV['DATABASE'] = 'football_test';
+
         $this->connector = new ORMSqlConnector();
 
         $this->schemaBuilder = new SchemaBuilder($this->connector);
@@ -49,9 +49,7 @@ class SqlConnectionTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
-
-
+        $this->schemaBuilder->clearDatabase();
         parent::tearDown();
     }
 

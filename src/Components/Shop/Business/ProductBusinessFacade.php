@@ -36,7 +36,7 @@ readonly class ProductBusinessFacade
         ?string $size,
         ?int $amount
     ): ProductDto {
-        return $this->productMapper->createProductDto($category,$teamName, $name, $image, $size, $amount, null);
+        return $this->productMapper->createProductDto($category, $teamName, $name, $image, $size, $amount, null);
     }
 
     public function getProductPrice(ProductDto $productDto): ProductDto
@@ -49,13 +49,23 @@ readonly class ProductBusinessFacade
         $this->productManager->addProductToCart($productDto);
     }
 
-    public function RemoveProductFromCart(ProductDto $productDto): void
-    {
-        $this->productManager->removeProductFromCart($productDto);
-    }
-
     public function getProducts(UserDTO $userDto): ?array
     {
         return $this->productRepository->getProductEntities($userDto);
+    }
+
+    public function increaseProductQuantity(string $productName): void
+    {
+        $this->productManager->increaseProductQuantity($productName);
+    }
+
+    public function decreaseProductQuantity(string $productName): void
+    {
+        $this->productManager->decreaseProductQuantity($productName);
+    }
+
+    public function deleteProduct(string $productName): void
+    {
+        $this->productManager->deleteProductFromCart($productName);
     }
 }

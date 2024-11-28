@@ -29,7 +29,13 @@ class ProductRepository
         );
         return $productEntity ?? null;
     }
-
+    public function getProductEntityByName(UserDTO $userDto, string $name): ?ProductEntity
+    {
+        $productEntity = $this->entityManager->getRepository(ProductEntity::class)->findOneBy(
+            ['userIdPd' => $userDto->userId, 'name' => $name]
+        );
+        return $productEntity ?? null;
+    }
     public function getProductEntities(UserDTO $userDto): array
     {
         $productEntities = $this->entityManager->getRepository(ProductEntity::class)->findBy(

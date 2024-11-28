@@ -8,7 +8,6 @@ use App\Components\Database\Persistence\Entity\ProductEntity;
 use App\Components\Shop\Persistence\DTOs\ProductDto;
 use App\Components\Shop\Persistence\ProductEntityManager;
 use App\Components\Shop\Persistence\ProductRepository;
-use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Core\SessionHandler;
 
 readonly class ProductManager
@@ -23,25 +22,42 @@ readonly class ProductManager
     public function addProductToCart(ProductDto $productDto): void
     {
         $userDto = $this->sessionHandler->getUserDTO();
-        $productEntity = $this->productRepository->getProductEntity($productDto, $userDto);
+        $productEntity = $this->productRepository->getProductEntityByName($userDto, $productDto->name);
         if ($productEntity instanceof ProductEntity) {
-            /*
-            $amount = $productEntity->getAmount();
-            $amount += $productDto->amount;
-            $productEntity->setAmount($amount);
-*/
-            $this->entityManager->addProductEntityAmount($productEntity, $productDto->amount);
+            $this->entityManager->manipulateProductEntityAmount($productEntity, $productDto->amount);
         } else {
             $this->entityManager->saveProductEntity($productDto, $userDto);
         }
     }
 
-    public function removeProductFromCart(ProductDto $productDto): void
+    public function increaseProductQuantity(string $productName): void
     {
         $userDto = $this->sessionHandler->getUserDTO();
-        $productEntity = $this->productRepository->getProductEntity($productDto, $userDto);
+        $productEntity = $this->productRepository->getProductEntityByName($userDto, $productName);
         if ($productEntity instanceof ProductEntity) {
-            $this->entityManager->deleteProductEntity($userDto,$productEntity->getProductId() );
+            $this->entityManager->manipulateProductEntityAmount($productEntity, +1);
+        }
+    }
+
+    public function decreaseProductQuantity(string $productName): void
+    {
+        $userDto = $this->sessionHandler->getUserDTO();
+        $productEntity = $this->productRepository->getProductEntityByName($userDto, $productName);
+        if ($productEntity instanceof ProductEntity) {
+            if ($productEntity->getAmount() > 1) {
+                $this->entityManager->manipulateProductEntityAmount($productEntity, -1);
+            } else {
+                $this->deleteProductFromCart($productName);
+            }
+        }
+    }
+
+    public function deleteProductFromCart(string $productName): void
+    {
+        $userDto = $this->sessionHandler->getUserDTO();
+        $productEntity = $this->productRepository->getProductEntityByName($userDto, $productName);
+        if ($productEntity instanceof ProductEntity) {
+            $this->entityManager->deleteProductEntity($userDto, $productEntity->getProductId());
         }
     }
 }

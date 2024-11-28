@@ -69,7 +69,7 @@ class DatabaseBuilder
         $pdo->exec($dropResetPasswords);
         $pdo->exec($dropUsers);
     }
-
+/*
     public function loadData(UserDTO $userDTO): void
     {
         if (isset($_ENV['DATABASE']) && $_ENV['DATABASE'] === 'football_test') {
@@ -80,4 +80,5 @@ class DatabaseBuilder
             }
         }
     }
+*/
 }

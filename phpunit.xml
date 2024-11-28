@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         bootstrap="testBootstrap.php"
          cacheDirectory=".phpunit.cache"
          executionOrder="depends,defects"
          shortenArraysForExportThreshold="10"
@@ -16,7 +16,7 @@
         </testsuite>
     </testsuites>
     <php>
-        <env name="test" value="1"/>
+        <env name="DATABASE" value="football_test" force="true"/>
         <ini name="display_errors" value="1"/>
         <ini name="error_reporting" value="-1"/>
 
@@ -30,6 +30,7 @@
         </include>
         <exclude>
             <file>src/Core/Redirect.php</file>
+            <file>src/Components/Database/Persistence/SchemaBuilder.php</file>
         </exclude>
     </source>
 </phpunit>

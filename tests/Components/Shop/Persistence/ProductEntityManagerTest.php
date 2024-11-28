@@ -27,17 +27,15 @@ class ProductEntityManagerTest extends TestCase
 
     private SchemaBuilder $schemaBuilder;
 
-    private DatabaseBuilder $databaseBuilder;
-
     private ProductRepository $productRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $_ENV['DATABASE'] = 'football_test';
+
         $ormSqlConnector = new ORMSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($ormSqlConnector);
-        $this->schemaBuilder->createSchema();
+
         $testData = [
             'userId' => 1,
             'firstName' => 'ImATestCat',
@@ -49,24 +47,29 @@ class ProductEntityManagerTest extends TestCase
         $userDTO = $this->userMapper->createDTO($testData);
         $this->productMapper = new ProductMapper();
         $this->productRepository = new ProductRepository($ormSqlConnector, $this->productMapper);
-        $this->databaseBuilder = new DatabaseBuilder($ormSqlConnector);
+        $this->schemaBuilder->fillTables($userDTO);
 
-
-        $this->databaseBuilder->loadData($userDTO);
 
         $this->productEntityManager = new ProductEntityManager($ormSqlConnector);
     }
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
-        unset($_ENV['DATABASE']);
+        $this->schemaBuilder->clearDatabase();
         parent::tearDown();
     }
 
     public function testSaveProductEntity(): void
     {
-        $productDto = $this->productMapper->createProductDto('jersey', 'bayern jersey', 'imageLink', 'L', 3, 9.99);
+        $productDto = $this->productMapper->createProductDto(
+            'jersey',
+            'team',
+            'bayern jersey',
+            'imageLink',
+            'L',
+            3,
+            9.99
+        );
 
         $userDto = $this->userMapper->UserDTOWithOnlyUserId(1);
         $this->productEntityManager->saveProductEntity($productDto, $userDto);
@@ -78,23 +81,40 @@ class ProductEntityManagerTest extends TestCase
 
     public function testUpdateProductEntityAmount(): void
     {
-        $productDto = $this->productMapper->createProductDto('jersey', 'bayern jersey', 'imageLink', 'L', 3, 9.99);
+        $productDto = $this->productMapper->createProductDto(
+            'jersey',
+            'team',
+            'bayern jersey',
+            'imageLink',
+            'L',
+            3,
+            9.99
+        );
 
         $userDto = $this->userMapper->UserDTOWithOnlyUserId(1);
         $this->productEntityManager->saveProductEntity($productDto, $userDto);
         $productEntityOld = $this->productRepository->getProductEntity($productDto, $userDto);
         $oldAmount = $productEntityOld->getAmount();
 
-        $this->productEntityManager->addProductEntityAmount($productEntityOld, 5);
+        $this->productEntityManager->manipulateProductEntityAmount($productEntityOld, 5);
         $productEntityNew = $this->productRepository->getProductEntity($productDto, $userDto);
         self::assertInstanceOf(ProductEntity::class, $productEntityNew);
         self::assertSame(8, $productEntityNew->getAmount());
         self::assertNotSame($oldAmount, $productEntityNew->getAmount());
     }
 
+
     public function testDeleteProductEntity(): void
     {
-        $productDto = $this->productMapper->createProductDto('jersey', 'bayern jersey', 'imageLink', 'L', 3, 9.99);
+        $productDto = $this->productMapper->createProductDto(
+            'jersey',
+            'team',
+            'bayern jersey',
+            'imageLink',
+            'L',
+            3,
+            9.99
+        );
 
         $userDto = $this->userMapper->UserDTOWithOnlyUserId(1);
         $this->productEntityManager->saveProductEntity($productDto, $userDto);

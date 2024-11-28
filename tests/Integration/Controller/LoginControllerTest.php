@@ -42,13 +42,12 @@ class LoginControllerTest extends TestCase
     private UserMapper $userMapper;
     private SchemaBuilder $schemaBuilder;
 
-  //  private DatabaseBusinessFacade $databaseBusinessFacade;
+    //  private DatabaseBusinessFacade $databaseBusinessFacade;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $_ENV['test'] = 1;
-        $_ENV['DATABASE'] = 'football_test';
+
         $this->viewFaker = new ViewFaker();
         $this->userMapper = new UserMapper();
         $this->errorMapper = new ErrorMapper();
@@ -57,12 +56,10 @@ class LoginControllerTest extends TestCase
         $ormSqlConnector = new OrmSqlConnector();
 
         $this->schemaBuilder = new SchemaBuilder($ormSqlConnector);
-        $this->schemaBuilder->createSchema();
         $userEntityMapper = new UserEntityMapper();
         $userRepository = new UserRepository($ormSqlConnector, $userEntityMapper);
         $userEntityManager = new UserEntityManager($ormSqlConnector);
 
-    //    $this->databaseBusinessFacade->createUserTables();
         $userBusinessFacade = new UserBusinessFacade(
             $userRepository, $userEntityManager
         );
@@ -113,7 +110,7 @@ class LoginControllerTest extends TestCase
     protected function tearDown(): void
     {
         unset(
-            $_ENV['test'], $_SERVER['REQUEST_METHOD'],
+            $_SERVER['REQUEST_METHOD'],
             $_POST['loginButton'],
             $_POST['email'],
             $_POST['password'],
@@ -126,7 +123,7 @@ class LoginControllerTest extends TestCase
             $this->redirectSpy
         );
 
-        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->clearDatabase();
         parent::tearDown();
     }
 

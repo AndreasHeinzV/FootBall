@@ -20,7 +20,7 @@ class ViewTest extends TestCase
      */
     public function testView(): void
     {
-        $_ENV['test'] = '';
+
         $fileSystemLoad = new FilesystemLoader(__dir__ . '/../Fixtures/ViewPages');
         $twig = new Environment($fileSystemLoad);
 

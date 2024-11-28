@@ -31,17 +31,15 @@ class ShopControllerTest extends TestCase
     private SchemaBuilder $schemaBuilder;
     private ViewFaker $view;
     private ShopController $controller;
-    private ORMSqlConnector $connector;
-
 
     protected function setUp(): void
     {
         parent::setUp();
-        $_ENV['DATABASE'] = 'football_test';
+
 
         $connector = new OrmSqlConnector();
         $this->schemaBuilder = new SchemaBuilder($connector);
-        $this->schemaBuilder->createSchema();
+
 
         $testData = [
             'userId' => 1,
@@ -53,8 +51,7 @@ class ShopControllerTest extends TestCase
         $userMapper = new UserMapper();
         $userDTO = $userMapper->createDTO($testData);
 
-        $databaseBuilder = new DatabaseBuilder($connector);
-        $databaseBuilder->loadData($userDTO);
+        $this->schemaBuilder->fillTables($userDTO);
         $this->view = new ViewFaker();
         $apiRequester = new ApiRequesterFaker(
             new LeaguesMapper(),
@@ -87,7 +84,7 @@ class ShopControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->clearDatabase();
         unset($_GET);
 
         parent::tearDown();
@@ -108,6 +105,4 @@ class ShopControllerTest extends TestCase
         self::assertNotEmpty($products);
         self::assertNotEmpty($parameters);
     }
-
-
 }

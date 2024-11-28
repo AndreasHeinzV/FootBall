@@ -32,18 +32,13 @@ class RegisterControllerTest extends TestCase
 {
     private ViewFaker $viewFaker;
 
-    private UserLoginValidation $validation;
-
-    private RedirectSpy $redirectSpy;
-
     private UserRegisterController $registerController;
 
     private SchemaBuilder $schemaBuilder;
 
     protected function setUp(): void
     {
-        $_ENV['test'] = 1;
-        $_ENV['DATABASE'] = 'football_test';
+
         parent::setUp();
         $this->viewFaker = new ViewFaker();
 
@@ -51,16 +46,8 @@ class RegisterControllerTest extends TestCase
         $redirectSpy = new RedirectSpy();
         $userEntityMapper = new UserEntityMapper();
         $ORMSqlConnector = new ORMSqlConnector();
-        /*
-        $sqlConnector = new SqlConnector();
-        $databaseBusinessFacade = new DatabaseBusinessFacade(
-            new Fixtures($sqlConnector)
-        );
-        $databaseBusinessFacade->createUserTables();
 
-        */
         $this->schemaBuilder = new SchemaBuilder($ORMSqlConnector);
-        $this->schemaBuilder->createSchema();
 
         $userBusinessFacade = new UserBusinessFacade(
             new UserRepository($ORMSqlConnector, $userEntityMapper),
@@ -87,15 +74,14 @@ class RegisterControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        unset($_SERVER['REQUEST_METHOD'], $_ENV, $_POST);
-        $this->schemaBuilder->dropSchema();
+        unset($_SERVER['REQUEST_METHOD'], $_POST);
+        $this->schemaBuilder->clearDatabase();
         parent::tearDown();
     }
 
 
     public function testRegisterUserWrongValues(): void
     {
-        $_ENV['test'] = 1;
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['registerMe'] = 'push';
         $_POST['fName'] = 'testName';
@@ -114,7 +100,6 @@ class RegisterControllerTest extends TestCase
 
     public function testRegisterUserRightValues(): void
     {
-        $_ENV['test'] = 1;
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['registerMe'] = 'push';
         $_POST['fName'] = 'testName';

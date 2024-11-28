@@ -84,7 +84,9 @@ readonly class Favorite implements FavoriteInterface
     public function getFavStatus(string $teamId): bool
     {
         $userDTO = $this->sessionHandler->getUserDTO();
-        return $this->userFavoriteRepository->checkExistingFavorite($userDTO, $teamId);
+
+        $favoriteEntity = $this->userFavoriteRepository->getUserFavoriteByTeamId($userDTO, (int)$teamId);
+        return $favoriteEntity instanceof FavoriteEntity;
     }
 
     private function userFavoriteUp(int $teamId): void

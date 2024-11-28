@@ -26,20 +26,20 @@ class PasswordValidationTest extends TestCase
 
     private DatabaseBusinessFacade $databaseBusinessFacade;
 
+    private SchemaBuilder $schemaBuilder;
+
     protected function setUp(): void
     {
-        $_ENV['DATABASE'] = 'football_test';
         //----------------------------------------------------------------------------------------
         //DB prepare for use
         $sqlConnector = new ORMSqlConnector();
-        $this->databaseBusinessFacade = new DatabaseBusinessFacade(
-            new SchemaBuilder($sqlConnector)
-        );
-        $this->databaseBusinessFacade->createUserTables();
+        $this->schemaBuilder = new SchemaBuilder($sqlConnector);
+
         //----------------------------------------------------------------------------------------
         //create User for Test
 
         $testData = [
+            'userId' => 1,
             'firstName' => 'ImATestCat',
             'lastName' => 'JustusCristus',
             'email' => 'dog@gmail.com',
@@ -47,8 +47,14 @@ class PasswordValidationTest extends TestCase
         ];
         $userRepository = new UserRepository($sqlConnector, new UserEntityMapper());
         $userMapper = new UserMapper();
+
+        $userDto = $userMapper->createDTO($testData);
+
+        $this->schemaBuilder->fillTables($userDto);
+
         $userEntityManager = new UserEntityManager($sqlConnector);
-        $userEntityManager->saveUser($userMapper->createDTO($testData));
+        $userEntityManager->saveUser($userDto);
+
 
 //----------------------------------------------------------------------------------------
 
@@ -60,8 +66,7 @@ class PasswordValidationTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->databaseBusinessFacade->dropUserTables();
-        unset($_ENV);
+        $this->schemaBuilder->clearDatabase();
         parent::tearDown();
     }
 

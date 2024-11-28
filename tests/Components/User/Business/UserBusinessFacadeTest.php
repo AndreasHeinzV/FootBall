@@ -23,7 +23,7 @@ class UserBusinessFacadeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $_ENV['DATABASE'] = 'football_test';
+
         $sqlConnector = new ORMSqlConnector();
         $userRepository = new UserRepository($sqlConnector, new UserEntityMapper());
         $userEntityManager = new UserEntityManager($sqlConnector);
@@ -44,7 +44,7 @@ class UserBusinessFacadeTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->clearDatabase();
         parent::tearDown();
     }
 
@@ -111,7 +111,7 @@ class UserBusinessFacadeTest extends TestCase
 
     public function testGetUsersButEmptyDb(): void
     {
-        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->clearDatabase();
         $this->schemaBuilder->createSchema();
 
         $users = $this->userBusinessFacade->getUsers();

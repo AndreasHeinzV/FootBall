@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Components\Shop\Communication;
 
 use App\Components\Shop\Business\ProductBusinessFacade;
-use App\Components\Shop\Persistence\DTOs\ProductDto;
-use App\Core\Redirect;
 use App\Core\ViewInterface;
 
 class DetailsController
@@ -31,9 +29,9 @@ class DetailsController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['category'], $_POST['imageLink'], $_POST['teamName'])) {
             $customName = $_POST['customName'] ?? null;
             $size = $_POST['size'] ?? null;
-            $amount = 1; // Default amount
+            $amount = 1;
 
-            if (isset($_POST['amount']) && ctype_digit($_POST['amount']) && $_POST['amount'] > 0) {
+            if (isset($_POST['amount']) && is_numeric($_POST['amount'])) {
                 $amount = (int)$_POST['amount'];
             }
             $teamName = $_POST['teamName'];
@@ -41,8 +39,8 @@ class DetailsController
             $name = $_POST['name'];
             $image = $_POST['imageLink'];
 
-            if ($customName !== null) {
-                $name = $customName . " " . $category;
+            if (!empty($customName)) {
+                $name = $customName . " " .$teamName . " ". $category;
             }
 
             $productDto = $this->productBusinessFacade->createProduct($category, $teamName, $name, $image, $size, $amount);
@@ -58,11 +56,6 @@ class DetailsController
                 $view->addParameter('message', "Product added to cart.");
             }
         }
-
-
-        //todo write function for button to save favorite Dto in db
-        //todo entity and repo are rdy to go
-        //todo testcase is rdy just needs to be adjusted
         $view->setTemplate('details.twig');
     }
 }

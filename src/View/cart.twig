@@ -6,7 +6,33 @@
     {% endblock %}
     <meta charset="UTF-8">
     <title>Shopping Cart</title>
-
+    <style>
+        .product {
+            display: flex;
+            align-items: center;
+            border: 2px solid black;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .product-image {
+            width: 100px;
+            height: auto;
+            flex-shrink: 0;
+        }
+        .product-name {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            flex-basis: 150px;
+        }
+        .product-form {
+            margin-left: 20px;
+        }
+    </style>
 </head>
 <body>
 <h1>Your Shopping Cart</h1>
@@ -19,12 +45,13 @@
     <div class="products">
         {% for product in products %}
             <div class="product">
-                <img src="{{ product.imageLink }}" alt="{{ product.name }}" class="product-image"
-                     style="width: 100px; height: auto;">
-                <h2>{{ product.name }}</h2>
-                <p>Amount: {{ product.amount }}</p>
-                <p>Price: {{ product.price | number_format(2, '.', ',') }} </p>
-                <form action="/cart/update" method="post">
+                <img src="{{ product.imageLink }}" alt="{{ product.name }}" class="product-image">
+                <h2 class="product-name">{{ product.name }}</h2>
+                <div class="product-details">
+                    <p>Price: {{ product.price | number_format(2, ',', '.') }}</p>
+                    <p>Amount: {{ product.amount }}</p>
+                </div>
+                <form class="product-form" method="post">
                     <input type="hidden" name="productName" value="{{ product.name }}">
                     <button type="submit" name="changeAmount" value="increase">+1</button>
                     <button type="submit" name="changeAmount" value="decrease">-1</button>
@@ -37,9 +64,10 @@
     </div>
 
     <div class="total-price">
-        <h3>Total Price: {{ total_price | number_format(2, '.', ',') }}</h3>
+        <h3>Total Price: {{ total_price | number_format(2, ',', '.') }}</h3>
     </div>
 {% endif %}
 
 </body>
 </html>
+

@@ -6,6 +6,7 @@ namespace App\Tests\Integration\Controller;
 
 use App\Components\Api\Business\ApiRequesterFacade;
 use App\Components\Api\Business\Model\ApiRequester;
+use App\Components\Database\Persistence\Entity\ProductEntity;
 use App\Components\Database\Persistence\ORMSqlConnector;
 use App\Components\Database\Persistence\SchemaBuilder;
 use App\Components\Football\Mapper\CompetitionMapper;
@@ -20,6 +21,7 @@ use App\Components\Shop\Communication\DetailsController;
 use App\Components\Shop\Persistence\Mapper\ProductMapper;
 use App\Components\Shop\Persistence\ProductEntityManager;
 use App\Components\Shop\Persistence\ProductRepository;
+use App\Components\User\Persistence\DTOs\UserDTO;
 use App\Components\User\Persistence\Mapper\UserMapper;
 use App\Core\SessionHandler;
 use App\Tests\Fixtures\DatabaseBuilder;
@@ -36,10 +38,14 @@ class DetailsControllerTest extends TestCase
     private SchemaBuilder $schemaBuilder;
     private UserMapper $userMapper;
 
+    private ProductRepository $productRepository;
+    private UserDTO $userDto;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $_ENV['DATABASE'] = 'football_test';
+        error_reporting(E_ALL);
+
 
         $this->view = new ViewFaker();
         $apiRequester = new ApiRequester(
@@ -53,7 +59,7 @@ class DetailsControllerTest extends TestCase
         $createProducts = new CreateProducts($apiRequesterFacade, $productMapper);
         $calculatePrice = new CalculatePrice();
         $ormSqlConnector = new ORMSqlConnector();
-        $productRepository = new ProductRepository($ormSqlConnector, $productMapper);
+        $this->productRepository = new ProductRepository($ormSqlConnector, $productMapper);
         $productEntityManager = new ProductEntityManager($ormSqlConnector);
 
         $testData = [
@@ -64,14 +70,14 @@ class DetailsControllerTest extends TestCase
             'password' => password_hash('passw0rd', PASSWORD_DEFAULT),
         ];
         $this->userMapper = new UserMapper();
-        $userDTO = $this->userMapper->createDTO($testData);
+        $this->userDto = $this->userMapper->createDTO($testData);
 
 
         $sessionHandlerMock = $this->createMock(SessionHandler::class);
-        $sessionHandlerMock->method('getUserDTO')->willReturn($userDTO);
+        $sessionHandlerMock->method('getUserDTO')->willReturn($this->userDto);
         $productManager = new ProductManager(
             $sessionHandlerMock,
-            $productRepository,
+            $this->productRepository,
             $productEntityManager
         );
         $productBusinessFacade = new ProductBusinessFacade(
@@ -79,32 +85,32 @@ class DetailsControllerTest extends TestCase
             $calculatePrice,
             $productMapper,
             $productManager,
-            $productRepository
+            $this->productRepository
         );
 
 
         $this->controller = new DetailsController($productBusinessFacade);
         $this->schemaBuilder = new SchemaBuilder($ormSqlConnector);
-        $this->schemaBuilder->createSchema();
-
-        (new DatabaseBuilder($ormSqlConnector))->loadData($userDTO);
+        $this->schemaBuilder->fillTables($this->userDto);
     }
 
 
     protected function tearDown(): void
     {
-        $this->schemaBuilder->dropSchema();
+        $this->schemaBuilder->clearDatabase();
         unset($this->controller, $_GET, $_POST);
 
 
         parent::tearDown();
     }
 
+
     public function testDetailsLoad(): void
     {
         $_GET['category'] = 'soccerJersey';
         $_GET['name'] = 'Jersey';
         $_GET['imageLink'] = "link";
+        $_GET['teamName'] = 'team';
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
 
@@ -126,6 +132,7 @@ class DetailsControllerTest extends TestCase
         $_POST['name'] = 'Michael';
         $_POST['imageLink'] = "testlink";
         $_POST['size'] = "L";
+        $_POST['teamName'] = 'team';
         $this->controller->load($this->view);
 
         $template = $this->view->getTemplate();
@@ -141,39 +148,69 @@ class DetailsControllerTest extends TestCase
 
     public function testSaveDetailsToCart(): void
     {
-
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['addToCartButton'] = 'addToCart';
         $_POST['category'] = 'soccerJersey';
         $_POST['name'] = 'MichaelJersey';
         $_POST['imageLink'] = "testLink";
         $_POST['size'] = "L";
         $_POST['price'] = 24.99;
+        $_POST['amount'] = "1";
+        $_POST['teamName'] = 'team';
+
         $this->controller->load($this->view);
+
         $template = $this->view->getTemplate();
         $result = $this->view->getParameters();
-        $productDto = $result['productDto'];
+        //  $productDto = $result['productDto'];
         self::assertSame('details.twig', $template);
         self::assertNotEmpty($result);
     }
 
+    public function testSaveDetailsToExistingProduct(): void
+    {
 
-    /*
-        public function testSaveDetailsToCartPost(): void
-        {
-            $_SERVER['REQUEST_METHOD'] = 'POST';
-            $_POST['addToCartButton'] = 'addToCart';
-            $_POST['category'] = 'soccerJersey';
-            $_POST['name'] = 'MichaelJersey';
-            $_POST['imageLink'] = "testLink";
-            $_POST['size'] = "L";
-            $_POST['price'] = 24.99;
-            $this->controller->load($this->view);
-            $template = $this->view->getTemplate();
-            $result = $this->view->getParameters();
-            $productDto = $result['productDto'];
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['addToCartButton'] = 'addToCart';
+        $_POST['category'] = 'soccerJersey';
+        $_POST['name'] = 'MichaelJersey';
+        $_POST['imageLink'] = "testLink";
+        $_POST['size'] = "L";
+        $_POST['price'] = 24.99;
+        $_POST['amount'] = "1";
+        $_POST['teamName'] = 'team';
 
-            self::assertSame('details.twig', $template);
-            self::assertNotEmpty($result);
-        }
-    */
+        $this->controller->load($this->view);
+
+        $template = $this->view->getTemplate();
+        $result = $this->view->getParameters();
+        self::assertSame('details.twig', $template);
+        self::assertNotEmpty($result);
+    }
+
+    public function testSaveDetailsWithCustomNameToCart(): void
+    {
+        $_POST['addToCartButton'] = 'addToCart';
+        $_POST['category'] = 'soccerJersey';
+        $_POST['name'] = 'MichaelJersey';
+        $_POST['imageLink'] = "testLink";
+        $_POST['size'] = "L";
+        $_POST['amount'] = 1;
+        $_POST['price'] = 24.99;
+        $_POST['teamName'] = 'team';
+        $_POST['customName'] = 'customName';
+        $_POST['addToCartButton'] = 'addToCart';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        $this->controller->load($this->view);
+        $template = $this->view->getTemplate();
+        $result = $this->view->getParameters();
+
+
+        $userDto = $this->userMapper->UserDTOWithOnlyUserId(1);
+        $productEntity = $this->productRepository->getProductEntityByName($userDto, 'customName team soccerJersey');
+        self::assertInstanceOf(ProductEntity::class, $productEntity);
+        self::assertSame('details.twig', $template);
+        self::assertNotEmpty($result);
+    }
 }
