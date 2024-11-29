@@ -14,21 +14,25 @@
             padding: 10px;
             margin-bottom: 10px;
         }
+
         .product-image {
             width: 100px;
             height: auto;
             flex-shrink: 0;
         }
+
         .product-name {
             flex-grow: 1;
             text-align: center;
         }
+
         .product-details {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             flex-basis: 150px;
         }
+
         .product-form {
             margin-left: 20px;
         }
@@ -48,7 +52,9 @@
                 <img src="{{ product.imageLink }}" alt="{{ product.name }}" class="product-image">
                 <h2 class="product-name">{{ product.name }}</h2>
                 <div class="product-details">
-                    <p>Price: {{ product.price | number_format(2, ',', '.') }}</p>
+                    <p>Unit Price: {{ product.price | number_format(2, ',', '.') }}</p>
+                    {% set total_unit = product.price * product.amount %}
+                    <p>Price: {{ total_unit }}</p>
                     <p>Amount: {{ product.amount }}</p>
                 </div>
                 <form class="product-form" method="post">
